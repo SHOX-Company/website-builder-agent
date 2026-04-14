@@ -1,0 +1,54 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 800" width="600" height="800">
+  <defs>
+    <radialGradient id="bloom" cx="50%" cy="28%" r="52%" gradientUnits="objectBoundingBox">
+      <stop offset="0%"   stop-color="#C4973A" stop-opacity="0.22"/>
+      <stop offset="60%"  stop-color="#C4973A" stop-opacity="0.05"/>
+      <stop offset="100%" stop-color="#141410" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="base" cx="50%" cy="50%" r="70%" gradientUnits="objectBoundingBox">
+      <stop offset="0%"   stop-color="#1C1C17"/>
+      <stop offset="100%" stop-color="#0A0A08"/>
+    </radialGradient>
+    <linearGradient id="topVignette" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%"   stop-color="#0A0A08" stop-opacity="0.9"/>
+      <stop offset="25%"  stop-color="#0A0A08" stop-opacity="0"/>
+    </linearGradient>
+    <linearGradient id="bottomVignette" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="70%"  stop-color="#141410" stop-opacity="0"/>
+      <stop offset="100%" stop-color="#141410" stop-opacity="0.95"/>
+    </linearGradient>
+    <clipPath id="roundHead">
+      <circle cx="300" cy="262" r="96"/>
+    </clipPath>
+  </defs>
+
+  <!-- Base dark background -->
+  <rect width="600" height="800" fill="url(#base)"/>
+
+  <!-- Warm gold bloom at portrait zone -->
+  <rect width="600" height="800" fill="url(#bloom)"/>
+
+  <!-- Head silhouette -->
+  <circle cx="300" cy="262" r="96" fill="#111110"/>
+
+  <!-- Neck -->
+  <rect x="272" y="348" width="56" height="52" rx="6" fill="#111110"/>
+
+  <!-- Shoulder / body silhouette -->
+  <path d="M60 800 Q80 570 180 520 Q240 496 300 492 Q360 496 420 520 Q520 570 540 800 Z"
+        fill="#0E0E0C"/>
+
+  <!-- Subtle warm rim light on head (right side) -->
+  <circle cx="300" cy="262" r="96" fill="none"
+          stroke="#C4973A" stroke-width="1" stroke-opacity="0.12"/>
+
+  <!-- Top vignette -->
+  <rect width="600" height="300" fill="url(#topVignette)"/>
+
+  <!-- Bottom vignette -->
+  <rect y="400" width="600" height="400" fill="url(#bottomVignette)"/>
+
+  <!-- Outer frame (barely visible) -->
+  <rect width="600" height="800" fill="none"
+        stroke="#2A2820" stroke-width="1" stroke-opacity="0.6"/>
+</svg>

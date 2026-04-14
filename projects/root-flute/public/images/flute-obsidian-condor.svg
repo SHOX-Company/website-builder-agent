@@ -1,0 +1,101 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 1000" width="800" height="1000">
+  <defs>
+    <radialGradient id="bloom1" cx="32%" cy="48%" r="48%" gradientUnits="objectBoundingBox">
+      <stop offset="0%"   stop-color="#C4973A" stop-opacity="0.20"/>
+      <stop offset="100%" stop-color="#0A0A08" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="bloom2" cx="68%" cy="60%" r="38%" gradientUnits="objectBoundingBox">
+      <stop offset="0%"   stop-color="#C4973A" stop-opacity="0.09"/>
+      <stop offset="100%" stop-color="#0A0A08" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="base" cx="40%" cy="50%" r="75%" gradientUnits="objectBoundingBox">
+      <stop offset="0%"   stop-color="#1A1A14"/>
+      <stop offset="100%" stop-color="#0A0A08"/>
+    </radialGradient>
+    <linearGradient id="fluteBody" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%"   stop-color="#1E1C15"/>
+      <stop offset="50%"  stop-color="#2A2618"/>
+      <stop offset="100%" stop-color="#141210"/>
+    </linearGradient>
+    <linearGradient id="fluteSheen" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%"   stop-color="#C4973A" stop-opacity="0.35"/>
+      <stop offset="40%"  stop-color="#C4973A" stop-opacity="0.08"/>
+      <stop offset="100%" stop-color="#C4973A" stop-opacity="0"/>
+    </linearGradient>
+    <linearGradient id="topFade" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%"  stop-color="#0A0A08" stop-opacity="1"/>
+      <stop offset="20%" stop-color="#0A0A08" stop-opacity="0"/>
+    </linearGradient>
+    <linearGradient id="bottomFade" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="75%" stop-color="#141410" stop-opacity="0"/>
+      <stop offset="100%" stop-color="#141410" stop-opacity="1"/>
+    </linearGradient>
+    <!-- Rotation transform for diagonal flute -->
+    <filter id="softBlur">
+      <feGaussianBlur stdDeviation="1.5"/>
+    </filter>
+  </defs>
+
+  <!-- Base -->
+  <rect width="800" height="1000" fill="url(#base)"/>
+
+  <!-- Gold atmosphere -->
+  <rect width="800" height="1000" fill="url(#bloom1)"/>
+  <rect width="800" height="1000" fill="url(#bloom2)"/>
+
+  <!-- Flute body — long diagonal tube -->
+  <g transform="translate(400,500) rotate(-22) translate(-400,-500)">
+
+    <!-- Shadow beneath flute -->
+    <rect x="88" y="496" width="632" height="32" rx="16" fill="#000" opacity="0.55" filter="url(#softBlur)" transform="translate(0, 14)"/>
+
+    <!-- Main flute body -->
+    <rect x="88" y="482" width="632" height="36" rx="18" fill="url(#fluteBody)"/>
+
+    <!-- Top sheen highlight -->
+    <rect x="88" y="482" width="632" height="18" rx="9" fill="url(#fluteSheen)"/>
+
+    <!-- Mouthpiece cap (left end — wider, obsidian dark) -->
+    <rect x="72" y="476" width="52" height="48" rx="24" fill="#0D0D0A"/>
+    <rect x="72" y="476" width="52" height="48" rx="24"
+          fill="none" stroke="#C4973A" stroke-width="1.2" stroke-opacity="0.4"/>
+
+    <!-- Obsidian inlay at mouthpiece (darkest black) -->
+    <ellipse cx="98" cy="500" rx="14" ry="17" fill="#060605"/>
+    <ellipse cx="98" cy="500" rx="14" ry="17"
+             fill="none" stroke="#C4973A" stroke-width="0.8" stroke-opacity="0.55"/>
+
+    <!-- Tone holes (5 decorative holes along the body) -->
+    <circle cx="250" cy="500" r="5.5" fill="#0A0A08"/>
+    <circle cx="250" cy="500" r="5.5" fill="none" stroke="#C4973A" stroke-width="0.6" stroke-opacity="0.3"/>
+
+    <circle cx="320" cy="500" r="5.5" fill="#0A0A08"/>
+    <circle cx="320" cy="500" r="5.5" fill="none" stroke="#C4973A" stroke-width="0.6" stroke-opacity="0.3"/>
+
+    <circle cx="390" cy="500" r="5.5" fill="#0A0A08"/>
+    <circle cx="390" cy="500" r="5.5" fill="none" stroke="#C4973A" stroke-width="0.6" stroke-opacity="0.3"/>
+
+    <circle cx="460" cy="500" r="5.5" fill="#0A0A08"/>
+    <circle cx="460" cy="500" r="5.5" fill="none" stroke="#C4973A" stroke-width="0.6" stroke-opacity="0.3"/>
+
+    <circle cx="530" cy="500" r="5.5" fill="#0A0A08"/>
+    <circle cx="530" cy="500" r="5.5" fill="none" stroke="#C4973A" stroke-width="0.6" stroke-opacity="0.3"/>
+
+    <!-- Tail end (right) — tapers slightly -->
+    <rect x="692" y="484" width="40" height="32" rx="16" fill="#12110E"/>
+
+    <!-- Outer tube edge highlight -->
+    <rect x="88" y="482" width="632" height="36" rx="18"
+          fill="none" stroke="#C4973A" stroke-width="0.8" stroke-opacity="0.18"/>
+  </g>
+
+  <!-- Top vignette -->
+  <rect width="800" height="220" fill="url(#topFade)"/>
+
+  <!-- Bottom vignette -->
+  <rect y="700" width="800" height="300" fill="url(#bottomFade)"/>
+
+  <!-- Outer border -->
+  <rect width="800" height="1000" fill="none"
+        stroke="#2A2820" stroke-width="1" stroke-opacity="0.5"/>
+</svg>
