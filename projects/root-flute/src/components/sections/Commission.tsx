@@ -124,7 +124,7 @@ export default function Commission() {
           loop
           playsInline
           className="w-full h-full object-cover"
-          src="/video/commission-tusk.mov"
+          src="https://p2pvgplym6odmfbh.public.blob.vercel-storage.com/commission-tusk.mov"
         />
         <div
           aria-hidden="true"

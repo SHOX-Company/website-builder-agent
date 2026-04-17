@@ -29,7 +29,7 @@ export default function SoundJourneys() {
         poster="/images/journey-poster.jpg"
         aria-hidden="true"
         className="absolute inset-0 z-[1] w-full h-full object-cover"
-        src="/video/subhero-flute.mp4"
+        src="https://p2pvgplym6odmfbh.public.blob.vercel-storage.com/subhero-flute.mp4"
       />
 
       {/* === 3. Base overlay + stronger gradient behind text === */}

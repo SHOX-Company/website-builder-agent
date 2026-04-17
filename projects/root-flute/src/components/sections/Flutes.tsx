@@ -119,7 +119,7 @@ export default function Flutes() {
             loop
             playsInline
             className="absolute inset-0 w-full h-full object-cover z-[1]"
-            src="/video/commission-video.mp4"
+            src="https://p2pvgplym6odmfbh.public.blob.vercel-storage.com/commission-video.mp4"
           />
 
           {/* Depth gradient */}

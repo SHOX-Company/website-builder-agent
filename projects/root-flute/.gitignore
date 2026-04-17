@@ -24,8 +24,12 @@
 .DS_Store
 *.pem
 
-# Large raw video files — exclude originals, keep web-optimised versions
+# Large video files — served from Vercel Blob, not committed to repo
 /public/video/hero.MP4
+/public/video/hero-web.mp4
+/public/video/subhero-flute.mp4
+/public/video/commission-video.mp4
+/public/video/commission-tusk.mov
 
 # debug
 npm-debug.log*
@@ -42,3 +46,4 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+.env*.local
