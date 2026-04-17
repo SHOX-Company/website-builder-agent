@@ -3,10 +3,10 @@ import Manifesto from "@/components/sections/Manifesto";
 import Authority from "@/components/sections/Authority";
 import SoundJourneys from "@/components/sections/SoundJourneys";
 import CommunityTiers from "@/components/sections/CommunityTiers";
-import WhoIsItFor from "@/components/sections/WhoIsItFor";
 import Testimonials from "@/components/sections/Testimonials";
 import PrimaryCTA from "@/components/sections/PrimaryCTA";
 import Flutes from "@/components/sections/Flutes";
+import Commission from "@/components/sections/Commission";
 import Footer from "@/components/sections/Footer";
 
 export default function Home() {
@@ -17,10 +17,10 @@ export default function Home() {
       <Authority />
       <SoundJourneys />
       <CommunityTiers />
-      <WhoIsItFor />
       <Testimonials />
       <PrimaryCTA />
       <Flutes />
+      <Commission />
       <Footer />
     </main>
   );

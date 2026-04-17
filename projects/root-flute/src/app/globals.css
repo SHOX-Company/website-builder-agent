@@ -65,6 +65,7 @@ body {
   animation: ambient-drift 24s ease-in-out infinite;
 }
 
+
 /* FAQ / details — suppress default disclosure triangle */
 details summary {
   cursor: pointer;

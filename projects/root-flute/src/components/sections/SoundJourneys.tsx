@@ -29,13 +29,17 @@ export default function SoundJourneys() {
         poster="/images/journey-poster.jpg"
         aria-hidden="true"
         className="absolute inset-0 z-[1] w-full h-full object-cover"
-        src="/video/hero-web.mp4"
+        src="/video/subhero-flute.mp4"
       />
 
-      {/* === 3. Heavy overlay — content legibility over video === */}
+      {/* === 3. Base overlay + stronger gradient behind text === */}
       <div
         aria-hidden="true"
-        className="absolute inset-0 z-[2] bg-black/65"
+        className="absolute inset-0 z-[2] bg-black/60"
+      />
+      <div
+        aria-hidden="true"
+        className="absolute bottom-0 inset-x-0 z-[2] h-[55%] bg-gradient-to-t from-black/80 via-black/40 to-transparent"
       />
 
       {/* === 4. Top + bottom fades for seamless section blending === */}
@@ -50,25 +54,26 @@ export default function SoundJourneys() {
 
       {/* === 5. Content === */}
       <div className="relative z-10 max-w-6xl mx-auto px-6">
-        <div className="max-w-3xl mx-auto text-center flex flex-col items-center gap-10">
+        <div className="max-w-3xl mx-auto text-center flex flex-col items-center">
 
-          <p className="text-brand-gold text-xs uppercase tracking-[0.3em] font-sans">
+          <p className="text-brand-gold text-xs uppercase tracking-[0.3em] font-sans mb-6">
             What You&apos;re Joining
           </p>
 
-          <blockquote className="font-display text-xl sm:text-2xl md:text-3xl font-light italic text-brand-text leading-relaxed">
-            &ldquo;A sound journey is not a performance. It is an invitation — into breath,
-            tone, and the silence between notes. Every session is ceremonial: guided by
+          <p className="text-white font-sans text-base sm:text-lg font-normal leading-[1.85] max-w-xl mb-10">
+            Every month, Daniel leads a live sound journey for community members.
+            These are not recordings you watch at your convenience. They are moments
+            you enter — together, in real time. The flute as guide. Breath as practice.
+            Presence as the whole point.
+          </p>
+
+          <span aria-hidden="true" className="w-16 border-t border-brand-gold/40 mb-10" />
+
+          <blockquote className="font-display text-xl sm:text-2xl md:text-3xl font-light italic text-white leading-relaxed">
+            &ldquo;A sound journey is not a performance. It is an invitation into breath,
+            tone, and the silence between notes. Every session is ceremonial, guided by
             intention, shaped by the instrument, held in community.&rdquo;
           </blockquote>
-
-          <span aria-hidden="true" className="w-16 border-t border-brand-gold/40" />
-
-          <p className="text-brand-muted text-base leading-relaxed max-w-xl">
-            Every month, Dan leads a live sound journey for community members. These are not
-            recordings you watch at your convenience. They are moments you enter — together,
-            in real time. The flute as guide. Breath as practice. Presence as the whole point.
-          </p>
 
         </div>
       </div>

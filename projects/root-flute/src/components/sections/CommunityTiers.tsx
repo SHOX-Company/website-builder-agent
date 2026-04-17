@@ -5,50 +5,41 @@ const tiers = [
   {
     name: "The Root",
     tagline: "Start here. Stay close.",
-    price: "$29.99",
+    price: "$30",
     seats: "200 founding seats",
     cta: "Join The Root →",
     highlighted: false,
     benefits: [
+      "One sound journey per month",
       "Private community access",
-      "Monthly live Q&A with Dan",
-      "Behind-the-scenes feed (2× per week)",
-      "Community technique tips",
-      "Early notice on flute drops",
-      "Member directory",
     ],
   },
   {
     name: "The Studio",
     tagline: "For people who actually play.",
-    price: "$49.99",
+    price: "$50",
     seats: "100 founding seats",
     cta: "Join The Studio →",
     highlighted: true,
     benefits: [
-      "Everything in The Root, plus:",
-      "Weekly live workshop with recording",
-      "Submit-a-video feedback (2× per month)",
-      "Early access to new content",
-      "Studio resource library",
-      "Priority DM reply (48hr SLA)",
-      "Flute drop early access (24hr before Tier 1)",
+      "Two sound journeys per month",
+      "Two live Q&As with Daniel",
+      "Access to coupon codes for select RootFlute offerings",
     ],
   },
   {
     name: "The Circle",
     tagline: "As close as it gets.",
-    price: "$79.99",
+    price: "$80",
     seats: "50 founding seats",
     cta: "Join The Circle →",
     highlighted: false,
     benefits: [
-      "Everything in The Studio, plus:",
-      "Monthly 1:1 or small-group session with Dan",
-      "Direct DM access (72hr SLA)",
-      "Circle-only flute drop window (first access)",
-      "Founding member recognition (permanent)",
-      "Input on flute designs",
+      "Three sound journeys per month",
+      "Three live Q&As with Daniel",
+      "Additional intimate Q&A with Daniel, reserved for Tier 3",
+      "Access to coupon codes for select RootFlute offerings",
+      "Founding member recognition",
     ],
   },
 ];
@@ -63,15 +54,15 @@ export default function CommunityTiers() {
           Choose Your Path
         </p>
         <h2 className="font-display text-4xl sm:text-5xl font-light text-brand-text mb-4">
-          A Community Built Around the Practice
+          Choose your depth.
         </h2>
         <p className="text-brand-muted text-base max-w-xl mx-auto">
-          Founding rates lock in permanently. Once founding seats fill, pricing increases.
+          Each level opens a deeper layer of the same practice.
         </p>
       </div>
 
       {/* Tier grid */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 items-start">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 items-start mb-12">
         {tiers.map((tier) =>
           tier.highlighted ? (
             /* Elevated / Most Popular card */
@@ -155,6 +146,11 @@ export default function CommunityTiers() {
           )
         )}
       </div>
+
+      {/* Closing anchor */}
+      <p className="text-center font-display text-2xl sm:text-3xl font-light italic text-brand-text/80 tracking-wide mt-20 max-w-2xl mx-auto leading-snug">
+        Each level opens a deeper layer of the same practice.
+      </p>
 
     </SectionWrapper>
   );
