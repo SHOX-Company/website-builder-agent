@@ -21,31 +21,14 @@ const STEPS = [
 
 export default function Commission() {
   const [muted, setMuted] = useState(true);
-  const videoRef    = useRef<HTMLVideoElement>(null);
-  const audioCtxRef = useRef<AudioContext | null>(null);
-  const gainNodeRef = useRef<GainNode | null>(null);
-  const srcCreated  = useRef(false);
+  const videoRef = useRef<HTMLVideoElement>(null);
 
   function toggleAudio() {
     if (!videoRef.current) return;
     const next = !muted;
     videoRef.current.muted = next;
     if (!next) {
-      // Wire Web Audio API gain boost once per element lifecycle
-      if (!srcCreated.current) {
-        const ctx    = new AudioContext();
-        const source = ctx.createMediaElementSource(videoRef.current);
-        const gain   = ctx.createGain();
-        gain.gain.value = 6.0;
-        source.connect(gain);
-        gain.connect(ctx.destination);
-        audioCtxRef.current = ctx;
-        gainNodeRef.current = gain;
-        srcCreated.current  = true;
-      }
-      audioCtxRef.current?.resume();
       videoRef.current.volume = 1.0;
-      videoRef.current.currentTime = 0;
       videoRef.current.play();
     }
     setMuted(next);
