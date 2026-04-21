@@ -5,8 +5,6 @@ import SoundJourneys from "@/components/sections/SoundJourneys";
 import CommunityTiers from "@/components/sections/CommunityTiers";
 import Testimonials from "@/components/sections/Testimonials";
 import PrimaryCTA from "@/components/sections/PrimaryCTA";
-import Flutes from "@/components/sections/Flutes";
-import Commission from "@/components/sections/Commission";
 import Footer from "@/components/sections/Footer";
 
 export default function Home() {
@@ -19,8 +17,6 @@ export default function Home() {
       <CommunityTiers />
       <Testimonials />
       <PrimaryCTA />
-      <Flutes />
-      <Commission />
       <Footer />
     </main>
   );
