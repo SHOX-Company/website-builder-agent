@@ -17,11 +17,11 @@ export default function PrimaryCTA() {
         </p>
 
         <h2 className="font-display text-5xl sm:text-6xl font-light text-brand-text leading-tight">
-          The rate you join at is the rate you keep. Forever.
+          The price you join at is the price you keep. Forever.
         </h2>
 
-        <p className="text-brand-muted text-sm uppercase tracking-widest">
-          [X] of 350 founding seats remaining
+        <p className="text-brand-muted text-base">
+          Founding membership is limited. When the seats are gone, the rate goes up.
         </p>
 
         <Button href="#community" size="lg" variant="primary">
@@ -29,7 +29,7 @@ export default function PrimaryCTA() {
         </Button>
 
         <p className="text-brand-muted text-xs">
-          Month-to-month. Cancel anytime. Founding rate locked for life.
+          $35/month. Cancel anytime. Founding rate locked for life.
         </p>
 
       </div>

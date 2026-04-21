@@ -30,7 +30,7 @@ export default function Hero() {
         playsInline
         aria-hidden="true"
         className="absolute inset-0 z-[1] w-full h-full object-cover origin-center animate-[hero-scale_20s_ease-in-out_infinite_alternate]"
-        src="https://p2pvgplym6odmfbh.public.blob.vercel-storage.com/hero-web.mp4"
+        src="https://p2pvgplym6odmfbh.public.blob.vercel-storage.com/subhero-flute.mp4"
       />
 
       {/* === 4. Gradient overlay — stabilizes readability across all video frames === */}
