@@ -20,10 +20,10 @@ export const metadata: Metadata = {
     siteName: "RootFlute",
     images: [
       {
-        url: "/images/daniel-portrait.jpg",
+        url: "/images/og-flutes.jpg",
         width: 1200,
         height: 630,
-        alt: "Daniel with handcrafted antler flute — lake and mountains backdrop",
+        alt: "Daniel on dock holding rare antler flute — mountains and lake backdrop",
       },
     ],
     type: "website",
@@ -33,7 +33,7 @@ export const metadata: Metadata = {
     title: "RootFlute | Rare Handcrafted Instruments",
     description:
       "One-of-one ceremonial flutes carved from ancient Woolly Mammoth tusk by master craftsman Daniel. Rare instruments for collectors, healers, and those called to sacred sound.",
-    images: ["/images/daniel-portrait.jpg"],
+    images: ["/images/og-flutes.jpg"],
   },
 };
 

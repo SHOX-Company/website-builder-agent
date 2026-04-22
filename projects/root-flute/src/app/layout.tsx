@@ -32,10 +32,10 @@ export const metadata: Metadata = {
     siteName: "RootFlute",
     images: [
       {
-        url: "/images/daniel-portrait.jpg",
+        url: "/images/og-community.jpg",
         width: 1200,
         height: 630,
-        alt: "Daniel with handcrafted antler flute — lake and mountains backdrop",
+        alt: "Daniel playing ceremonial flute in sacred sound journey — RootFlute Community",
       },
     ],
     type: "website",
@@ -45,7 +45,7 @@ export const metadata: Metadata = {
     title: "RootFlute | Sacred Sound Community with Daniel",
     description:
       "Join Daniel's private community for sound healers, flute players, and seekers of sacred music. Founding seats now open for RootFlute Sound Journeys.",
-    images: ["/images/daniel-portrait.jpg"],
+    images: ["/images/og-community.jpg"],
   },
 };
 
