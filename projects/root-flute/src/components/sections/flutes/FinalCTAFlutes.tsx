@@ -45,11 +45,8 @@ export default function FinalCTAFlutes() {
         </p>
 
         <div className="flex flex-col sm:flex-row gap-4 items-center justify-center flex-wrap">
-          <Button href="#current-drop" variant="secondary" size="lg">
-            View Current Offering
-          </Button>
           <Button href="#current-drop" variant="primary" size="lg">
-            Claim This Instrument →
+            View Current Offering →
           </Button>
         </div>
 

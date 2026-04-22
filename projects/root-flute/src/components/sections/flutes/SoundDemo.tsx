@@ -56,8 +56,8 @@ export default function SoundDemo() {
           Twenty years of mastery shaped by hand.
         </p>
 
-        <Button href="#acquire" variant="primary" size="lg">
-          Claim This Instrument →
+        <Button href="#current-drop" variant="primary" size="lg">
+          View Current Offering →
         </Button>
 
       </div>
