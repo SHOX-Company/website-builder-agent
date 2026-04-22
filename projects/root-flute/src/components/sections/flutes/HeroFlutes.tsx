@@ -50,21 +50,13 @@ export default function HeroFlutes() {
           Handcrafted ceremonial instruments built for depth, resonance, and presence.
         </p>
 
-        <div className="flex flex-col sm:flex-row gap-4 items-center">
-          <Button
-            href="#current-drop"
-            size="lg"
-            className="hover:scale-105 hover:brightness-110 active:scale-100 transition-all duration-200 ease-out"
-          >
-            View Current Offering →
-          </Button>
-          <a
-            href="#sound-demo"
-            className="text-brand-gold border border-brand-gold/60 text-sm uppercase tracking-[0.3em] font-sans px-8 py-4 hover:bg-brand-gold hover:text-brand-dark transition-colors duration-200"
-          >
-            Hear the Sound
-          </a>
-        </div>
+        <Button
+          href="#current-drop"
+          size="lg"
+          className="hover:scale-105 hover:brightness-110 active:scale-100 transition-all duration-200 ease-out"
+        >
+          View Current Offering →
+        </Button>
 
         {/* Micro-copy accent */}
         <div className="flex flex-col items-center gap-2 pt-2">

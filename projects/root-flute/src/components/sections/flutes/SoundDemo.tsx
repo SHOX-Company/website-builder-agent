@@ -1,23 +1,6 @@
-"use client";
-
-import { useState, useRef } from "react";
 import Button from "@/components/ui/Button";
 
 export default function SoundDemo() {
-  const [muted, setMuted] = useState(true);
-  const videoRef = useRef<HTMLVideoElement>(null);
-
-  function toggleAudio() {
-    if (!videoRef.current) return;
-    const next = !muted;
-    videoRef.current.muted = next;
-    if (!next) {
-      videoRef.current.volume = 1.0;
-      videoRef.current.play();
-    }
-    setMuted(next);
-  }
-
   return (
     <section id="sound-demo" className="relative overflow-hidden py-36">
 
@@ -28,9 +11,8 @@ export default function SoundDemo() {
         className="absolute inset-0 z-0 bg-[radial-gradient(ellipse_80%_60%_at_50%_50%,rgba(196,151,58,0.05),transparent)] animate-ambient-drift"
       />
 
-      {/* Video — elk footage (temporary, same as hero) */}
+      {/* Video — elk footage */}
       <video
-        ref={videoRef}
         autoPlay
         muted
         loop
@@ -74,22 +56,8 @@ export default function SoundDemo() {
           Twenty years of mastery shaped by hand.
         </p>
 
-        <div className="flex flex-col items-center gap-3">
-          <button
-            onClick={toggleAudio}
-            className="border border-brand-gold/70 text-brand-gold text-sm uppercase tracking-[0.3em] font-sans px-8 py-4 hover:bg-brand-gold hover:text-brand-dark transition-colors duration-200 bg-brand-dark/40 backdrop-blur-sm"
-          >
-            {muted ? "▶  Unmute — Hear the Flute" : "⏸  Mute"}
-          </button>
-          {muted && (
-            <p className="text-brand-muted/60 text-xs font-sans uppercase tracking-widest">
-              Tap to experience the sound
-            </p>
-          )}
-        </div>
-
-        <Button href="#acquire" variant="primary" size="lg" className="mt-2">
-          Own This Sound →
+        <Button href="#acquire" variant="primary" size="lg">
+          Claim This Instrument →
         </Button>
 
       </div>
