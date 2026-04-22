@@ -8,9 +8,33 @@ import FinalCTAFlutes from "@/components/sections/flutes/FinalCTAFlutes";
 import Footer from "@/components/sections/Footer";
 
 export const metadata: Metadata = {
+  metadataBase: new URL("https://root-flute.vercel.app"),
   title: "RootFlute | Rare Handcrafted Instruments",
   description:
     "One-of-one ceremonial flutes carved from ancient Woolly Mammoth tusk by master craftsman Daniel. Rare instruments for collectors, healers, and those called to sacred sound.",
+  openGraph: {
+    title: "RootFlute | Rare Handcrafted Instruments",
+    description:
+      "One-of-one ceremonial flutes carved from ancient Woolly Mammoth tusk by master craftsman Daniel. Rare instruments for collectors, healers, and those called to sacred sound.",
+    url: "https://root-flute.vercel.app/flutes",
+    siteName: "RootFlute",
+    images: [
+      {
+        url: "/images/daniel-portrait.jpg",
+        width: 1200,
+        height: 630,
+        alt: "Daniel with handcrafted antler flute — lake and mountains backdrop",
+      },
+    ],
+    type: "website",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "RootFlute | Rare Handcrafted Instruments",
+    description:
+      "One-of-one ceremonial flutes carved from ancient Woolly Mammoth tusk by master craftsman Daniel. Rare instruments for collectors, healers, and those called to sacred sound.",
+    images: ["/images/daniel-portrait.jpg"],
+  },
 };
 
 export default function FlutesPage() {
