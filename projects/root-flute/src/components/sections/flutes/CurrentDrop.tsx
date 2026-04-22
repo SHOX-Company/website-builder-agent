@@ -169,9 +169,9 @@ export default function CurrentDrop() {
             <Button href="#acquire" variant="primary" size="lg" className="self-start">
               Claim This Instrument →
             </Button>
-            <Button href="#acquire" variant="secondary" size="md" className="self-start">
-              Inquire Privately
-            </Button>
+            <p className="text-brand-muted/60 text-xs font-sans">
+              Serious inquiries handled personally.
+            </p>
           </div>
 
         </div>
