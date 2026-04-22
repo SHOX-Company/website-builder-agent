@@ -42,7 +42,7 @@ export default function Hero() {
 
       {/* === 5. Content === */}
       <div className="relative z-10 max-w-2xl mx-auto px-6 text-center flex flex-col items-center gap-8">
-        <p className="text-brand-gold text-xl sm:text-2xl uppercase tracking-[0.25em] sm:tracking-[0.35em] font-sans font-medium [text-shadow:0_0_28px_rgba(196,151,58,0.35),0_2px_12px_rgba(0,0,0,0.95)]">
+        <p className="text-brand-gold text-2xl sm:text-3xl font-display font-normal [text-shadow:0_0_28px_rgba(196,151,58,0.35),0_2px_12px_rgba(0,0,0,0.95)]">
           RootFlute Sound Journeys
         </p>
 

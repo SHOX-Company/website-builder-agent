@@ -3,8 +3,8 @@ export default function Footer() {
     <footer className="bg-brand-surface border-t border-brand-border py-14">
       <div className="max-w-6xl mx-auto px-6 flex flex-col items-center gap-6 text-center">
 
-        <span className="font-display text-xl font-light text-brand-text">
-          RootFlute
+        <span className="font-display text-2xl font-normal text-brand-text">
+          Root<span className="text-brand-gold">Flute</span>
         </span>
 
         <p className="text-brand-muted text-xs uppercase tracking-widest">

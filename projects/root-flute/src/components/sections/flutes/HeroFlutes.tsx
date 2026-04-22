@@ -36,7 +36,7 @@ export default function HeroFlutes() {
       {/* Content */}
       <div className="relative z-10 max-w-3xl mx-auto px-6 text-center flex flex-col items-center gap-8">
 
-        <p className="text-brand-gold text-xl sm:text-2xl uppercase tracking-[0.25em] sm:tracking-[0.35em] font-sans font-medium [text-shadow:0_0_28px_rgba(196,151,58,0.35),0_2px_12px_rgba(0,0,0,0.95)]">
+        <p className="text-brand-gold text-3xl sm:text-4xl font-display font-normal [text-shadow:0_0_28px_rgba(196,151,58,0.35),0_2px_12px_rgba(0,0,0,0.95)]">
           RootFlute
         </p>
 

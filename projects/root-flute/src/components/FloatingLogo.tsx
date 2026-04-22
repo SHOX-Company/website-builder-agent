@@ -21,9 +21,8 @@ export default function FloatingLogo() {
         pastHero ? "opacity-100" : "opacity-100 sm:opacity-100"
       }`}
     >
-      <span className="font-display text-brand-text text-2xl sm:text-3xl font-light tracking-wide [text-shadow:0_2px_10px_rgba(0,0,0,0.75)]">
-        Root{" "}
-        <span className="text-brand-gold">Flute</span>
+      <span className="font-display text-brand-text text-3xl sm:text-4xl font-normal [text-shadow:0_2px_10px_rgba(0,0,0,0.75)]">
+        Root<span className="text-brand-gold">Flute</span>
       </span>
     </a>
   );
