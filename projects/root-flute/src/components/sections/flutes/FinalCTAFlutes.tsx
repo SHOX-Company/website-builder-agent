@@ -50,13 +50,6 @@ export default function FinalCTAFlutes() {
           </Button>
         </div>
 
-        <a
-          href="mailto:dan@rootflute.com"
-          className="text-brand-muted hover:text-brand-gold text-sm font-sans uppercase tracking-[0.3em] transition-colors duration-200"
-        >
-          Inquire Privately →
-        </a>
-
         <p className="text-brand-muted/50 text-xs">
           Only 25 Woolly Mammoth tusks remain. Each acquisition is handled personally by Daniel.
         </p>

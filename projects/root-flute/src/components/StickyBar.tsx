@@ -37,12 +37,6 @@ export default function StickyBar() {
               <p className="text-brand-gold font-semibold text-sm sm:hidden">
                 One instrument available now.
               </p>
-              <a
-                href="#acquire"
-                className="inline-flex items-center justify-center px-5 py-2.5 text-sm font-bold bg-brand-gold text-brand-dark hover:bg-brand-gold-light transition-colors duration-200 flex-shrink-0"
-              >
-                Claim This Instrument →
-              </a>
             </>
           ) : (
             <>

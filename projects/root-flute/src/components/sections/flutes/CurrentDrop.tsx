@@ -3,7 +3,6 @@
 import { useState, useRef, useEffect } from "react";
 import Image from "next/image";
 import SectionWrapper from "@/components/ui/SectionWrapper";
-import Button from "@/components/ui/Button";
 
 const GALLERY = [
   { src: "/images/commission-1.jpg", alt: "Woolly Mammoth tusk — raw material" },
@@ -19,7 +18,13 @@ const GALLERY = [
 export default function CurrentDrop() {
   const [muted, setMuted] = useState(true);
   const [lightbox, setLightbox] = useState<number | null>(null);
+  const [claimPending, setClaimPending] = useState(false);
   const videoRef = useRef<HTMLVideoElement>(null);
+
+  function handleClaim() {
+    setClaimPending(true);
+    setTimeout(() => setClaimPending(false), 2200);
+  }
 
   function toggleAudio() {
     if (!videoRef.current) return;
@@ -157,9 +162,13 @@ export default function CurrentDrop() {
             <span className="inline-block border border-brand-border text-brand-muted text-xs uppercase tracking-widest px-4 py-2 self-start">
               Extremely Limited &nbsp;·&nbsp; One Available Now
             </span>
-            <Button href="#acquire" variant="primary" size="lg" className="self-start">
-              Claim This Instrument →
-            </Button>
+            <button
+              type="button"
+              onClick={handleClaim}
+              className="inline-flex items-center justify-center font-semibold transition-colors duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-gold bg-brand-gold text-brand-dark hover:bg-brand-gold-light px-8 py-4 text-lg self-start"
+            >
+              {claimPending ? "Available Soon →" : "Claim This Instrument →"}
+            </button>
             <p className="text-brand-muted/60 text-xs font-sans">
               Serious acquisition handled personally.
             </p>
