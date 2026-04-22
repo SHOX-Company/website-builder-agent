@@ -8,7 +8,7 @@ import FinalCTAFlutes from "@/components/sections/flutes/FinalCTAFlutes";
 import Footer from "@/components/sections/Footer";
 
 export const metadata: Metadata = {
-  title: "Root Flute | Rare Handcrafted Instruments",
+  title: "RootFlute | Rare Handcrafted Instruments",
   description:
     "One-of-one ceremonial flutes carved from ancient Woolly Mammoth tusk by master craftsman Daniel. Rare instruments for collectors, healers, and those called to sacred sound.",
 };

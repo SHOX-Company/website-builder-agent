@@ -16,7 +16,7 @@ export default function FloatingLogo() {
   return (
     <a
       href="#"
-      aria-label="Root Flute — scroll to top"
+      aria-label="RootFlute — scroll to top"
       className={`fixed top-0 left-0 z-50 p-6 transition-opacity duration-500 ${
         pastHero ? "opacity-100" : "opacity-100 sm:opacity-100"
       }`}

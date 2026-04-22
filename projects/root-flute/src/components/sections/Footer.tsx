@@ -4,7 +4,7 @@ export default function Footer() {
       <div className="max-w-6xl mx-auto px-6 flex flex-col items-center gap-6 text-center">
 
         <span className="font-display text-xl font-light text-brand-text">
-          Root Flute
+          RootFlute
         </span>
 
         <p className="text-brand-muted text-xs uppercase tracking-widest">
@@ -29,7 +29,7 @@ export default function Footer() {
         </nav>
 
         <p className="text-brand-muted text-xs">
-          © 2026 Root Flute. All rights reserved.
+          © 2026 RootFlute. All rights reserved.
         </p>
 
       </div>

@@ -90,7 +90,7 @@ export default function Commission() {
         </h2>
         <p className="text-brand-muted text-base leading-relaxed max-w-xl mx-auto mb-5">
           Each instrument is shaped by hand, from ancient materials,
-          for a single owner. One-of-one, built personally by Dan
+          for a single owner. One-of-one, built personally by Daniel
           with intention for ceremonial or personal use.
         </p>
         <p className="text-brand-gold text-xs uppercase tracking-[0.3em] font-sans">
@@ -179,7 +179,7 @@ export default function Commission() {
                 Thank you.
               </p>
               <p className="text-brand-muted text-sm leading-relaxed">
-                Your application has been received. Dan reviews each request
+                Your application has been received. Daniel reviews each request
                 personally and will be in touch if there is alignment.
               </p>
             </div>
@@ -261,7 +261,7 @@ export default function Commission() {
                     name="notes"
                     value={form.notes}
                     onChange={handleChange}
-                    placeholder="Materials, tuning preferences, timeline, or anything else you want Dan to know."
+                    placeholder="Materials, tuning preferences, timeline, or anything else you want Daniel to know."
                     rows={4}
                     className={inputClass() + " resize-none"}
                   />

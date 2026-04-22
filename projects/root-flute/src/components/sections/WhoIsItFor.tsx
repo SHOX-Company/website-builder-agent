@@ -1,7 +1,7 @@
 import SectionWrapper from "@/components/ui/SectionWrapper";
 
 const statements = [
-  "You've followed Dan for years and feel called to go deeper.",
+  "You've followed Daniel for years and feel called to go deeper.",
   "You play flute — or are beginning — and want direct feedback and community.",
   "Sound healing is a serious practice for you, not a hobby.",
   "You want access to live sessions, not just recorded content.",

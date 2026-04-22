@@ -81,7 +81,7 @@ export default function Flutes() {
           Flutes are born, not made.
         </h2>
         <p className="text-brand-muted text-base leading-relaxed max-w-2xl mx-auto">
-          Each instrument is handcrafted by Dan — one at a time. Released as drops,
+          Each instrument is handcrafted by Daniel — one at a time. Released as drops,
           not in a permanent shop. When one is ready, it finds its owner. Circle members
           receive access before anyone else.
         </p>
@@ -99,7 +99,7 @@ export default function Flutes() {
           */}
           <Image
             src="/images/flute-obsidian-condor.svg"
-            alt="The Obsidian Condor — handcrafted cedar flute by Dan"
+            alt="The Obsidian Condor — handcrafted cedar flute by Daniel"
             fill
             unoptimized
             className="object-cover object-center"
@@ -109,7 +109,7 @@ export default function Flutes() {
 
           {/*
             Video loop.
-            Replace src with /video/flute-loop.mp4 when Dan provides final footage.
+            Replace src with /video/flute-loop.mp4 when Daniel provides final footage.
             Currently using hero-web.mp4 as a stand-in.
           */}
           <video

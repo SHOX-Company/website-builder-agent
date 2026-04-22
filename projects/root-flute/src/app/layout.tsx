@@ -20,9 +20,9 @@ const cormorant = Cormorant_Garamond({
 });
 
 export const metadata: Metadata = {
-  title: "Root Flute | Sacred Sound Community with Dan",
+  title: "RootFlute | Sacred Sound Community with Daniel",
   description:
-    "Join Dan's private community for sound healers, flute players, and seekers of sacred music. Founding seats now open for Root Flute Sound Journeys.",
+    "Join Daniel's private community for sound healers, flute players, and seekers of sacred music. Founding seats now open for RootFlute Sound Journeys.",
 };
 
 export default function RootLayout({
