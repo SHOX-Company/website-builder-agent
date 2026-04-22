@@ -11,7 +11,9 @@ const DISPLAYED_BENEFITS = [
 
 export default function CommunityTiers() {
   return (
-    <SectionWrapper id="community" className="bg-brand-surface-2">
+    <SectionWrapper className="bg-brand-surface-2">
+      {/* Scroll target: sits inside content so CTA lands with heading visible below FloatingLogo */}
+      <div id="community" className="scroll-mt-20 sm:scroll-mt-24" />
 
       {/* Header */}
       <div className="text-center mb-16">
