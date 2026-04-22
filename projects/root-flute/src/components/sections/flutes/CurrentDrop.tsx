@@ -56,7 +56,9 @@ export default function CurrentDrop() {
   }, [lightbox]);
 
   return (
-    <SectionWrapper id="current-drop" className="bg-brand-surface-2">
+    <SectionWrapper className="bg-brand-surface-2">
+      {/* Scroll target: sits inside content area so CTA lands with heading visible below FloatingLogo */}
+      <div id="current-drop" className="scroll-mt-20 sm:scroll-mt-24" />
 
       {/* Header */}
       <div className="text-center mb-14">
