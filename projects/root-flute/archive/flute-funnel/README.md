@@ -23,6 +23,7 @@ High-conversion flute sales landing page optimized for:
 
 | Folder | Contents |
 |--------|----------|
+| `components/` | `Authority-craftsman.tsx` — "The Craftsman" section: gold-frame portrait, craftsman bio, flute-builder credentials, stats row |
 | `components/` | `Flutes.tsx` — rare instruments drop showcase with gallery lightbox + audio toggle |
 | `components/` | `Commission.tsx` — custom commission section with process flow, video, and application form |
 | `copy/` | `flute-copy.md` — all headlines, body copy, CTAs, and UX copy for both sections |
@@ -35,6 +36,17 @@ High-conversion flute sales landing page optimized for:
 ## Components Ready to Reuse
 
 Both components are fully built in React/Next.js with Tailwind CSS and the existing brand token system.
+
+**Authority-craftsman.tsx** — "The Craftsman" section featuring:
+- Two-column layout: gold-frame portrait (left) + editorial copy (right)
+- Gold frame: complex inline gradient border + inner inset shadow treatment
+- Portrait: `/images/daniel-portrait.jpg`, object-position `50% 48%`
+- Eyebrow: "The Craftsman"
+- Headline: "Daniel doesn't manufacture flutes. He listens for them."
+- Subhead: "Each instrument begins long before the first cut — in the material itself."
+- Body: Woolly mammoth tusk + elk antler craftsmanship — hand-shaping, one-of-one positioning
+- Stats row (3): `430k+ Followers`, `20+ Years of the Craft`, `100+ Flutes Built`
+- Brand tokens: `bg-brand-surface-2`, gold frame via inline `background: linear-gradient(...)`, `boxShadow`
 
 **Flutes.tsx** — Drop showcase featuring:
 - Two-column layout: video panel (audio toggle) + product specs panel
