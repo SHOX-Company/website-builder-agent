@@ -132,10 +132,7 @@ export default function CurrentDrop() {
               Ancient Tusk &nbsp;·&nbsp; Hand-Carved &nbsp;·&nbsp; One of One
             </p>
 
-            <p className="text-brand-gold/70 text-xs font-sans leading-relaxed">
-              Woolly Mammoth tusk preserved beneath Arctic permafrost for 10,000+ years.
-            </p>
-            <p className="text-brand-muted/60 text-xs font-sans italic -mt-2">
+            <p className="text-brand-muted/60 text-xs font-sans italic">
               A material the world stopped producing when the Ice Age ended.
             </p>
 
@@ -153,12 +150,6 @@ export default function CurrentDrop() {
 
             <p className="font-display text-4xl font-light text-brand-text">
               $15,000
-            </p>
-            <p className="text-brand-muted text-sm leading-relaxed -mt-2">
-              One Woolly Mammoth Tusk Flute available now.
-            </p>
-            <p className="text-brand-gold/50 text-xs font-sans uppercase tracking-[0.3em]">
-              Hand-tuned resonance.
             </p>
           </div>
 
