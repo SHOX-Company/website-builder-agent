@@ -5,14 +5,10 @@ import Image from "next/image";
 import SectionWrapper from "@/components/ui/SectionWrapper";
 
 const GALLERY = [
-  { src: "/images/commission-1.jpg", alt: "Woolly Mammoth tusk — raw material" },
-  { src: "/images/commission-2.jpg", alt: "Woolly Mammoth tusk — grain detail" },
-  { src: "/images/commission-3.jpg", alt: "Woolly Mammoth tusk — texture" },
-  { src: "/images/commission-4.jpg", alt: "Woolly Mammoth tusk — close-up" },
-  { src: "/images/commission-5.jpg", alt: "Woolly Mammoth tusk — surface" },
-  { src: "/images/commission-6.jpg", alt: "Woolly Mammoth tusk — cross-section" },
-  { src: "/images/commission-7.jpg", alt: "Woolly Mammoth tusk — mouthpiece area" },
-  { src: "/images/commission-8.jpg", alt: "Woolly Mammoth tusk — full form" },
+  { src: "/images/flute-1-full.png",       alt: "Antler flute on natural stand — full instrument" },
+  { src: "/images/flute-2-detail.png",      alt: "Crystal mouthpiece and carved wood — craftsmanship detail" },
+  { src: "/images/flute-3-angle.png",       alt: "Antler flute — alternate angle showing finger holes" },
+  { src: "/images/flute-4-mouthpiece.png",  alt: "Mouthpiece assembly — teal wrap and crystal inlay" },
 ];
 
 export default function CurrentDrop() {
@@ -82,8 +78,8 @@ export default function CurrentDrop() {
         <div className="relative aspect-[3/4] lg:aspect-auto min-h-[500px] overflow-hidden bg-brand-dark">
 
           <Image
-            src="/images/commission-1.jpg"
-            alt="Woolly Mammoth tusk — ancient material"
+            src="/images/flute-1-full.png"
+            alt="Antler flute on natural stand — full instrument"
             fill
             unoptimized
             className="object-cover object-center"
@@ -182,7 +178,7 @@ export default function CurrentDrop() {
       {/* Gallery strip */}
       <div
         className="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-10"
-        aria-label="Woolly Mammoth tusk gallery"
+        aria-label="Instrument gallery"
       >
         {GALLERY.map(({ src, alt }, i) => (
           <button
