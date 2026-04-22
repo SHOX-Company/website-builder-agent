@@ -132,11 +132,17 @@ export default function CurrentDrop() {
               Ancient Tusk &nbsp;·&nbsp; Hand-Carved &nbsp;·&nbsp; One of One
             </p>
 
+            <p className="text-brand-gold/70 text-xs font-sans leading-relaxed">
+              Woolly Mammoth tusk preserved beneath Arctic permafrost for 10,000+ years.
+            </p>
+            <p className="text-brand-muted/60 text-xs font-sans italic -mt-2">
+              A material the world stopped producing when the Ice Age ended.
+            </p>
+
             <p className="text-brand-muted text-sm leading-relaxed mt-1">
-              Preserved beneath Arctic permafrost for over 10,000 years, Woolly Mammoth tusk
-              carries a density, warmth, and resonance that no living material can replicate.
-              Shaped slowly by hand — no two pieces are ever the same. What emerges is not
-              just an instrument, but a voice from deep time.
+              Shaped slowly by hand in response to the material itself — no two pieces
+              are ever the same. What emerges is not just an instrument, but a voice
+              from deep time.
             </p>
 
             <div className="pt-4 border-t border-brand-border">
@@ -150,6 +156,9 @@ export default function CurrentDrop() {
             </p>
             <p className="text-brand-muted text-xs leading-relaxed -mt-2">
               Depending on tusk grade, size, and complexity. Each acquisition is handled personally.
+            </p>
+            <p className="text-brand-gold/50 text-xs font-sans uppercase tracking-[0.3em]">
+              Hand-tuned resonance.
             </p>
           </div>
 

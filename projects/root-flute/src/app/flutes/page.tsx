@@ -1,7 +1,6 @@
 import type { Metadata } from "next";
 import HeroFlutes from "@/components/sections/flutes/HeroFlutes";
 import CurrentDrop from "@/components/sections/flutes/CurrentDrop";
-import WhyDifferent from "@/components/sections/flutes/WhyDifferent";
 import CraftsmanAuthority from "@/components/sections/flutes/CraftsmanAuthority";
 import SoundDemo from "@/components/sections/flutes/SoundDemo";
 import FluteFAQ from "@/components/sections/flutes/FluteFAQ";
@@ -19,7 +18,6 @@ export default function FlutesPage() {
     <main>
       <HeroFlutes />
       <CurrentDrop />
-      <WhyDifferent />
       <CraftsmanAuthority />
       <SoundDemo />
       <FluteFAQ />

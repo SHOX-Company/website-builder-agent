@@ -40,6 +40,10 @@ export default function FinalCTAFlutes() {
           something irreplaceable.
         </p>
 
+        <p className="font-display text-3xl sm:text-4xl font-light italic text-brand-gold/75">
+          Impossible to replicate.
+        </p>
+
         <div className="flex flex-col sm:flex-row gap-4 items-center justify-center flex-wrap">
           <Button href="#current-drop" variant="secondary" size="lg">
             View Current Offering

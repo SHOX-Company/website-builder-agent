@@ -66,6 +66,16 @@ export default function HeroFlutes() {
           </a>
         </div>
 
+        {/* Micro-copy accent */}
+        <div className="flex flex-col items-center gap-2 pt-2">
+          <p className="text-white/40 text-xs font-sans uppercase tracking-[0.35em]">
+            No forest. No farm. No factory.
+          </p>
+          <p className="text-brand-gold/60 text-xs font-sans uppercase tracking-widest">
+            One instrument available now.
+          </p>
+        </div>
+
       </div>
 
       {/* Bottom fade */}

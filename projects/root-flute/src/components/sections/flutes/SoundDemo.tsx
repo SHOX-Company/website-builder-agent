@@ -70,6 +70,10 @@ export default function SoundDemo() {
           before the mind can name what it is.
         </p>
 
+        <p className="font-display text-xl sm:text-2xl font-light italic text-brand-text/55">
+          Twenty years of mastery shaped by hand.
+        </p>
+
         <div className="flex flex-col items-center gap-3">
           <button
             onClick={toggleAudio}
