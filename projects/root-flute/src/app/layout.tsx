@@ -3,6 +3,7 @@ import { Inter, Cormorant_Garamond } from "next/font/google";
 import "./globals.css";
 import FloatingLogo from "@/components/FloatingLogo";
 import StickyBar from "@/components/StickyBar";
+import ScrollReset from "@/components/ScrollReset";
 
 const inter = Inter({
   variable: "--font-inter",
@@ -35,6 +36,7 @@ export default function RootLayout({
       className={`${inter.variable} ${cormorant.variable} scroll-smooth`}
     >
       <body className="bg-brand-dark text-brand-text antialiased">
+        <ScrollReset />
         <FloatingLogo />
         {children}
         <StickyBar />
