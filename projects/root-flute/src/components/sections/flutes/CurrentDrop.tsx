@@ -16,6 +16,23 @@ export default function CurrentDrop() {
   const [lightbox, setLightbox] = useState<number | null>(null);
   const [claimPending, setClaimPending] = useState(false);
   const videoRef = useRef<HTMLVideoElement>(null);
+  const touchStartX = useRef<number>(0);
+
+  function handleTouchStart(e: React.TouchEvent) {
+    touchStartX.current = e.touches[0].clientX;
+  }
+
+  function handleTouchEnd(e: React.TouchEvent) {
+    const delta = e.changedTouches[0].clientX - touchStartX.current;
+    if (Math.abs(delta) < 50) return;
+    setLightbox((p) =>
+      p !== null
+        ? delta < 0
+          ? (p + 1) % GALLERY.length
+          : (p - 1 + GALLERY.length) % GALLERY.length
+        : 0
+    );
+  }
 
   function handleClaim() {
     setClaimPending(true);
@@ -212,6 +229,8 @@ export default function CurrentDrop() {
         <div
           className="fixed inset-0 z-50 bg-black/92 flex items-center justify-center p-6"
           onClick={() => setLightbox(null)}
+          onTouchStart={handleTouchStart}
+          onTouchEnd={handleTouchEnd}
           role="dialog"
           aria-modal="true"
           aria-label="Image viewer"
@@ -238,32 +257,16 @@ export default function CurrentDrop() {
             />
           </div>
 
-          <div className="absolute bottom-8 left-1/2 -translate-x-1/2 flex items-center gap-8">
-            <button
-              onClick={(e) => {
-                e.stopPropagation();
-                setLightbox((p) =>
-                  p !== null ? (p - 1 + GALLERY.length) % GALLERY.length : 0
-                );
-              }}
-              className="text-brand-muted hover:text-brand-text text-xs uppercase tracking-[0.3em] font-sans transition-colors duration-200"
-            >
-              ← Prev
-            </button>
-            <span className="text-brand-border text-xs font-sans tabular-nums">
-              {lightbox + 1} / {GALLERY.length}
-            </span>
-            <button
-              onClick={(e) => {
-                e.stopPropagation();
-                setLightbox((p) =>
-                  p !== null ? (p + 1) % GALLERY.length : 0
-                );
-              }}
-              className="text-brand-muted hover:text-brand-text text-xs uppercase tracking-[0.3em] font-sans transition-colors duration-200"
-            >
-              Next →
-            </button>
+          {/* Position dots — replaces button controls */}
+          <div className="absolute bottom-8 left-1/2 -translate-x-1/2 flex items-center gap-2">
+            {GALLERY.map((_, i) => (
+              <span
+                key={i}
+                className={`block w-1.5 h-1.5 rounded-full transition-colors duration-200 ${
+                  i === lightbox ? "bg-brand-gold" : "bg-brand-muted/40"
+                }`}
+              />
+            ))}
           </div>
         </div>
       )}
