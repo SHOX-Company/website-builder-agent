@@ -151,11 +151,11 @@ export default function CurrentDrop() {
               </p>
             </div>
 
-            <p className="font-display text-3xl font-light text-brand-text">
-              $3,000 – $20,000+
+            <p className="font-display text-4xl font-light text-brand-text">
+              $15,000
             </p>
-            <p className="text-brand-muted text-xs leading-relaxed -mt-2">
-              Depending on tusk grade, size, and complexity. Each acquisition is handled personally.
+            <p className="text-brand-muted text-sm leading-relaxed -mt-2">
+              One Woolly Mammoth Tusk Flute available now.
             </p>
             <p className="text-brand-gold/50 text-xs font-sans uppercase tracking-[0.3em]">
               Hand-tuned resonance.
@@ -170,7 +170,7 @@ export default function CurrentDrop() {
               Claim This Instrument →
             </Button>
             <p className="text-brand-muted/60 text-xs font-sans">
-              Serious inquiries handled personally.
+              Serious acquisition handled personally.
             </p>
           </div>
 
