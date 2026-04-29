@@ -39,17 +39,28 @@ export default function CurrentDrop() {
     setTimeout(() => setClaimPending(false), 2200);
   }
 
-  function toggleAudio() {
-    if (!videoRef.current) return;
-    const next = !muted;
-    videoRef.current.muted = next;
-    if (!next) {
-      videoRef.current.volume = 0.6;
-      videoRef.current.currentTime = 0;
-      videoRef.current.play();
+  function handleListen() {
+    const v = videoRef.current;
+    if (!v) return;
+    if (muted) {
+      v.currentTime = 0;
+      v.muted = false;
+      v.volume = 0.6;
+      v.play().catch(() => {});
+      setMuted(false);
+    } else {
+      v.muted = true;
+      setMuted(true);
     }
-    setMuted(next);
   }
+
+  useEffect(() => {
+    const v = videoRef.current;
+    if (v) {
+      v.muted = true;
+      v.play().catch(() => {});
+    }
+  }, []);
 
   useEffect(() => {
     if (lightbox === null) return;
@@ -108,20 +119,24 @@ export default function CurrentDrop() {
             ref={videoRef}
             autoPlay
             muted
-            loop
             playsInline
+            loop
+            preload="auto"
+            disablePictureInPicture
+            controls={false}
             className="absolute inset-0 w-full h-full object-cover z-[1]"
-            src="https://p2pvgplym6odmfbh.public.blob.vercel-storage.com/commission-video.mp4"
-          />
+          >
+            <source src="/video/commission-web.mp4" type="video/mp4" />
+          </video>
 
           <div
             aria-hidden="true"
-            className="absolute inset-0 z-[2] bg-gradient-to-t from-brand-dark/75 via-transparent to-transparent"
+            className="absolute inset-0 z-[2] bg-gradient-to-t from-brand-dark/75 via-transparent to-transparent pointer-events-none"
           />
 
           <div className="absolute bottom-0 inset-x-0 z-[3] p-6 flex flex-col items-start gap-2">
             <button
-              onClick={toggleAudio}
+              onClick={handleListen}
               className="border border-brand-gold/70 text-brand-gold text-xs uppercase tracking-[0.3em] font-sans px-5 py-2.5 hover:bg-brand-gold hover:text-brand-dark transition-colors duration-200 bg-brand-dark/40 backdrop-blur-sm"
             >
               {muted ? "Listen to the Flute" : "Mute"}

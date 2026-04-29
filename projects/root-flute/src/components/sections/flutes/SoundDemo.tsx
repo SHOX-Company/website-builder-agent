@@ -1,6 +1,19 @@
+"use client";
+
+import { useRef, useEffect } from "react";
 import Button from "@/components/ui/Button";
 
 export default function SoundDemo() {
+  const videoRef = useRef<HTMLVideoElement>(null);
+
+  useEffect(() => {
+    const v = videoRef.current;
+    if (v) {
+      v.muted = true;
+      v.play().catch(() => {});
+    }
+  }, []);
+
   return (
     <section id="sound-demo" className="relative overflow-hidden py-36">
 
@@ -13,14 +26,19 @@ export default function SoundDemo() {
 
       {/* Video — elk footage */}
       <video
+        ref={videoRef}
         autoPlay
         muted
-        loop
         playsInline
+        loop
+        preload="auto"
+        disablePictureInPicture
+        controls={false}
         aria-hidden="true"
         className="absolute inset-0 z-[1] w-full h-full object-cover"
-        src="https://p2pvgplym6odmfbh.public.blob.vercel-storage.com/hero-web.mp4"
-      />
+      >
+        <source src="/video/hero-web-fs.mp4" type="video/mp4" />
+      </video>
 
       {/* Overlays */}
       <div aria-hidden="true" className="absolute inset-0 z-[2] bg-black/68" />

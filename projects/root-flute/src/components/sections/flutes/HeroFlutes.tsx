@@ -1,6 +1,19 @@
+"use client";
+
+import { useRef, useEffect } from "react";
 import Button from "@/components/ui/Button";
 
 export default function HeroFlutes() {
+  const videoRef = useRef<HTMLVideoElement>(null);
+
+  useEffect(() => {
+    const v = videoRef.current;
+    if (v) {
+      v.muted = true;
+      v.play().catch(() => {});
+    }
+  }, []);
+
   return (
     <section className="relative min-h-screen flex flex-col items-center justify-center overflow-hidden">
 
@@ -18,14 +31,19 @@ export default function HeroFlutes() {
 
       {/* Hero video — elk/Daniel footage */}
       <video
+        ref={videoRef}
         autoPlay
         muted
-        loop
         playsInline
+        loop
+        preload="auto"
+        disablePictureInPicture
+        controls={false}
         aria-hidden="true"
         className="absolute inset-0 z-[1] w-full h-full object-cover origin-center animate-[hero-scale_20s_ease-in-out_infinite_alternate]"
-        src="https://p2pvgplym6odmfbh.public.blob.vercel-storage.com/hero-web.mp4"
-      />
+      >
+        <source src="/video/hero-web-fs.mp4" type="video/mp4" />
+      </video>
 
       {/* Gradient overlay */}
       <div
