@@ -38,7 +38,7 @@ const PIECES: Piece[] = [
     description:
       "A single pearl — luminous, still, singular. Not decorative. Worn by the one who has learned to hold clarity in a world of noise. This piece is quiet in the way that still water is quiet. It carries something.",
     materials: "Natural pearl · Handcrafted setting · One of one",
-    price: "$1,800",
+    price: "$4,600",
     priceLabel: "Acquisition price",
     images: [{ src: "/images/jewelry/pearl-vision-1.png", alt: "Pearl of Vision — ceremonial pearl adornment" }],
     layout: "left",
@@ -52,7 +52,7 @@ const PIECES: Piece[] = [
     description:
       "Born from the light between dusk and night — the color of something neither here nor there. The lavender holds a quality the eye recognizes before the mind does. An adornment for those who exist at the threshold.",
     materials: "Handcrafted setting · Natural stones · One of one",
-    price: "$2,400",
+    price: "$1,200",
     priceLabel: "Acquisition price",
     images: [
       { src: "/images/jewelry/lavender-pendant-1.png", alt: "Lavender Moonrise — ceremonial adornment" },
@@ -68,7 +68,7 @@ const PIECES: Piece[] = [
     description:
       "There are pieces that protect and pieces that see. This is both. A moody, powerful artifact — not a decoration but an intention made physical. For the one who moves through the unseen with awareness and without fear.",
     materials: "Handcrafted setting · Natural stones · One of one",
-    price: "$3,200",
+    price: "$1,700",
     priceLabel: "Acquisition price",
     images: [
       { src: "/images/jewelry/eye-of-the-dragon-2.png", alt: "Eye of Dragon — ceremonial adornment" },
