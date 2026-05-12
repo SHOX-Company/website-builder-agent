@@ -22,7 +22,7 @@ export default function HeroJewelry() {
           ═══════════════════════════════════════════════════════ */}
       <div
         aria-hidden="true"
-        className="absolute left-1/2 -translate-x-1/2 top-[16%] sm:top-[13%] z-[1] w-[88%] sm:w-[64%] h-[52%] sm:h-[58%] pointer-events-none"
+        className="absolute left-1/2 -translate-x-1/2 top-[16%] sm:top-[13%] lg:top-[8%] z-[1] w-[88%] sm:w-[64%] lg:w-[88%] h-[52%] sm:h-[58%] lg:h-[82%] pointer-events-none"
       >
         <Image
           src="/images/jewelry/pendant-array-1.png"

@@ -245,7 +245,7 @@ function InstrumentCard({
             fill
             unoptimized
             priority={instrument.id === "triton-violin"}
-            className="object-contain object-center transition-transform duration-700 group-hover:scale-[1.02]"
+            className="object-cover object-center transition-transform duration-700 group-hover:scale-[1.02]"
             sizes="(max-width: 1024px) 100vw, 50vw"
           />
           <div
