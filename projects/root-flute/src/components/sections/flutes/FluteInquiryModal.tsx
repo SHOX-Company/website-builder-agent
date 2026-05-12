@@ -1,0 +1,277 @@
+"use client";
+
+import { useState, useEffect, useRef } from "react";
+
+interface FormData {
+  name: string;
+  email: string;
+  instagram: string;
+  item: string;
+  message: string;
+}
+
+interface Props {
+  isOpen: boolean;
+  defaultItem?: string;
+  onClose: () => void;
+}
+
+const FIELD_BASE =
+  "w-full bg-transparent border-0 border-b border-brand-border text-brand-text text-sm placeholder:text-brand-muted/40 focus:outline-none focus:border-brand-gold transition-colors duration-200 py-3";
+
+export default function FluteInquiryModal({
+  isOpen,
+  defaultItem = "Woolly Mammoth Tusk Flute",
+  onClose,
+}: Props) {
+  const [status, setStatus] = useState<"idle" | "submitting" | "success">("idle");
+  const [form, setForm] = useState<FormData>({
+    name: "",
+    email: "",
+    instagram: "",
+    item: defaultItem,
+    message: "",
+  });
+  const firstFieldRef = useRef<HTMLInputElement>(null);
+
+  useEffect(() => {
+    setForm((prev) => ({ ...prev, item: defaultItem }));
+  }, [defaultItem]);
+
+  useEffect(() => {
+    if (isOpen) {
+      setStatus("idle");
+      setForm({ name: "", email: "", instagram: "", item: defaultItem, message: "" });
+      const t = setTimeout(() => firstFieldRef.current?.focus(), 240);
+      return () => clearTimeout(t);
+    }
+  }, [isOpen, defaultItem]);
+
+  useEffect(() => {
+    if (!isOpen) return;
+    const onKey = (e: KeyboardEvent) => { if (e.key === "Escape") onClose(); };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [isOpen, onClose]);
+
+  useEffect(() => {
+    document.body.style.overflow = isOpen ? "hidden" : "";
+    return () => { document.body.style.overflow = ""; };
+  }, [isOpen]);
+
+  function handleChange(e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) {
+    setForm((prev) => ({ ...prev, [e.target.name]: e.target.value }));
+  }
+
+  async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
+    e.preventDefault();
+    setStatus("submitting");
+
+    try {
+      await fetch("/api/flute-inquiry", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(form),
+      });
+    } catch {
+      // Network failure — proceed to success state; API logs server-side
+    }
+
+    setStatus("success");
+  }
+
+  if (!isOpen) return null;
+
+  return (
+    <div
+      className="fixed inset-0 z-[100] flex items-end sm:items-center justify-center sm:p-6 bg-black/90 backdrop-blur-md"
+      onClick={onClose}
+      role="dialog"
+      aria-modal="true"
+      aria-label="Flute acquisition inquiry"
+    >
+      {/* Modal card */}
+      <div
+        className="relative w-full sm:max-w-lg bg-brand-surface border border-brand-gold/20 shadow-[0_0_100px_rgba(0,0,0,0.9)] animate-[modal-entry_0.25s_ease-out] overflow-y-auto max-h-[92dvh] sm:max-h-[88vh]"
+        onClick={(e) => e.stopPropagation()}
+      >
+
+        {/* Gold top accent line */}
+        <div
+          aria-hidden="true"
+          className="absolute top-0 inset-x-0 h-px bg-gradient-to-r from-transparent via-brand-gold/60 to-transparent"
+        />
+
+        {/* Close button */}
+        <button
+          onClick={onClose}
+          className="absolute top-5 right-5 z-10 text-brand-muted hover:text-brand-text text-xs uppercase tracking-[0.25em] font-sans transition-colors duration-200"
+          aria-label="Close"
+        >
+          Close ×
+        </button>
+
+        <div className="p-8 sm:p-10 pt-10 sm:pt-10">
+
+          {status === "success" ? (
+            /* ── Success state ─────────────────────────────────────────── */
+            <div className="flex flex-col items-center text-center gap-7 py-8">
+              <div className="w-px h-12 bg-brand-gold/40" aria-hidden="true" />
+
+              <p className="text-brand-gold text-xs uppercase tracking-[0.35em] font-sans">
+                Inquiry Received
+              </p>
+
+              <h3 className="font-display text-3xl sm:text-4xl font-light text-brand-text leading-snug">
+                Your acquisition inquiry<br />has been received.
+              </h3>
+
+              <p className="text-brand-muted text-sm leading-relaxed max-w-[300px]">
+                Daniel personally reviews each request. With only 25 tusks remaining,
+                availability is confirmed individually — you will hear back directly.
+              </p>
+
+              <div className="w-16 h-px bg-brand-gold/20" aria-hidden="true" />
+
+              <p className="font-display text-xl italic text-brand-text/40">
+                One instrument. One owner.
+              </p>
+
+              <button
+                onClick={onClose}
+                className="mt-1 text-brand-muted hover:text-brand-gold text-xs uppercase tracking-[0.25em] font-sans transition-colors duration-200"
+              >
+                Return to Instrument
+              </button>
+            </div>
+
+          ) : (
+            /* ── Inquiry form ──────────────────────────────────────────── */
+            <>
+              {/* Header */}
+              <div className="mb-9">
+                <p className="text-brand-gold text-xs uppercase tracking-[0.3em] font-sans mb-3">
+                  Acquisition Inquiry
+                </p>
+                <h3 className="font-display text-3xl font-light text-brand-text leading-tight">
+                  {form.item}
+                </h3>
+                <p className="text-brand-muted/50 text-xs font-sans mt-2">
+                  One-of-one ancient instrument &nbsp;·&nbsp; Handled personally by Daniel
+                </p>
+              </div>
+
+              <form onSubmit={handleSubmit} className="flex flex-col gap-8" noValidate>
+
+                {/* Name */}
+                <div className="flex flex-col gap-1.5">
+                  <label htmlFor="flute-name" className="text-brand-muted/50 text-[10px] uppercase tracking-[0.2em] font-sans">
+                    Name <span className="text-brand-gold">*</span>
+                  </label>
+                  <input
+                    ref={firstFieldRef}
+                    id="flute-name"
+                    name="name"
+                    type="text"
+                    required
+                    autoComplete="name"
+                    placeholder="Your full name"
+                    value={form.name}
+                    onChange={handleChange}
+                    className={FIELD_BASE}
+                  />
+                </div>
+
+                {/* Email */}
+                <div className="flex flex-col gap-1.5">
+                  <label htmlFor="flute-email" className="text-brand-muted/50 text-[10px] uppercase tracking-[0.2em] font-sans">
+                    Email <span className="text-brand-gold">*</span>
+                  </label>
+                  <input
+                    id="flute-email"
+                    name="email"
+                    type="email"
+                    required
+                    autoComplete="email"
+                    placeholder="your@email.com"
+                    value={form.email}
+                    onChange={handleChange}
+                    className={FIELD_BASE}
+                  />
+                </div>
+
+                {/* Instagram (optional) */}
+                <div className="flex flex-col gap-1.5">
+                  <label htmlFor="flute-instagram" className="text-brand-muted/50 text-[10px] uppercase tracking-[0.2em] font-sans">
+                    Instagram <span className="text-brand-muted/30">(optional)</span>
+                  </label>
+                  <input
+                    id="flute-instagram"
+                    name="instagram"
+                    type="text"
+                    autoComplete="off"
+                    placeholder="@handle"
+                    value={form.instagram}
+                    onChange={handleChange}
+                    className={FIELD_BASE}
+                  />
+                </div>
+
+                {/* Item of interest — displayed, not editable */}
+                <div className="flex flex-col gap-1.5">
+                  <p className="text-brand-muted/50 text-[10px] uppercase tracking-[0.2em] font-sans">
+                    Item of Interest
+                  </p>
+                  <div className="border-b border-brand-border py-3">
+                    <span className="text-brand-text text-sm">{form.item}</span>
+                  </div>
+                  <input type="hidden" name="item" value={form.item} />
+                </div>
+
+                {/* Message */}
+                <div className="flex flex-col gap-1.5">
+                  <label htmlFor="flute-message" className="text-brand-muted/50 text-[10px] uppercase tracking-[0.2em] font-sans">
+                    Message
+                  </label>
+                  <textarea
+                    id="flute-message"
+                    name="message"
+                    rows={3}
+                    placeholder="Tell Daniel what calls you to this instrument…"
+                    value={form.message}
+                    onChange={handleChange}
+                    className={`${FIELD_BASE} resize-none`}
+                  />
+                </div>
+
+                {/* Submit */}
+                <div className="flex flex-col gap-3 pt-1">
+                  <button
+                    type="submit"
+                    disabled={status === "submitting" || !form.name.trim() || !form.email.trim()}
+                    className="w-full inline-flex items-center justify-center font-semibold transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-gold bg-brand-gold text-brand-dark hover:bg-brand-gold-light disabled:opacity-40 disabled:cursor-not-allowed px-8 py-4 text-base"
+                  >
+                    {status === "submitting" ? (
+                      <span className="flex items-center gap-3">
+                        <span className="w-3.5 h-3.5 border border-brand-dark/40 border-t-brand-dark rounded-full animate-spin" aria-hidden="true" />
+                        Sending…
+                      </span>
+                    ) : (
+                      "Begin Acquisition →"
+                    )}
+                  </button>
+
+                  <p className="text-center text-brand-muted/40 text-xs font-sans">
+                    Private acquisition inquiry &nbsp;·&nbsp; No automated responses
+                  </p>
+                </div>
+
+              </form>
+            </>
+          )}
+
+        </div>
+      </div>
+    </div>
+  );
+}

@@ -3,6 +3,7 @@
 import { useState, useRef, useEffect } from "react";
 import Image from "next/image";
 import SectionWrapper from "@/components/ui/SectionWrapper";
+import FluteInquiryModal from "./FluteInquiryModal";
 
 const GALLERY = [
   { src: "/images/flute-1-full.png",       alt: "Antler flute on natural stand — full instrument" },
@@ -14,7 +15,7 @@ const GALLERY = [
 export default function CurrentDrop() {
   const [muted, setMuted] = useState(true);
   const [lightbox, setLightbox] = useState<number | null>(null);
-  const [claimPending, setClaimPending] = useState(false);
+  const [modalOpen, setModalOpen] = useState(false);
   const videoRef = useRef<HTMLVideoElement>(null);
   const touchStartX = useRef<number>(0);
 
@@ -32,11 +33,6 @@ export default function CurrentDrop() {
           : (p - 1 + GALLERY.length) % GALLERY.length
         : 0
     );
-  }
-
-  function handleClaim() {
-    setClaimPending(true);
-    setTimeout(() => setClaimPending(false), 2200);
   }
 
   function handleListen() {
@@ -80,6 +76,7 @@ export default function CurrentDrop() {
   }, [lightbox]);
 
   return (
+    <>
     <SectionWrapper className="bg-brand-surface-2">
       {/* Scroll target: sits inside content area so CTA lands with heading visible below FloatingLogo */}
       <div id="current-drop" className="scroll-mt-20 sm:scroll-mt-24" />
@@ -194,13 +191,13 @@ export default function CurrentDrop() {
             </span>
             <button
               type="button"
-              onClick={handleClaim}
+              onClick={() => setModalOpen(true)}
               className="inline-flex items-center justify-center font-semibold transition-colors duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-gold bg-brand-gold text-brand-dark hover:bg-brand-gold-light px-8 py-4 text-lg self-start"
             >
-              {claimPending ? "Available Soon →" : "Claim This Instrument →"}
+              Claim This Instrument →
             </button>
             <p className="text-brand-muted/60 text-xs font-sans">
-              Serious acquisition handled personally.
+              Private acquisition inquiry &nbsp;·&nbsp; Handled personally by Daniel
             </p>
           </div>
 
@@ -287,5 +284,12 @@ export default function CurrentDrop() {
       )}
 
     </SectionWrapper>
+
+      <FluteInquiryModal
+        isOpen={modalOpen}
+        defaultItem="Woolly Mammoth Tusk Flute"
+        onClose={() => setModalOpen(false)}
+      />
+    </>
   );
 }
