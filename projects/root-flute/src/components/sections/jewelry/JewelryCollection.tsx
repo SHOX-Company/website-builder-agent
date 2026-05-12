@@ -21,6 +21,8 @@ interface Piece {
   tagline: string;
   description: string;
   materials: string;
+  price: string;
+  priceLabel: string;
   images: { src: string; alt: string }[];
   layout: "left" | "right";
   status: PieceStatus;
@@ -36,6 +38,8 @@ const PIECES: Piece[] = [
     description:
       "A single pearl — luminous, still, singular. Not decorative. Worn by the one who has learned to hold clarity in a world of noise. This piece is quiet in the way that still water is quiet. It carries something.",
     materials: "Natural pearl · Handcrafted setting · One of one",
+    price: "$1,800",
+    priceLabel: "Acquisition price",
     images: [{ src: "/images/jewelry/pearl-of-vision-1.png", alt: "Pearl of Vision — ceremonial pearl adornment" }],
     layout: "left",
     status: "inquiry",
@@ -48,6 +52,8 @@ const PIECES: Piece[] = [
     description:
       "Born from the light between dusk and night — the color of something neither here nor there. Two views of the same piece. The lavender holds a quality the eye recognizes before the mind does. An adornment for those who exist at the threshold.",
     materials: "Handcrafted setting · Natural stones · One of one",
+    price: "$2,400",
+    priceLabel: "Acquisition price",
     images: [
       { src: "/images/jewelry/lavender-moonrise-1.png", alt: "Lavender Moonrise — ceremonial adornment, first view" },
       { src: "/images/jewelry/lavender-moonrise-2.png", alt: "Lavender Moonrise — ceremonial adornment, second view" },
@@ -63,6 +69,8 @@ const PIECES: Piece[] = [
     description:
       "There are pieces that protect and pieces that see. This is both. A moody, powerful artifact — not a decoration but an intention made physical. For the one who moves through the unseen with awareness and without fear.",
     materials: "Handcrafted setting · Natural stones · One of one",
+    price: "$3,200",
+    priceLabel: "Acquisition price",
     images: [
       { src: "/images/jewelry/eye-of-dragon-1.png", alt: "Eye of Dragon — ceremonial adornment, first view" },
       { src: "/images/jewelry/eye-of-dragon-2.png", alt: "Eye of Dragon — ceremonial adornment, second view" },
@@ -71,6 +79,20 @@ const PIECES: Piece[] = [
     status: "inquiry",
   },
 ];
+
+// ─── Price anchor — luxury gallery typography ────────────────────────────────
+function PriceAnchor({ price, priceLabel }: { price: string; priceLabel: string }) {
+  return (
+    <div className="flex flex-col gap-1">
+      <p className="text-brand-muted/40 text-[10px] uppercase tracking-[0.25em] font-sans">
+        {priceLabel}
+      </p>
+      <p className="font-display text-4xl font-light text-brand-text">
+        {price}
+      </p>
+    </div>
+  );
+}
 
 // ─── CTA block — driven by piece status ─────────────────────────────────────
 function PieceCTA({
@@ -95,52 +117,61 @@ function PieceCTA({
 
   if (piece.status === "reserved") {
     return (
-      <div className="flex flex-col gap-3">
-        <span className="inline-block border border-brand-gold/30 text-brand-gold/50 text-xs uppercase tracking-widest px-4 py-2 self-start">
-          Reserved &nbsp;·&nbsp; Pending Acquisition
-        </span>
-        <p className="text-brand-muted/40 text-xs font-sans">
-          An acquisition is in progress for this piece.
-        </p>
+      <div className="flex flex-col gap-5">
+        <PriceAnchor price={piece.price} priceLabel={piece.priceLabel} />
+        <div className="flex flex-col gap-3">
+          <span className="inline-block border border-brand-gold/30 text-brand-gold/50 text-xs uppercase tracking-widest px-4 py-2 self-start">
+            Reserved &nbsp;·&nbsp; Pending Acquisition
+          </span>
+          <p className="text-brand-muted/40 text-xs font-sans">
+            An acquisition is in progress for this piece.
+          </p>
+        </div>
       </div>
     );
   }
 
   if (piece.status === "checkout" && piece.stripeUrl) {
     return (
-      <div className="flex flex-col gap-4">
-        <span className="inline-block border border-brand-border text-brand-muted text-xs uppercase tracking-widest px-4 py-2 self-start">
-          Available Now &nbsp;·&nbsp; One of One
-        </span>
-        <a
-          href={piece.stripeUrl}
-          className="inline-flex items-center justify-center font-semibold transition-colors duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-gold bg-brand-gold text-brand-dark hover:bg-brand-gold-light px-8 py-4 text-base self-start"
-        >
-          Purchase This Piece →
-        </a>
-        <p className="text-brand-muted/50 text-xs font-sans">
-          Secure checkout &nbsp;·&nbsp; Direct acquisition
-        </p>
+      <div className="flex flex-col gap-5">
+        <PriceAnchor price={piece.price} priceLabel={piece.priceLabel} />
+        <div className="flex flex-col gap-4">
+          <span className="inline-block border border-brand-border text-brand-muted text-xs uppercase tracking-widest px-4 py-2 self-start">
+            Available Now &nbsp;·&nbsp; One of One
+          </span>
+          <a
+            href={piece.stripeUrl}
+            className="inline-flex items-center justify-center font-semibold transition-colors duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-gold bg-brand-gold text-brand-dark hover:bg-brand-gold-light px-8 py-4 text-base self-start"
+          >
+            Purchase This Piece →
+          </a>
+          <p className="text-brand-muted/50 text-xs font-sans">
+            Secure checkout &nbsp;·&nbsp; Direct acquisition
+          </p>
+        </div>
       </div>
     );
   }
 
   // Default: "inquiry"
   return (
-    <div className="flex flex-col gap-4">
-      <span className="inline-block border border-brand-border text-brand-muted text-xs uppercase tracking-widest px-4 py-2 self-start">
-        Available Now &nbsp;·&nbsp; One of One
-      </span>
-      <button
-        type="button"
-        onClick={() => onAcquire(piece.name)}
-        className="inline-flex items-center justify-center font-semibold transition-colors duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-gold bg-brand-gold text-brand-dark hover:bg-brand-gold-light px-8 py-4 text-base self-start"
-      >
-        Acquire This Piece →
-      </button>
-      <p className="text-brand-muted/50 text-xs font-sans">
-        Private acquisition inquiry &nbsp;·&nbsp; Handled personally by Daniel
-      </p>
+    <div className="flex flex-col gap-5">
+      <PriceAnchor price={piece.price} priceLabel={piece.priceLabel} />
+      <div className="flex flex-col gap-4">
+        <span className="inline-block border border-brand-border text-brand-muted text-xs uppercase tracking-widest px-4 py-2 self-start">
+          Available Now &nbsp;·&nbsp; One of One
+        </span>
+        <button
+          type="button"
+          onClick={() => onAcquire(piece.name)}
+          className="inline-flex items-center justify-center font-semibold transition-colors duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-gold bg-brand-gold text-brand-dark hover:bg-brand-gold-light px-8 py-4 text-base self-start"
+        >
+          Acquire This Piece →
+        </button>
+        <p className="text-brand-muted/50 text-xs font-sans">
+          Private acquisition inquiry &nbsp;·&nbsp; Handled personally by Daniel
+        </p>
+      </div>
     </div>
   );
 }

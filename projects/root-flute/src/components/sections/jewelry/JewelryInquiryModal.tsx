@@ -2,14 +2,6 @@
 
 import { useState, useEffect, useRef } from "react";
 
-// ─── Form submission endpoint ───────────────────────────────────────────────
-// Wire this to Formspree, Web3Forms, or a Next.js API route when ready.
-// Formspree:  https://formspree.io/f/YOUR_FORM_ID
-// Web3Forms:  https://api.web3forms.com/submit  (add { access_key: "..." })
-// Next.js:    /api/jewelry-inquiry
-const INQUIRY_ENDPOINT = "";
-// ────────────────────────────────────────────────────────────────────────────
-
 interface FormData {
   name: string;
   email: string;
@@ -38,23 +30,19 @@ export default function JewelryInquiryModal({ isOpen, defaultPiece, onClose }: P
   });
   const firstFieldRef = useRef<HTMLInputElement>(null);
 
-  // Sync piece when defaultPiece changes (different card opens modal)
   useEffect(() => {
     setForm((prev) => ({ ...prev, piece: defaultPiece }));
   }, [defaultPiece]);
 
-  // Reset form state when modal opens
   useEffect(() => {
     if (isOpen) {
       setStatus("idle");
       setForm({ name: "", email: "", instagram: "", piece: defaultPiece, message: "" });
-      // Focus first field after entry animation settles
-      const t = setTimeout(() => firstFieldRef.current?.focus(), 220);
+      const t = setTimeout(() => firstFieldRef.current?.focus(), 240);
       return () => clearTimeout(t);
     }
   }, [isOpen, defaultPiece]);
 
-  // ESC to close
   useEffect(() => {
     if (!isOpen) return;
     const onKey = (e: KeyboardEvent) => { if (e.key === "Escape") onClose(); };
@@ -62,7 +50,6 @@ export default function JewelryInquiryModal({ isOpen, defaultPiece, onClose }: P
     return () => window.removeEventListener("keydown", onKey);
   }, [isOpen, onClose]);
 
-  // Prevent body scroll while open
   useEffect(() => {
     document.body.style.overflow = isOpen ? "hidden" : "";
     return () => { document.body.style.overflow = ""; };
@@ -72,24 +59,20 @@ export default function JewelryInquiryModal({ isOpen, defaultPiece, onClose }: P
     setForm((prev) => ({ ...prev, [e.target.name]: e.target.value }));
   }
 
-  async function handleSubmit(e: React.FormEvent) {
+  async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
     setStatus("submitting");
 
-    if (INQUIRY_ENDPOINT) {
-      try {
-        await fetch(INQUIRY_ENDPOINT, {
-          method: "POST",
-          headers: { "Content-Type": "application/json", Accept: "application/json" },
-          body: JSON.stringify(form),
-        });
-      } catch {
-        // Submission attempt recorded — proceed to success state regardless
-      }
+    try {
+      await fetch("/api/jewelry-inquiry", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(form),
+      });
+    } catch {
+      // Network failure — proceed to success state; API logs server-side
     }
 
-    // Brief pause for perceived intentionality, then success
-    await new Promise((r) => setTimeout(r, 900));
     setStatus("success");
   }
 
@@ -97,7 +80,7 @@ export default function JewelryInquiryModal({ isOpen, defaultPiece, onClose }: P
 
   return (
     <div
-      className="fixed inset-0 z-[100] flex items-center justify-center p-4 sm:p-6 bg-black/85 backdrop-blur-sm"
+      className="fixed inset-0 z-[100] flex items-end sm:items-center justify-center sm:p-6 bg-black/90 backdrop-blur-md"
       onClick={onClose}
       role="dialog"
       aria-modal="true"
@@ -105,53 +88,54 @@ export default function JewelryInquiryModal({ isOpen, defaultPiece, onClose }: P
     >
       {/* Modal card */}
       <div
-        className="relative w-full max-w-lg bg-brand-surface border border-brand-gold/20 shadow-[0_0_80px_rgba(0,0,0,0.8)] animate-[modal-entry_0.22s_ease-out]"
+        className="relative w-full sm:max-w-lg bg-brand-surface border border-brand-gold/20 shadow-[0_0_100px_rgba(0,0,0,0.9)] animate-[modal-entry_0.25s_ease-out] overflow-y-auto max-h-[92dvh] sm:max-h-[88vh]"
         onClick={(e) => e.stopPropagation()}
       >
 
         {/* Gold top accent line */}
         <div
           aria-hidden="true"
-          className="absolute top-0 inset-x-0 h-px bg-gradient-to-r from-transparent via-brand-gold/50 to-transparent"
+          className="absolute top-0 inset-x-0 h-px bg-gradient-to-r from-transparent via-brand-gold/60 to-transparent"
         />
 
         {/* Close button */}
         <button
           onClick={onClose}
-          className="absolute top-5 right-5 text-brand-muted hover:text-brand-text text-xs uppercase tracking-[0.25em] font-sans transition-colors duration-200"
+          className="absolute top-5 right-5 z-10 text-brand-muted hover:text-brand-text text-xs uppercase tracking-[0.25em] font-sans transition-colors duration-200"
           aria-label="Close"
         >
           Close ×
         </button>
 
-        <div className="p-8 sm:p-10">
+        <div className="p-8 sm:p-10 pt-10 sm:pt-10">
 
           {status === "success" ? (
             /* ── Success state ─────────────────────────────────────────── */
-            <div className="flex flex-col items-center text-center gap-6 py-6">
-              <div className="w-px h-10 bg-brand-gold/50" aria-hidden="true" />
+            <div className="flex flex-col items-center text-center gap-7 py-8">
+              <div className="w-px h-12 bg-brand-gold/40" aria-hidden="true" />
 
-              <p className="text-brand-gold text-xs uppercase tracking-[0.3em] font-sans">
+              <p className="text-brand-gold text-xs uppercase tracking-[0.35em] font-sans">
                 Inquiry Received
               </p>
 
               <h3 className="font-display text-3xl sm:text-4xl font-light text-brand-text leading-snug">
-                Your request has been received.
+                Your acquisition inquiry<br />has been received.
               </h3>
 
-              <p className="text-brand-muted text-sm leading-relaxed max-w-xs">
-                Daniel personally reviews all acquisition inquiries. You will hear back directly.
+              <p className="text-brand-muted text-sm leading-relaxed max-w-[300px]">
+                Daniel personally reviews each request. Due to the one-of-one nature of these pieces,
+                availability is not guaranteed until confirmed.
               </p>
 
-              <div className="w-px h-6 bg-brand-border" aria-hidden="true" />
+              <div className="w-16 h-px bg-brand-gold/20" aria-hidden="true" />
 
-              <p className="font-display text-lg italic text-brand-text/50">
-                Thank you for reaching out.
+              <p className="font-display text-xl italic text-brand-text/40">
+                You will hear back directly.
               </p>
 
               <button
                 onClick={onClose}
-                className="mt-2 text-brand-muted hover:text-brand-gold text-xs uppercase tracking-[0.25em] font-sans transition-colors duration-200"
+                className="mt-1 text-brand-muted hover:text-brand-gold text-xs uppercase tracking-[0.25em] font-sans transition-colors duration-200"
               >
                 Return to Collection
               </button>
@@ -161,22 +145,22 @@ export default function JewelryInquiryModal({ isOpen, defaultPiece, onClose }: P
             /* ── Inquiry form ──────────────────────────────────────────── */
             <>
               {/* Header */}
-              <div className="mb-8">
+              <div className="mb-9">
                 <p className="text-brand-gold text-xs uppercase tracking-[0.3em] font-sans mb-3">
                   Acquisition Inquiry
                 </p>
                 <h3 className="font-display text-3xl font-light text-brand-text leading-tight">
                   {defaultPiece || "Private Acquisition"}
                 </h3>
-                <p className="text-brand-muted/60 text-xs font-sans mt-2">
+                <p className="text-brand-muted/50 text-xs font-sans mt-2">
                   One-of-one ceremonial artifact &nbsp;·&nbsp; Handled personally by Daniel
                 </p>
               </div>
 
-              <form onSubmit={handleSubmit} className="flex flex-col gap-7" noValidate>
+              <form onSubmit={handleSubmit} className="flex flex-col gap-8" noValidate>
 
                 {/* Name */}
-                <div className="flex flex-col gap-1">
+                <div className="flex flex-col gap-1.5">
                   <label htmlFor="inq-name" className="text-brand-muted/50 text-[10px] uppercase tracking-[0.2em] font-sans">
                     Name <span className="text-brand-gold">*</span>
                   </label>
@@ -195,7 +179,7 @@ export default function JewelryInquiryModal({ isOpen, defaultPiece, onClose }: P
                 </div>
 
                 {/* Email */}
-                <div className="flex flex-col gap-1">
+                <div className="flex flex-col gap-1.5">
                   <label htmlFor="inq-email" className="text-brand-muted/50 text-[10px] uppercase tracking-[0.2em] font-sans">
                     Email <span className="text-brand-gold">*</span>
                   </label>
@@ -213,7 +197,7 @@ export default function JewelryInquiryModal({ isOpen, defaultPiece, onClose }: P
                 </div>
 
                 {/* Instagram (optional) */}
-                <div className="flex flex-col gap-1">
+                <div className="flex flex-col gap-1.5">
                   <label htmlFor="inq-instagram" className="text-brand-muted/50 text-[10px] uppercase tracking-[0.2em] font-sans">
                     Instagram <span className="text-brand-muted/30">(optional)</span>
                   </label>
@@ -230,7 +214,7 @@ export default function JewelryInquiryModal({ isOpen, defaultPiece, onClose }: P
                 </div>
 
                 {/* Piece of interest — displayed, not editable */}
-                <div className="flex flex-col gap-1">
+                <div className="flex flex-col gap-1.5">
                   <p className="text-brand-muted/50 text-[10px] uppercase tracking-[0.2em] font-sans">
                     Piece of Interest
                   </p>
@@ -243,7 +227,7 @@ export default function JewelryInquiryModal({ isOpen, defaultPiece, onClose }: P
                 </div>
 
                 {/* Message */}
-                <div className="flex flex-col gap-1">
+                <div className="flex flex-col gap-1.5">
                   <label htmlFor="inq-message" className="text-brand-muted/50 text-[10px] uppercase tracking-[0.2em] font-sans">
                     Message
                   </label>
@@ -259,24 +243,26 @@ export default function JewelryInquiryModal({ isOpen, defaultPiece, onClose }: P
                 </div>
 
                 {/* Submit */}
-                <button
-                  type="submit"
-                  disabled={status === "submitting" || !form.name || !form.email}
-                  className="mt-2 w-full inline-flex items-center justify-center font-semibold transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-gold bg-brand-gold text-brand-dark hover:bg-brand-gold-light disabled:opacity-40 disabled:cursor-not-allowed px-8 py-4 text-base"
-                >
-                  {status === "submitting" ? (
-                    <span className="flex items-center gap-3">
-                      <span className="w-3.5 h-3.5 border border-brand-dark/40 border-t-brand-dark rounded-full animate-spin" aria-hidden="true" />
-                      Sending…
-                    </span>
-                  ) : (
-                    "Begin Acquisition →"
-                  )}
-                </button>
+                <div className="flex flex-col gap-3 pt-1">
+                  <button
+                    type="submit"
+                    disabled={status === "submitting" || !form.name.trim() || !form.email.trim()}
+                    className="w-full inline-flex items-center justify-center font-semibold transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-gold bg-brand-gold text-brand-dark hover:bg-brand-gold-light disabled:opacity-40 disabled:cursor-not-allowed px-8 py-4 text-base"
+                  >
+                    {status === "submitting" ? (
+                      <span className="flex items-center gap-3">
+                        <span className="w-3.5 h-3.5 border border-brand-dark/40 border-t-brand-dark rounded-full animate-spin" aria-hidden="true" />
+                        Sending…
+                      </span>
+                    ) : (
+                      "Begin Acquisition →"
+                    )}
+                  </button>
 
-                <p className="text-center text-brand-muted/40 text-xs font-sans -mt-3">
-                  Private acquisition inquiry &nbsp;·&nbsp; No automated responses
-                </p>
+                  <p className="text-center text-brand-muted/40 text-xs font-sans">
+                    Private acquisition inquiry &nbsp;·&nbsp; No automated responses
+                  </p>
+                </div>
 
               </form>
             </>
