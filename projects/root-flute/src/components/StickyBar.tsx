@@ -55,12 +55,10 @@ export default function StickyBar() {
                 Three ceremonial pieces.
               </p>
               <a
-                href="https://instagram.com/rootflute"
-                target="_blank"
-                rel="noopener noreferrer"
+                href="#inquire"
                 className="inline-flex items-center justify-center px-5 py-2.5 text-sm font-bold bg-brand-gold text-brand-dark hover:bg-brand-gold-light transition-colors duration-200 flex-shrink-0"
               >
-                Inquire →
+                Acquire →
               </a>
             </>
           ) : (
