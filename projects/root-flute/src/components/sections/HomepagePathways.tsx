@@ -38,6 +38,18 @@ const PATHWAYS = [
     imageAlt: "Pearl of Vision — handcrafted ceremonial adornment",
     variant: "neutral" as const,
   },
+  {
+    href: "/instruments",
+    eyebrow: "Sacred Craft",
+    name: "Ceremonial Instruments",
+    description:
+      "Six handcrafted instruments — each made once, played for a lifetime. Violin. Cello. Lyre. Harp. Guitar. And the singular Shellivarious.",
+    cta: "View the Instruments →",
+    accent: "Six pieces · Ceremonial · One of one",
+    imageSrc: "/images/instruments/instruments-hero.png",
+    imageAlt: "RootFlute ceremonial instruments — handcrafted sacred collection",
+    variant: "neutral" as const,
+  },
 ];
 
 export default function HomepagePathways() {
@@ -48,7 +60,7 @@ export default function HomepagePathways() {
       {/* Section label */}
       <div className="text-center mb-16">
         <p className="text-brand-gold text-xs uppercase tracking-[0.3em] font-sans mb-4">
-          Three Pathways
+          Four Pathways
         </p>
         <h2 className="font-display text-4xl sm:text-5xl font-light text-brand-text">
           Where do you begin?
@@ -56,7 +68,7 @@ export default function HomepagePathways() {
       </div>
 
       {/* Pathway cards */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-3">
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
         {PATHWAYS.map((p) => (
           <a
             key={p.href}

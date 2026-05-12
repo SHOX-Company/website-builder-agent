@@ -9,7 +9,7 @@ import Image from "next/image";
 
 export default function HeroInstruments() {
   return (
-    <section className="relative min-h-[100svh] flex flex-col items-center justify-center overflow-hidden bg-[#07060B]">
+    <section className="relative min-h-[100svh] lg:min-h-[88vh] flex flex-col items-center justify-center overflow-hidden bg-[#07060B]">
 
       {/* ═══════════════════════════════════════════════════════════
           HERO IMAGE — instruments-hero.png
@@ -67,7 +67,7 @@ export default function HeroInstruments() {
       {/* Bottom dissolution into collection section */}
       <div
         aria-hidden="true"
-        className="absolute bottom-0 inset-x-0 z-[4] h-44 bg-gradient-to-t from-brand-dark to-transparent pointer-events-none"
+        className="absolute bottom-0 inset-x-0 z-[4] h-32 bg-gradient-to-t from-brand-dark to-transparent pointer-events-none"
       />
 
       {/* Top edge seal */}
@@ -138,11 +138,6 @@ export default function HeroInstruments() {
       </div>
 
 
-      {/* Scroll indicator */}
-      <div className="absolute bottom-10 left-1/2 -translate-x-1/2 z-10 flex flex-col items-center gap-2 opacity-[0.20] pointer-events-none">
-        <span className="text-brand-muted text-[9px] uppercase tracking-[0.22em] font-sans">Scroll</span>
-        <div className="w-px h-7 bg-brand-muted/40 animate-pulse" />
-      </div>
 
     </section>
   );

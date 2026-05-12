@@ -210,7 +210,7 @@ function PieceCard({
             fill
             unoptimized
             priority={piece.id === "pearl-of-vision"}
-            className="object-contain object-center transition-transform duration-700 group-hover:scale-[1.02]"
+            className="object-cover object-center transition-transform duration-700 group-hover:scale-[1.02]"
             sizes="(max-width: 1024px) 100vw, 50vw"
           />
 
