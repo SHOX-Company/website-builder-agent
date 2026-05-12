@@ -40,7 +40,7 @@ const PIECES: Piece[] = [
     materials: "Natural pearl · Handcrafted setting · One of one",
     price: "$1,800",
     priceLabel: "Acquisition price",
-    images: [{ src: "/images/jewelry/pearl-of-vision-1.png", alt: "Pearl of Vision — ceremonial pearl adornment" }],
+    images: [{ src: "/images/jewelry/pearl-vision-1.png", alt: "Pearl of Vision — ceremonial pearl adornment" }],
     layout: "left",
     status: "inquiry",
   },
@@ -50,13 +50,12 @@ const PIECES: Piece[] = [
     name: "Lavender Moonrise",
     tagline: "For those who move in the in-between.",
     description:
-      "Born from the light between dusk and night — the color of something neither here nor there. Two views of the same piece. The lavender holds a quality the eye recognizes before the mind does. An adornment for those who exist at the threshold.",
+      "Born from the light between dusk and night — the color of something neither here nor there. The lavender holds a quality the eye recognizes before the mind does. An adornment for those who exist at the threshold.",
     materials: "Handcrafted setting · Natural stones · One of one",
     price: "$2,400",
     priceLabel: "Acquisition price",
     images: [
-      { src: "/images/jewelry/lavender-moonrise-1.png", alt: "Lavender Moonrise — ceremonial adornment, first view" },
-      { src: "/images/jewelry/lavender-moonrise-2.png", alt: "Lavender Moonrise — ceremonial adornment, second view" },
+      { src: "/images/jewelry/lavender-pendant-1.png", alt: "Lavender Moonrise — ceremonial adornment" },
     ],
     layout: "right",
     status: "inquiry",
@@ -72,8 +71,7 @@ const PIECES: Piece[] = [
     price: "$3,200",
     priceLabel: "Acquisition price",
     images: [
-      { src: "/images/jewelry/eye-of-dragon-1.png", alt: "Eye of Dragon — ceremonial adornment, first view" },
-      { src: "/images/jewelry/eye-of-dragon-2.png", alt: "Eye of Dragon — ceremonial adornment, second view" },
+      { src: "/images/jewelry/eye-of-the-dragon-2.png", alt: "Eye of Dragon — ceremonial adornment" },
     ],
     layout: "left",
     status: "inquiry",
@@ -212,7 +210,7 @@ function PieceCard({
             fill
             unoptimized
             priority={piece.id === "pearl-of-vision"}
-            className="object-cover object-center transition-transform duration-700 group-hover:scale-[1.02]"
+            className="object-contain object-center transition-transform duration-700 group-hover:scale-[1.02]"
             sizes="(max-width: 1024px) 100vw, 50vw"
           />
 

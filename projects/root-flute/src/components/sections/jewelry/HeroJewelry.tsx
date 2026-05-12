@@ -1,18 +1,15 @@
 import Image from "next/image";
 
-// ─── Selected hero images ─────────────────────────────────────────────────────
+// ─── Hero image selection ──────────────────────────────────────────────────────
 //
-//   DOMINANT   eye-of-the-dragon-2.png — marquise amethyst eye, Ethiopian opal,
-//              rosewood setting. Mountain + sky backdrop desaturates to cool
-//              cinematic dark. The "eye" shape is the most iconic in the set.
+//   PRIMARY    pendant-array-1.png  — full arrangement of all three pieces.
+//              Bottom-centered, object-contain so nothing is cropped.
+//              Materializes from below into the dark canvas. Feathered deeply
+//              on top so pieces emerge beneath the typography without competing.
 //
-//   SECONDARY  lavender-pendant-1.png  — oval amethyst + aquamarine in ivory/
-//              bone frame. Softer geometry contrasts the Eye's sharp marquise.
-//              Green bokeh dissolves naturally into near-black.
-//
-//   TERTIARY   triangle-pendant-1.png  — moonstone blue-flash, amber, gold inlay.
-//              Sacred geometry. Almost shadow-level brightness — creates floor
-//              depth without drawing attention. Hidden on mobile.
+//   SECONDARY  pearl-vision-1.png   — single ametrine/pearl pendant.
+//              Upper-left atmospheric whisper. Very low brightness — a presence
+//              only. Hidden on mobile for clean negative-space mobile layout.
 //
 // ─────────────────────────────────────────────────────────────────────────────
 
@@ -21,115 +18,83 @@ export default function HeroJewelry() {
     <section className="relative min-h-[100svh] flex flex-col items-center justify-center overflow-hidden bg-[#07060B]">
 
       {/* ═══════════════════════════════════════════════════════════
-          SECONDARY — lavender-pendant-1.png
-          Upper-left anchor. Oval amethyst + aquamarine, ivory frame.
-          Fades right + bottom into the sacred center darkness.
-          All edges feathered — no visible image boundary.
+          SECONDARY — pearl-vision-1.png
+          Upper-left atmospheric accent. Very faded — a presence,
+          not a feature. Creates counterweight to the array below.
+          Hidden on mobile; pure negative space there.
           ═══════════════════════════════════════════════════════ */}
       <div
         aria-hidden="true"
-        className="absolute left-0 top-0 z-[1] w-[42%] sm:w-[36%] h-[52%] sm:h-[56%] pointer-events-none"
+        className="absolute left-0 top-0 z-[1] hidden sm:block w-[30%] h-[46%] pointer-events-none"
       >
         <Image
-          src="/images/jewelry/lavender-pendant-1.png"
+          src="/images/jewelry/pearl-vision-1.png"
+          alt=""
+          fill
+          unoptimized
+          aria-hidden="true"
+          className="object-cover object-[50%_40%] brightness-[0.36] saturate-[0.20]"
+          sizes="30vw"
+        />
+        {/* Top seal */}
+        <div aria-hidden="true" className="absolute top-0 inset-x-0 h-[20%] bg-gradient-to-b from-[#07060B] to-transparent pointer-events-none" />
+        {/* Bottom feather — deep dissolve into darkness */}
+        <div aria-hidden="true" className="absolute bottom-0 inset-x-0 h-[58%] bg-gradient-to-t from-[#07060B] via-[#07060B]/80 to-transparent pointer-events-none" />
+        {/* Right feather — dissolves toward center canvas */}
+        <div aria-hidden="true" className="absolute inset-y-0 right-0 w-[62%] bg-gradient-to-r from-transparent via-[#07060B]/68 to-[#07060B] pointer-events-none" />
+        {/* Left edge seal */}
+        <div aria-hidden="true" className="absolute inset-y-0 left-0 w-[12%] bg-gradient-to-r from-[#07060B] to-transparent pointer-events-none" />
+      </div>
+
+
+      {/* ═══════════════════════════════════════════════════════════
+          PRIMARY — pendant-array-1.png
+          Bottom-center anchor. object-contain ensures the full
+          arrangement of all three pieces is visible — no cropping.
+          Top feather spans 60% of container — the pendants rise
+          from beneath the typography, materializing from darkness.
+          ═══════════════════════════════════════════════════════ */}
+      <div
+        aria-hidden="true"
+        className="absolute left-1/2 -translate-x-1/2 bottom-0 z-[2] w-[90%] sm:w-[68%] h-[52%] sm:h-[60%] pointer-events-none"
+      >
+        <Image
+          src="/images/jewelry/pendant-array-1.png"
           alt=""
           fill
           priority
           unoptimized
           aria-hidden="true"
-          className="object-cover object-[50%_48%] brightness-[0.56] saturate-[0.36]"
-          sizes="(max-width: 640px) 42vw, 36vw"
+          className="object-contain object-bottom brightness-[0.60] saturate-[0.42]"
+          sizes="(max-width: 640px) 90vw, 68vw"
         />
-        {/* Top seal */}
-        <div aria-hidden="true" className="absolute top-0 inset-x-0 h-[22%] bg-gradient-to-b from-[#07060B] via-[#07060B]/70 to-transparent pointer-events-none" />
-        {/* Bottom feather — dissolves down into darkness */}
-        <div aria-hidden="true" className="absolute bottom-0 inset-x-0 h-[48%] bg-gradient-to-t from-[#07060B] via-[#07060B]/75 to-transparent pointer-events-none" />
-        {/* Right feather — dissolves toward center dark canvas */}
-        <div aria-hidden="true" className="absolute inset-y-0 right-0 w-[55%] bg-gradient-to-r from-transparent via-[#07060B]/58 to-[#07060B] pointer-events-none" />
-        {/* Left edge seal */}
-        <div aria-hidden="true" className="absolute inset-y-0 left-0 w-[10%] bg-gradient-to-r from-[#07060B] to-transparent pointer-events-none" />
-      </div>
-
-
-      {/* ═══════════════════════════════════════════════════════════
-          TERTIARY — triangle-pendant-1.png
-          Lower-left depth layer. Moonstone blue-flash, amber, gold.
-          Nearly shadow-level — creates spatial depth without
-          competing for attention. Hidden on mobile.
-          ═══════════════════════════════════════════════════════ */}
-      <div
-        aria-hidden="true"
-        className="absolute left-0 bottom-[16%] z-[1] hidden sm:block w-[28%] h-[40%] pointer-events-none"
-      >
-        <Image
-          src="/images/jewelry/triangle-pendant-1.png"
-          alt=""
-          fill
-          unoptimized
-          aria-hidden="true"
-          className="object-cover object-[50%_44%] brightness-[0.44] saturate-[0.26]"
-          sizes="28vw"
-        />
-        {/* Top feather — dissolves up into darkness */}
-        <div aria-hidden="true" className="absolute top-0 inset-x-0 h-[48%] bg-gradient-to-b from-[#07060B] via-[#07060B]/72 to-transparent pointer-events-none" />
+        {/* Top feather — deep dissolve up into text zone */}
+        <div aria-hidden="true" className="absolute top-0 inset-x-0 h-[60%] bg-gradient-to-b from-[#07060B] via-[#07060B]/84 to-transparent pointer-events-none" />
         {/* Bottom seal */}
-        <div aria-hidden="true" className="absolute bottom-0 inset-x-0 h-[20%] bg-gradient-to-t from-[#07060B] via-[#07060B]/65 to-transparent pointer-events-none" />
+        <div aria-hidden="true" className="absolute bottom-0 inset-x-0 h-[6%] bg-gradient-to-t from-[#07060B] to-transparent pointer-events-none" />
+        {/* Left feather */}
+        <div aria-hidden="true" className="absolute inset-y-0 left-0 w-[16%] bg-gradient-to-r from-[#07060B] via-[#07060B]/55 to-transparent pointer-events-none" />
         {/* Right feather */}
-        <div aria-hidden="true" className="absolute inset-y-0 right-0 w-[58%] bg-gradient-to-r from-transparent via-[#07060B]/58 to-[#07060B] pointer-events-none" />
-        {/* Left edge seal */}
-        <div aria-hidden="true" className="absolute inset-y-0 left-0 w-[10%] bg-gradient-to-r from-[#07060B] to-transparent pointer-events-none" />
-      </div>
-
-
-      {/* ═══════════════════════════════════════════════════════════
-          DOMINANT — eye-of-the-dragon-2.png
-          Right-side hero. The Eye — amethyst marquise, opal fire,
-          rosewood. Contained height (not full-bleed) preserves
-          breathing room above and below. Left edge dissolves
-          across more than half the container width — the pendant
-          appears to emerge from the darkness on the right.
-          ═══════════════════════════════════════════════════════ */}
-      <div
-        aria-hidden="true"
-        className="absolute right-0 top-[4%] z-[2] w-[56%] sm:w-[46%] h-[82%] sm:h-[88%] pointer-events-none"
-      >
-        <Image
-          src="/images/jewelry/eye-of-the-dragon-2.png"
-          alt=""
-          fill
-          priority
-          unoptimized
-          aria-hidden="true"
-          className="object-cover object-[50%_34%] brightness-[0.70] saturate-[0.46]"
-          sizes="(max-width: 640px) 56vw, 46vw"
-        />
-        {/* Top seal */}
-        <div aria-hidden="true" className="absolute top-0 inset-x-0 h-[16%] bg-gradient-to-b from-[#07060B] via-[#07060B]/60 to-transparent pointer-events-none" />
-        {/* Bottom feather */}
-        <div aria-hidden="true" className="absolute bottom-0 inset-x-0 h-[26%] bg-gradient-to-t from-[#07060B] via-[#07060B]/65 to-transparent pointer-events-none" />
-        {/* Left feather — dissolves toward center text canvas */}
-        <div aria-hidden="true" className="absolute inset-y-0 left-0 w-[58%] bg-gradient-to-l from-transparent via-[#07060B]/55 to-[#07060B] pointer-events-none" />
-        {/* Right edge seal */}
-        <div aria-hidden="true" className="absolute inset-y-0 right-0 w-[8%] bg-gradient-to-l from-[#07060B] to-transparent pointer-events-none" />
+        <div aria-hidden="true" className="absolute inset-y-0 right-0 w-[16%] bg-gradient-to-l from-[#07060B] via-[#07060B]/55 to-transparent pointer-events-none" />
       </div>
 
 
       {/* ═══════════════════════════════════════════════════════════
           ATMOSPHERIC LAYERS
-          Restrained — the darkness is the atmosphere.
-          One gentle gold breath. Nothing that competes with the text.
+          Center darkness pool deepens the canvas above the array.
+          Gold resonance: 3.6% warmth only — a whisper.
           ═══════════════════════════════════════════════════════ */}
 
-      {/* Center-darkness pool: deepens the canvas between pieces */}
+      {/* Center-darkness pool — protects text readability */}
       <div
         aria-hidden="true"
-        className="absolute inset-0 z-[3] bg-[radial-gradient(ellipse_38%_52%_at_46%_50%,rgba(7,6,11,0.42),transparent_80%)] pointer-events-none"
+        className="absolute inset-0 z-[3] bg-[radial-gradient(ellipse_52%_62%_at_50%_42%,rgba(7,6,11,0.54),transparent_80%)] pointer-events-none"
       />
 
-      {/* Gold resonance: 4% warmth only — a whisper, not a glow */}
+      {/* Gold resonance — barely there */}
       <div
         aria-hidden="true"
-        className="absolute inset-0 z-[3] bg-[radial-gradient(ellipse_24%_30%_at_48%_48%,rgba(196,151,58,0.042),transparent)] animate-ambient-breathe pointer-events-none"
+        className="absolute inset-0 z-[3] bg-[radial-gradient(ellipse_20%_24%_at_50%_46%,rgba(196,151,58,0.036),transparent)] animate-ambient-breathe pointer-events-none"
       />
 
       {/* Bottom dissolution into the collection section */}
@@ -147,7 +112,8 @@ export default function HeroJewelry() {
 
       {/* ═══════════════════════════════════════════════════════════
           TYPOGRAPHY
-          Lives in the dark center canvas between the three pieces.
+          Lives in the dark upper-center canvas — breathing room
+          above, array emerging from below.
           Hermès register: tracked text link, no gold button.
           ═══════════════════════════════════════════════════════ */}
       <div className="relative z-10 max-w-[15rem] sm:max-w-[17rem] mx-auto px-4 text-center flex flex-col items-center gap-5 sm:gap-6">
