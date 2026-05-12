@@ -8,6 +8,7 @@ export default function StickyBar() {
   const pathname = usePathname();
   const isFlutes = pathname === "/flutes";
   const isJewelry = pathname === "/jewelry";
+  const isInstruments = pathname === "/instruments";
   const isHome = pathname === "/";
 
   useEffect(() => {
@@ -47,6 +48,24 @@ export default function StickyBar() {
                 className="inline-flex items-center justify-center px-5 py-2.5 text-sm font-bold bg-brand-gold text-brand-dark hover:bg-brand-gold-light transition-colors duration-200 flex-shrink-0"
               >
                 Inquire →
+              </a>
+            </>
+          ) : isInstruments ? (
+            <>
+              <p className="text-brand-muted text-sm hidden sm:block">
+                Six ceremonial instruments.{" "}
+                <span className="text-brand-gold font-semibold">
+                  Each handcrafted. Each unrepeatable.
+                </span>
+              </p>
+              <p className="text-brand-gold font-semibold text-sm sm:hidden">
+                Six ceremonial instruments.
+              </p>
+              <a
+                href="#inquire"
+                className="inline-flex items-center justify-center px-5 py-2.5 text-sm font-bold bg-brand-gold text-brand-dark hover:bg-brand-gold-light transition-colors duration-200 flex-shrink-0"
+              >
+                Acquire →
               </a>
             </>
           ) : isJewelry ? (
