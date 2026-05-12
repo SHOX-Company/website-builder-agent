@@ -3,6 +3,16 @@
 import { useState } from "react";
 import Image from "next/image";
 import SectionWrapper from "@/components/ui/SectionWrapper";
+import JewelryInquiryModal from "./JewelryInquiryModal";
+
+// ─── Piece status architecture ──────────────────────────────────────────────
+// Controls CTA rendering per piece. Swap status per piece to change behavior.
+//   "inquiry"  → "Acquire This Piece" → opens inquiry modal
+//   "checkout" → "Purchase This Piece" → links to stripeUrl (future)
+//   "reserved" → "Reserved" badge, no CTA
+//   "sold"     → "Sold" badge, no CTA
+type PieceStatus = "inquiry" | "checkout" | "reserved" | "sold";
+// ────────────────────────────────────────────────────────────────────────────
 
 interface Piece {
   id: string;
@@ -12,9 +22,9 @@ interface Piece {
   description: string;
   materials: string;
   images: { src: string; alt: string }[];
-  cta: string;
-  ctaHref: string;
   layout: "left" | "right";
+  status: PieceStatus;
+  stripeUrl?: string; // populate when status = "checkout"
 }
 
 const PIECES: Piece[] = [
@@ -27,9 +37,8 @@ const PIECES: Piece[] = [
       "A single pearl — luminous, still, singular. Not decorative. Worn by the one who has learned to hold clarity in a world of noise. This piece is quiet in the way that still water is quiet. It carries something.",
     materials: "Natural pearl · Handcrafted setting · One of one",
     images: [{ src: "/images/jewelry/pearl-of-vision-1.png", alt: "Pearl of Vision — ceremonial pearl adornment" }],
-    cta: "Inquire About This Piece",
-    ctaHref: "https://instagram.com/rootflute",
     layout: "left",
+    status: "inquiry",
   },
   {
     id: "lavender-moonrise",
@@ -43,9 +52,8 @@ const PIECES: Piece[] = [
       { src: "/images/jewelry/lavender-moonrise-1.png", alt: "Lavender Moonrise — ceremonial adornment, first view" },
       { src: "/images/jewelry/lavender-moonrise-2.png", alt: "Lavender Moonrise — ceremonial adornment, second view" },
     ],
-    cta: "Inquire About This Piece",
-    ctaHref: "https://instagram.com/rootflute",
     layout: "right",
+    status: "inquiry",
   },
   {
     id: "eye-of-dragon",
@@ -59,13 +67,92 @@ const PIECES: Piece[] = [
       { src: "/images/jewelry/eye-of-dragon-1.png", alt: "Eye of Dragon — ceremonial adornment, first view" },
       { src: "/images/jewelry/eye-of-dragon-2.png", alt: "Eye of Dragon — ceremonial adornment, second view" },
     ],
-    cta: "Inquire About This Piece",
-    ctaHref: "https://instagram.com/rootflute",
     layout: "left",
+    status: "inquiry",
   },
 ];
 
-function PieceCard({ piece }: { piece: Piece }) {
+// ─── CTA block — driven by piece status ─────────────────────────────────────
+function PieceCTA({
+  piece,
+  onAcquire,
+}: {
+  piece: Piece;
+  onAcquire: (name: string) => void;
+}) {
+  if (piece.status === "sold") {
+    return (
+      <div className="flex flex-col gap-3">
+        <span className="inline-block border border-brand-border text-brand-muted/50 text-xs uppercase tracking-widest px-4 py-2 self-start">
+          Sold &nbsp;·&nbsp; One of One
+        </span>
+        <p className="text-brand-muted/40 text-xs font-sans">
+          This piece has found its owner.
+        </p>
+      </div>
+    );
+  }
+
+  if (piece.status === "reserved") {
+    return (
+      <div className="flex flex-col gap-3">
+        <span className="inline-block border border-brand-gold/30 text-brand-gold/50 text-xs uppercase tracking-widest px-4 py-2 self-start">
+          Reserved &nbsp;·&nbsp; Pending Acquisition
+        </span>
+        <p className="text-brand-muted/40 text-xs font-sans">
+          An acquisition is in progress for this piece.
+        </p>
+      </div>
+    );
+  }
+
+  if (piece.status === "checkout" && piece.stripeUrl) {
+    return (
+      <div className="flex flex-col gap-4">
+        <span className="inline-block border border-brand-border text-brand-muted text-xs uppercase tracking-widest px-4 py-2 self-start">
+          Available Now &nbsp;·&nbsp; One of One
+        </span>
+        <a
+          href={piece.stripeUrl}
+          className="inline-flex items-center justify-center font-semibold transition-colors duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-gold bg-brand-gold text-brand-dark hover:bg-brand-gold-light px-8 py-4 text-base self-start"
+        >
+          Purchase This Piece →
+        </a>
+        <p className="text-brand-muted/50 text-xs font-sans">
+          Secure checkout &nbsp;·&nbsp; Direct acquisition
+        </p>
+      </div>
+    );
+  }
+
+  // Default: "inquiry"
+  return (
+    <div className="flex flex-col gap-4">
+      <span className="inline-block border border-brand-border text-brand-muted text-xs uppercase tracking-widest px-4 py-2 self-start">
+        Available Now &nbsp;·&nbsp; One of One
+      </span>
+      <button
+        type="button"
+        onClick={() => onAcquire(piece.name)}
+        className="inline-flex items-center justify-center font-semibold transition-colors duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-gold bg-brand-gold text-brand-dark hover:bg-brand-gold-light px-8 py-4 text-base self-start"
+      >
+        Acquire This Piece →
+      </button>
+      <p className="text-brand-muted/50 text-xs font-sans">
+        Private acquisition inquiry &nbsp;·&nbsp; Handled personally by Daniel
+      </p>
+    </div>
+  );
+}
+
+// ─── Single piece card ───────────────────────────────────────────────────────
+function PieceCard({
+  piece,
+  onAcquire,
+}: {
+  piece: Piece;
+  onAcquire: (name: string) => void;
+}) {
   const [activeImg, setActiveImg] = useState(0);
   const [lightbox, setLightbox] = useState(false);
   const isRight = piece.layout === "right";
@@ -98,29 +185,23 @@ function PieceCard({ piece }: { piece: Piece }) {
             sizes="(max-width: 1024px) 100vw, 50vw"
           />
 
-          {/* Subtle gradient at bottom */}
           <div
             aria-hidden="true"
             className="absolute inset-0 bg-gradient-to-t from-brand-dark/60 via-transparent to-transparent pointer-events-none"
           />
 
-          {/* Expand hint */}
           <div className="absolute bottom-5 right-5 opacity-0 group-hover:opacity-100 transition-opacity duration-200">
             <span className="text-brand-muted/70 text-xs font-sans uppercase tracking-[0.2em]">
               Expand
             </span>
           </div>
 
-          {/* Thumbnail switcher for multi-image pieces */}
           {piece.images.length > 1 && (
             <div className="absolute bottom-5 left-5 flex gap-2 z-10">
               {piece.images.map((img, i) => (
                 <button
                   key={i}
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    setActiveImg(i);
-                  }}
+                  onClick={(e) => { e.stopPropagation(); setActiveImg(i); }}
                   aria-label={`View image ${i + 1}`}
                   className={`w-8 h-8 overflow-hidden border transition-all duration-200 ${
                     i === activeImg
@@ -152,48 +233,26 @@ function PieceCard({ piece }: { piece: Piece }) {
             <p className="text-brand-gold text-xs uppercase tracking-widest font-sans">
               {piece.eyebrow}
             </p>
-
             <h2 className="font-display text-4xl sm:text-5xl font-light text-brand-text leading-tight">
               {piece.name}
             </h2>
-
             <p className="font-display text-xl italic text-brand-text/60">
               {piece.tagline}
             </p>
-
             <div className="w-8 h-px bg-brand-gold/40 my-1" aria-hidden="true" />
-
             <p className="text-brand-muted text-sm leading-relaxed">
               {piece.description}
             </p>
-
             <p className="text-brand-muted/50 text-xs uppercase tracking-widest font-sans pt-2">
               {piece.materials}
             </p>
           </div>
 
-          <div className="flex flex-col gap-4">
-            <span className="inline-block border border-brand-border text-brand-muted text-xs uppercase tracking-widest px-4 py-2 self-start">
-              Available Now &nbsp;·&nbsp; One of One
-            </span>
-
-            <a
-              href={piece.ctaHref}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="inline-flex items-center justify-center font-semibold transition-colors duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-gold bg-brand-gold text-brand-dark hover:bg-brand-gold-light px-8 py-4 text-base self-start"
-            >
-              {piece.cta} →
-            </a>
-
-            <p className="text-brand-muted/50 text-xs font-sans">
-              Inquiries handled personally by Daniel.
-            </p>
-          </div>
+          <PieceCTA piece={piece} onAcquire={onAcquire} />
         </div>
       </div>
 
-      {/* Lightbox */}
+      {/* Image lightbox */}
       {lightbox && (
         <div
           className="fixed inset-0 z-50 bg-black/94 flex items-center justify-center p-6"
@@ -229,10 +288,7 @@ function PieceCard({ piece }: { piece: Piece }) {
               {piece.images.map((_, i) => (
                 <button
                   key={i}
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    setActiveImg(i);
-                  }}
+                  onClick={(e) => { e.stopPropagation(); setActiveImg(i); }}
                   aria-label={`Image ${i + 1}`}
                   className={`block w-1.5 h-1.5 rounded-full transition-colors duration-200 ${
                     i === activeImg ? "bg-brand-gold" : "bg-brand-muted/40"
@@ -247,31 +303,46 @@ function PieceCard({ piece }: { piece: Piece }) {
   );
 }
 
+// ─── Collection section ──────────────────────────────────────────────────────
 export default function JewelryCollection() {
+  const [modalOpen, setModalOpen] = useState(false);
+  const [selectedPiece, setSelectedPiece] = useState("");
+
+  function openAcquire(pieceName: string) {
+    setSelectedPiece(pieceName);
+    setModalOpen(true);
+  }
+
   return (
-    <SectionWrapper className="bg-brand-dark">
-      <div id="collection" className="scroll-mt-20 sm:scroll-mt-24" />
+    <>
+      <SectionWrapper className="bg-brand-dark">
+        <div id="collection" className="scroll-mt-20 sm:scroll-mt-24" />
 
-      {/* Section header */}
-      <div className="text-center mb-20">
-        <p className="text-brand-gold text-xs uppercase tracking-[0.3em] font-sans mb-4">
-          The Collection
-        </p>
-        <h2 className="font-display text-4xl sm:text-5xl font-light text-brand-text mb-6">
-          Three pieces. Three intentions.
-        </h2>
-        <p className="text-brand-muted text-base leading-relaxed max-w-xl mx-auto">
-          Each piece is made once. There is no restocking, no reordering, no reproduction.
-          When it finds its owner, it is gone.
-        </p>
-      </div>
+        <div className="text-center mb-20">
+          <p className="text-brand-gold text-xs uppercase tracking-[0.3em] font-sans mb-4">
+            The Collection
+          </p>
+          <h2 className="font-display text-4xl sm:text-5xl font-light text-brand-text mb-6">
+            Three pieces. Three intentions.
+          </h2>
+          <p className="text-brand-muted text-base leading-relaxed max-w-xl mx-auto">
+            Each piece is made once. There is no restocking, no reordering, no reproduction.
+            When it finds its owner, it is gone.
+          </p>
+        </div>
 
-      {/* Pieces */}
-      <div className="flex flex-col gap-3">
-        {PIECES.map((piece) => (
-          <PieceCard key={piece.id} piece={piece} />
-        ))}
-      </div>
-    </SectionWrapper>
+        <div className="flex flex-col gap-3">
+          {PIECES.map((piece) => (
+            <PieceCard key={piece.id} piece={piece} onAcquire={openAcquire} />
+          ))}
+        </div>
+      </SectionWrapper>
+
+      <JewelryInquiryModal
+        isOpen={modalOpen}
+        defaultPiece={selectedPiece}
+        onClose={() => setModalOpen(false)}
+      />
+    </>
   );
 }
