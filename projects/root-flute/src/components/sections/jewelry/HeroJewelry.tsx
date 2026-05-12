@@ -1,15 +1,11 @@
 import Image from "next/image";
 
-// ─── Hero image selection ──────────────────────────────────────────────────────
+// ─── Sole hero image ───────────────────────────────────────────────────────────
 //
-//   PRIMARY    pendant-array-1.png  — full arrangement of all three pieces.
-//              Bottom-centered, object-contain so nothing is cropped.
-//              Materializes from below into the dark canvas. Feathered deeply
-//              on top so pieces emerge beneath the typography without competing.
-//
-//   SECONDARY  pearl-vision-1.png   — single ametrine/pearl pendant.
-//              Upper-left atmospheric whisper. Very low brightness — a presence
-//              only. Hidden on mobile for clean negative-space mobile layout.
+//   pendant-array-1.png — full arrangement of all three pieces.
+//   Centered, positioned to sit BEHIND the headline "Worn. Held. Felt."
+//   NOT behind body copy or CTA — those zones are cleared by the bottom feather
+//   and the lower readability vignette in the atmospheric layer.
 //
 // ─────────────────────────────────────────────────────────────────────────────
 
@@ -18,45 +14,15 @@ export default function HeroJewelry() {
     <section className="relative min-h-[100svh] flex flex-col items-center justify-center overflow-hidden bg-[#07060B]">
 
       {/* ═══════════════════════════════════════════════════════════
-          SECONDARY — pearl-vision-1.png
-          Upper-left atmospheric accent. Very faded — a presence,
-          not a feature. Creates counterweight to the array below.
-          Hidden on mobile; pure negative space there.
+          PENDANT ARRAY — pendant-array-1.png
+          Center-anchored behind the headline. object-contain
+          preserves the full ceremonial arrangement without crop.
+          Top feather: soft seal. Bottom feather: heavy (50%) —
+          dissolves before body copy and CTA begin.
           ═══════════════════════════════════════════════════════ */}
       <div
         aria-hidden="true"
-        className="absolute left-0 top-0 z-[1] hidden sm:block w-[30%] h-[46%] pointer-events-none"
-      >
-        <Image
-          src="/images/jewelry/pearl-vision-1.png"
-          alt=""
-          fill
-          unoptimized
-          aria-hidden="true"
-          className="object-cover object-[50%_40%] brightness-[0.36] saturate-[0.20]"
-          sizes="30vw"
-        />
-        {/* Top seal */}
-        <div aria-hidden="true" className="absolute top-0 inset-x-0 h-[20%] bg-gradient-to-b from-[#07060B] to-transparent pointer-events-none" />
-        {/* Bottom feather — deep dissolve into darkness */}
-        <div aria-hidden="true" className="absolute bottom-0 inset-x-0 h-[58%] bg-gradient-to-t from-[#07060B] via-[#07060B]/80 to-transparent pointer-events-none" />
-        {/* Right feather — dissolves toward center canvas */}
-        <div aria-hidden="true" className="absolute inset-y-0 right-0 w-[62%] bg-gradient-to-r from-transparent via-[#07060B]/68 to-[#07060B] pointer-events-none" />
-        {/* Left edge seal */}
-        <div aria-hidden="true" className="absolute inset-y-0 left-0 w-[12%] bg-gradient-to-r from-[#07060B] to-transparent pointer-events-none" />
-      </div>
-
-
-      {/* ═══════════════════════════════════════════════════════════
-          PRIMARY — pendant-array-1.png
-          Bottom-center anchor. object-contain ensures the full
-          arrangement of all three pieces is visible — no cropping.
-          Top feather spans 60% of container — the pendants rise
-          from beneath the typography, materializing from darkness.
-          ═══════════════════════════════════════════════════════ */}
-      <div
-        aria-hidden="true"
-        className="absolute left-1/2 -translate-x-1/2 bottom-0 z-[2] w-[90%] sm:w-[68%] h-[52%] sm:h-[60%] pointer-events-none"
+        className="absolute left-1/2 -translate-x-1/2 top-[16%] sm:top-[13%] z-[1] w-[88%] sm:w-[64%] h-[52%] sm:h-[58%] pointer-events-none"
       >
         <Image
           src="/images/jewelry/pendant-array-1.png"
@@ -65,36 +31,42 @@ export default function HeroJewelry() {
           priority
           unoptimized
           aria-hidden="true"
-          className="object-contain object-bottom brightness-[0.60] saturate-[0.42]"
-          sizes="(max-width: 640px) 90vw, 68vw"
+          className="object-contain object-center brightness-[0.60] saturate-[0.44]"
+          sizes="(max-width: 640px) 88vw, 64vw"
         />
-        {/* Top feather — deep dissolve up into text zone */}
-        <div aria-hidden="true" className="absolute top-0 inset-x-0 h-[60%] bg-gradient-to-b from-[#07060B] via-[#07060B]/84 to-transparent pointer-events-none" />
-        {/* Bottom seal */}
-        <div aria-hidden="true" className="absolute bottom-0 inset-x-0 h-[6%] bg-gradient-to-t from-[#07060B] to-transparent pointer-events-none" />
-        {/* Left feather */}
-        <div aria-hidden="true" className="absolute inset-y-0 left-0 w-[16%] bg-gradient-to-r from-[#07060B] via-[#07060B]/55 to-transparent pointer-events-none" />
-        {/* Right feather */}
-        <div aria-hidden="true" className="absolute inset-y-0 right-0 w-[16%] bg-gradient-to-l from-[#07060B] via-[#07060B]/55 to-transparent pointer-events-none" />
+        {/* Top feather — softly seals into the dark canvas above */}
+        <div aria-hidden="true" className="absolute top-0 inset-x-0 h-[20%] bg-gradient-to-b from-[#07060B] via-[#07060B]/70 to-transparent pointer-events-none" />
+        {/* Bottom feather — 50% dissolve, clears below the headline */}
+        <div aria-hidden="true" className="absolute bottom-0 inset-x-0 h-[50%] bg-gradient-to-t from-[#07060B] via-[#07060B]/85 to-transparent pointer-events-none" />
+        {/* Left edge feather */}
+        <div aria-hidden="true" className="absolute inset-y-0 left-0 w-[14%] bg-gradient-to-r from-[#07060B] via-[#07060B]/50 to-transparent pointer-events-none" />
+        {/* Right edge feather */}
+        <div aria-hidden="true" className="absolute inset-y-0 right-0 w-[14%] bg-gradient-to-l from-[#07060B] via-[#07060B]/50 to-transparent pointer-events-none" />
       </div>
 
 
       {/* ═══════════════════════════════════════════════════════════
           ATMOSPHERIC LAYERS
-          Center darkness pool deepens the canvas above the array.
-          Gold resonance: 3.6% warmth only — a whisper.
           ═══════════════════════════════════════════════════════ */}
 
-      {/* Center-darkness pool — protects text readability */}
+      {/* Lower readability vignette — deepens the body/CTA zone
+          below the headline. Ellipse centered at 76% height. No
+          visible edges — pure atmospheric darkening. */}
       <div
         aria-hidden="true"
-        className="absolute inset-0 z-[3] bg-[radial-gradient(ellipse_52%_62%_at_50%_42%,rgba(7,6,11,0.54),transparent_80%)] pointer-events-none"
+        className="absolute inset-0 z-[3] bg-[radial-gradient(ellipse_65%_48%_at_50%_76%,rgba(7,6,11,0.78),transparent_72%)] pointer-events-none"
       />
 
-      {/* Gold resonance — barely there */}
+      {/* Ambient center darkness — general cinematic depth */}
       <div
         aria-hidden="true"
-        className="absolute inset-0 z-[3] bg-[radial-gradient(ellipse_20%_24%_at_50%_46%,rgba(196,151,58,0.036),transparent)] animate-ambient-breathe pointer-events-none"
+        className="absolute inset-0 z-[3] bg-[radial-gradient(ellipse_45%_38%_at_50%_46%,rgba(7,6,11,0.36),transparent_80%)] pointer-events-none"
+      />
+
+      {/* Gold resonance — 4% warmth, barely perceptible */}
+      <div
+        aria-hidden="true"
+        className="absolute inset-0 z-[3] bg-[radial-gradient(ellipse_22%_26%_at_50%_40%,rgba(196,151,58,0.042),transparent)] animate-ambient-breathe pointer-events-none"
       />
 
       {/* Bottom dissolution into the collection section */}
@@ -112,9 +84,8 @@ export default function HeroJewelry() {
 
       {/* ═══════════════════════════════════════════════════════════
           TYPOGRAPHY
-          Lives in the dark upper-center canvas — breathing room
-          above, array emerging from below.
-          Hermès register: tracked text link, no gold button.
+          Centered. Headline sits directly over the pendant array.
+          Body + CTA sit in the dark zone cleared by the feathers.
           ═══════════════════════════════════════════════════════ */}
       <div className="relative z-10 max-w-[15rem] sm:max-w-[17rem] mx-auto px-4 text-center flex flex-col items-center gap-5 sm:gap-6">
 
@@ -123,10 +94,10 @@ export default function HeroJewelry() {
           Sacred Adornment &nbsp;·&nbsp; RootFlute
         </p>
 
-        {/* Headline */}
+        {/* Headline — sits directly over the pendant array */}
         <div
           className="flex flex-col font-display font-light tracking-tight leading-[0.97]"
-          style={{ textShadow: "0 4px 52px rgba(0,0,0,1)" }}
+          style={{ textShadow: "0 2px 48px rgba(0,0,0,0.92), 0 0 80px rgba(0,0,0,0.6)" }}
         >
           <span className="block text-brand-text text-[3.75rem] sm:text-[4.5rem] md:text-[5.25rem]">
             Worn.
@@ -136,7 +107,7 @@ export default function HeroJewelry() {
           </span>
           <span
             className="block italic text-brand-gold text-[3.75rem] sm:text-[4.5rem] md:text-[5.25rem]"
-            style={{ textShadow: "0 0 28px rgba(196,151,58,0.15), 0 4px 52px rgba(0,0,0,1)" }}
+            style={{ textShadow: "0 0 28px rgba(196,151,58,0.18), 0 2px 48px rgba(0,0,0,0.92), 0 0 80px rgba(0,0,0,0.6)" }}
           >
             Felt.
           </span>
@@ -151,7 +122,7 @@ export default function HeroJewelry() {
         {/* Body */}
         <p
           className="text-white/50 text-[0.84rem] sm:text-[0.9rem] font-light leading-relaxed max-w-[210px] sm:max-w-[235px]"
-          style={{ textShadow: "0 2px 28px rgba(0,0,0,1)" }}
+          style={{ textShadow: "0 2px 20px rgba(0,0,0,1)" }}
         >
           Handcrafted ceremonial adornment for those who carry the practice into their body.
         </p>
