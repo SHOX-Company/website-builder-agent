@@ -1,22 +1,43 @@
-import Hero from "@/components/sections/Hero";
-import Manifesto from "@/components/sections/Manifesto";
-import Authority from "@/components/sections/Authority";
-import SoundJourneys from "@/components/sections/SoundJourneys";
-import CommunityTiers from "@/components/sections/CommunityTiers";
-import Testimonials from "@/components/sections/Testimonials";
-import PrimaryCTA from "@/components/sections/PrimaryCTA";
+import type { Metadata } from "next";
+import HomepageHero from "@/components/sections/HomepageHero";
+import HomepagePathways from "@/components/sections/HomepagePathways";
 import Footer from "@/components/sections/Footer";
+
+export const metadata: Metadata = {
+  metadataBase: new URL("https://rootflute.com"),
+  title: "RootFlute | Sacred Sound. Handcrafted Instruments. Rare Adornment.",
+  description:
+    "Daniel's world — private community, handcrafted ceremonial flutes, and rare jewelry. Three pathways. One practice.",
+  openGraph: {
+    title: "RootFlute | Sacred Sound. Handcrafted Instruments. Rare Adornment.",
+    description:
+      "Daniel's world — private community, handcrafted ceremonial flutes, and rare jewelry. Three pathways. One practice.",
+    url: "https://rootflute.com",
+    siteName: "RootFlute",
+    images: [
+      {
+        url: "/images/og-community.jpg",
+        width: 1200,
+        height: 630,
+        alt: "RootFlute — Sacred Sound, Handcrafted Instruments, Rare Adornment",
+      },
+    ],
+    type: "website",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "RootFlute | Sacred Sound. Handcrafted Instruments. Rare Adornment.",
+    description:
+      "Daniel's world — private community, handcrafted ceremonial flutes, and rare jewelry. Three pathways. One practice.",
+    images: ["/images/og-community.jpg"],
+  },
+};
 
 export default function Home() {
   return (
     <main>
-      <Hero />
-      <Manifesto />
-      <Authority />
-      <SoundJourneys />
-      <CommunityTiers />
-      <Testimonials />
-      <PrimaryCTA />
+      <HomepageHero />
+      <HomepagePathways />
       <Footer />
     </main>
   );

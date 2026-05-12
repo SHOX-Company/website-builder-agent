@@ -7,6 +7,8 @@ export default function StickyBar() {
   const [visible, setVisible] = useState(false);
   const pathname = usePathname();
   const isFlutes = pathname === "/flutes";
+  const isJewelry = pathname === "/jewelry";
+  const isHome = pathname === "/";
 
   useEffect(() => {
     const onScroll = () => {
@@ -15,6 +17,9 @@ export default function StickyBar() {
     window.addEventListener("scroll", onScroll, { passive: true });
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
+
+  // No sticky bar on the brand hub homepage — let the pathways card do the routing
+  if (isHome) return null;
 
   return (
     <div
@@ -38,12 +43,33 @@ export default function StickyBar() {
                 One instrument available now.
               </p>
             </>
+          ) : isJewelry ? (
+            <>
+              <p className="text-brand-muted text-sm hidden sm:block">
+                Three ceremonial pieces.{" "}
+                <span className="text-brand-gold font-semibold">
+                  Each handcrafted. Each unrepeatable.
+                </span>
+              </p>
+              <p className="text-brand-gold font-semibold text-sm sm:hidden">
+                Three ceremonial pieces.
+              </p>
+              <a
+                href="https://instagram.com/rootflute"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center justify-center px-5 py-2.5 text-sm font-bold bg-brand-gold text-brand-dark hover:bg-brand-gold-light transition-colors duration-200 flex-shrink-0"
+              >
+                Inquire →
+              </a>
+            </>
           ) : (
+            // /society and any other route
             <>
               <p className="text-brand-muted text-sm hidden sm:block">
                 Founding seats are limited.{" "}
                 <span className="text-brand-gold font-semibold">
-                  350 total — join before they&apos;re gone.
+                  Join before they&apos;re gone.
                 </span>
               </p>
               <p className="text-brand-gold font-semibold text-sm sm:hidden">
