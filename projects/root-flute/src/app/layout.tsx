@@ -1,9 +1,14 @@
+// PROTECTED SOCIAL METADATA INFRASTRUCTURE — DO NOT MODIFY
+// See src/lib/siteMetadata.ts for the single source of truth.
+// This layout sets metadataBase (inherited by all pages) and provides
+// a site-level fallback. Page-specific metadata is in each page file.
 import type { Metadata } from "next";
 import { Inter, Cormorant_Garamond } from "next/font/google";
 import "./globals.css";
 import FloatingLogo from "@/components/FloatingLogo";
 import StickyBar from "@/components/StickyBar";
 import ScrollReset from "@/components/ScrollReset";
+import { SITE_URL, buildPageMetadata } from "@/lib/siteMetadata";
 
 const inter = Inter({
   variable: "--font-inter",
@@ -19,34 +24,11 @@ const cormorant = Cormorant_Garamond({
   display: "swap",
 });
 
+// PROTECTED — metadataBase must be set here in the root layout so all
+// pages inherit it. Individual pages override via buildPageMetadata().
 export const metadata: Metadata = {
-  metadataBase: new URL("https://root-flute.vercel.app"),
-  title: "RootFlute | Sacred Sound Community with Daniel",
-  description:
-    "Join Daniel's private community for sound healers, flute players, and seekers of sacred music. Founding seats now open for RootFlute Sound Journeys.",
-  openGraph: {
-    title: "RootFlute | Sacred Sound Community with Daniel",
-    description:
-      "Join Daniel's private community for sound healers, flute players, and seekers of sacred music. Founding seats now open for RootFlute Sound Journeys.",
-    url: "https://root-flute.vercel.app",
-    siteName: "RootFlute",
-    images: [
-      {
-        url: "/images/og-community.jpg",
-        width: 1200,
-        height: 630,
-        alt: "Daniel playing ceremonial flute in sacred sound journey — RootFlute Community",
-      },
-    ],
-    type: "website",
-  },
-  twitter: {
-    card: "summary_large_image",
-    title: "RootFlute | Sacred Sound Community with Daniel",
-    description:
-      "Join Daniel's private community for sound healers, flute players, and seekers of sacred music. Founding seats now open for RootFlute Sound Journeys.",
-    images: ["/images/og-community.jpg"],
-  },
+  metadataBase: new URL(SITE_URL),
+  ...buildPageMetadata("home"),
 };
 
 export default function RootLayout({

@@ -15,7 +15,7 @@ export default function SoundDemo() {
   }, []);
 
   return (
-    <section id="sound-demo" className="relative overflow-hidden py-36">
+    <section id="sound-demo" className="relative overflow-hidden py-20 sm:py-36">
 
       {/* Base */}
       <div aria-hidden="true" className="absolute inset-0 z-0 bg-brand-dark" />

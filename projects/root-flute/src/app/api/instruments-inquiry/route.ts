@@ -1,50 +1,40 @@
 import { NextRequest, NextResponse } from "next/server";
-
-const RESEND_API_KEY = process.env.RESEND_API_KEY;
-const TO_EMAIL = "danraasch1@gmail.com";
-const FROM_EMAIL =
-  process.env.RESEND_FROM_EMAIL ??
-  "RootFlute Acquisitions <onboarding@resend.dev>";
-
-function buildEmailText(data: Record<string, string>): string {
-  return [
-    `New Instrument Acquisition Inquiry`,
-    ``,
-    `Name:       ${data.name || "—"}`,
-    `Email:      ${data.email || "—"}`,
-    `Instagram:  ${data.instagram || "—"}`,
-    `Instrument: ${data.item || "—"}`,
-    ``,
-    `Message:`,
-    data.message || "(no message)",
-  ].join("\n");
-}
+import { sendInquiryEmail } from "@/lib/email";
+import { checkRateLimit, isHoneypot } from "@/lib/rateLimit";
 
 export async function POST(req: NextRequest) {
-  let data: Record<string, string> = {};
+  const { allowed } = checkRateLimit(req);
+  if (!allowed) {
+    return NextResponse.json({ ok: true });
+  }
+
+  let body: Record<string, string> = {};
   try {
-    data = await req.json();
+    body = await req.json();
   } catch {
+    return NextResponse.json({ error: "Invalid request." }, { status: 400 });
+  }
+
+  if (isHoneypot(body)) {
     return NextResponse.json({ ok: true });
   }
 
-  if (!RESEND_API_KEY) {
-    console.log("[instruments-inquiry] No RESEND_API_KEY — logging inquiry:", data);
-    return NextResponse.json({ ok: true });
+  const { name = "", email = "", phone = "", instagram = "", item = "", message = "" } = body;
+
+  if (!name.trim() || !email.trim()) {
+    return NextResponse.json({ error: "Name and email are required." }, { status: 400 });
   }
 
-  try {
-    const { Resend } = await import("resend");
-    const resend = new Resend(RESEND_API_KEY);
-    await resend.emails.send({
-      from: FROM_EMAIL,
-      to: TO_EMAIL,
-      subject: `Instrument Acquisition Inquiry — ${data.item || "Instrument"}`,
-      text: buildEmailText(data),
-    });
-  } catch (err) {
-    console.error("[instruments-inquiry] Resend error:", err);
-  }
+  await sendInquiryEmail({
+    name: name.trim(),
+    email: email.trim(),
+    phone: phone.trim(),
+    instagram: instagram.trim(),
+    message: message.trim(),
+    product: item.trim() || "Handcrafted Instrument",
+    source: "rootflute.com/instruments",
+    formType: "Instrument Acquisition Inquiry",
+  });
 
   return NextResponse.json({ ok: true });
 }

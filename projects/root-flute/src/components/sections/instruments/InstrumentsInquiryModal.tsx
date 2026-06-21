@@ -5,9 +5,11 @@ import { useState, useEffect, useRef } from "react";
 interface FormData {
   name: string;
   email: string;
+  phone: string;
   instagram: string;
   item: string;
   message: string;
+  website: string;
 }
 
 interface Props {
@@ -28,9 +30,11 @@ export default function InstrumentsInquiryModal({
   const [form, setForm] = useState<FormData>({
     name: "",
     email: "",
+    phone: "",
     instagram: "",
     item: defaultItem,
     message: "",
+    website: "",
   });
   const firstFieldRef = useRef<HTMLInputElement>(null);
 
@@ -41,7 +45,7 @@ export default function InstrumentsInquiryModal({
   useEffect(() => {
     if (isOpen) {
       setStatus("idle");
-      setForm({ name: "", email: "", instagram: "", item: defaultItem, message: "" });
+      setForm({ name: "", email: "", phone: "", instagram: "", item: defaultItem, message: "", website: "" });
       const t = setTimeout(() => firstFieldRef.current?.focus(), 240);
       return () => clearTimeout(t);
     }
@@ -183,6 +187,22 @@ export default function InstrumentsInquiryModal({
                 </div>
 
                 <div className="flex flex-col gap-1.5">
+                  <label htmlFor="instr-phone" className="text-brand-muted/50 text-[10px] uppercase tracking-[0.2em] font-sans">
+                    Phone <span className="text-brand-muted/30">(optional)</span>
+                  </label>
+                  <input
+                    id="instr-phone"
+                    name="phone"
+                    type="tel"
+                    autoComplete="tel"
+                    placeholder="+1 (555) 000-0000"
+                    value={form.phone}
+                    onChange={handleChange}
+                    className={FIELD_BASE}
+                  />
+                </div>
+
+                <div className="flex flex-col gap-1.5">
                   <label htmlFor="instr-instagram" className="text-brand-muted/50 text-[10px] uppercase tracking-[0.2em] font-sans">
                     Instagram <span className="text-brand-muted/30">(optional)</span>
                   </label>
@@ -220,6 +240,18 @@ export default function InstrumentsInquiryModal({
                     value={form.message}
                     onChange={handleChange}
                     className={`${FIELD_BASE} resize-none`}
+                  />
+                </div>
+
+                {/* Honeypot — hidden from real users, catches bots */}
+                <div aria-hidden="true" style={{ position: "absolute", left: "-9999px", width: "1px", height: "1px", overflow: "hidden" }}>
+                  <input
+                    type="text"
+                    name="website"
+                    value={form.website}
+                    onChange={handleChange}
+                    tabIndex={-1}
+                    autoComplete="off"
                   />
                 </div>
 

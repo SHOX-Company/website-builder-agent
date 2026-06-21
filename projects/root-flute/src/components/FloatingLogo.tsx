@@ -18,7 +18,7 @@ export default function FloatingLogo() {
       href="/"
       aria-label="RootFlute — return to homepage"
       className={`fixed top-0 left-0 z-50 p-6 transition-opacity duration-500 ${
-        pastHero ? "opacity-100" : "opacity-100 sm:opacity-100"
+        pastHero ? "opacity-100" : "opacity-0 sm:opacity-100"
       }`}
     >
       <span className="font-display text-brand-text text-3xl sm:text-4xl font-normal [text-shadow:0_2px_10px_rgba(0,0,0,0.75)]">

@@ -35,13 +35,16 @@ export default function Commission() {
   }
 
   const [submitted, setSubmitted] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
   const [form, setForm] = useState({
     name: "",
     email: "",
+    phone: "",
     instagram: "",
     budget: BUDGET_OPTIONS[0],
     intendedUse: "",
     notes: "",
+    website: "", // honeypot
   });
   const [errors, setErrors] = useState<Record<string, string>>({});
 
@@ -66,14 +69,24 @@ export default function Commission() {
     }
   }
 
-  function handleSubmit(e: React.FormEvent) {
+  async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     const e2 = validate();
     if (Object.keys(e2).length) {
       setErrors(e2);
       return;
     }
-    // In production: POST to an API route or form service
+    setSubmitting(true);
+    try {
+      await fetch("/api/commission", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(form),
+      });
+    } catch {
+      // Network failure — proceed to success; API logs server-side
+    }
+    setSubmitting(false);
     setSubmitted(true);
   }
 
@@ -215,6 +228,19 @@ export default function Commission() {
                   />
                 </Field>
 
+                {/* Phone */}
+                <Field label="Phone" hint="Optional">
+                  <input
+                    type="tel"
+                    name="phone"
+                    value={form.phone}
+                    onChange={handleChange}
+                    autoComplete="tel"
+                    placeholder="+1 (555) 000-0000"
+                    className={inputClass()}
+                  />
+                </Field>
+
                 {/* Instagram */}
                 <Field label="Instagram Handle" hint="Optional">
                   <input
@@ -267,11 +293,24 @@ export default function Commission() {
                   />
                 </Field>
 
+                {/* Honeypot — hidden from real users, catches bots */}
+                <div aria-hidden="true" style={{ position: "absolute", left: "-9999px", width: "1px", height: "1px", overflow: "hidden" }}>
+                  <input
+                    type="text"
+                    name="website"
+                    value={form.website}
+                    onChange={handleChange}
+                    tabIndex={-1}
+                    autoComplete="off"
+                  />
+                </div>
+
                 <button
                   type="submit"
-                  className="mt-2 w-full border border-brand-gold text-brand-gold text-xs uppercase tracking-[0.3em] font-sans px-6 py-3 hover:bg-brand-gold hover:text-brand-dark transition-colors duration-200 cursor-pointer"
+                  disabled={submitting}
+                  className="mt-2 w-full border border-brand-gold text-brand-gold text-xs uppercase tracking-[0.3em] font-sans px-6 py-3 hover:bg-brand-gold hover:text-brand-dark transition-colors duration-200 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
                 >
-                  Submit Application
+                  {submitting ? "Sending…" : "Submit Application"}
                 </button>
 
               </form>

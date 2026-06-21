@@ -147,14 +147,14 @@ export default function CurrentDrop() {
         </div>
 
         {/* Right: product panel */}
-        <div className="bg-brand-surface p-10 lg:p-14 flex flex-col justify-between gap-10">
+        <div className="bg-brand-surface p-5 sm:p-10 lg:p-14 flex flex-col justify-between gap-8 sm:gap-10">
 
           <div className="flex flex-col gap-4">
             <p className="text-brand-gold text-xs uppercase tracking-widest font-sans">
               Current Drop
             </p>
 
-            <h3 className="font-display text-4xl sm:text-5xl font-light text-brand-text leading-tight">
+            <h3 className="font-display text-3xl sm:text-5xl font-light text-brand-text leading-tight">
               Woolly Mammoth
               <br />
               Tusk Flute
@@ -186,17 +186,17 @@ export default function CurrentDrop() {
           </div>
 
           <div className="flex flex-col gap-4">
-            <span className="inline-block border border-brand-border text-brand-muted text-xs uppercase tracking-widest px-4 py-2 self-start">
+            <span className="inline-block border border-brand-border text-brand-muted text-xs uppercase tracking-widest px-4 py-2 text-center sm:text-left sm:self-start">
               Extremely Limited &nbsp;·&nbsp; One Available Now
             </span>
             <button
               type="button"
               onClick={() => setModalOpen(true)}
-              className="inline-flex items-center justify-center font-semibold transition-colors duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-gold bg-brand-gold text-brand-dark hover:bg-brand-gold-light px-8 py-4 text-lg self-start"
+              className="inline-flex items-center justify-center font-semibold transition-colors duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-gold bg-brand-gold text-brand-dark hover:bg-brand-gold-light px-8 py-4 text-base sm:text-lg w-full sm:self-start sm:w-auto"
             >
               Claim This Instrument →
             </button>
-            <p className="text-brand-muted/60 text-xs font-sans">
+            <p className="text-brand-muted/60 text-xs font-sans text-center sm:text-left">
               Private acquisition inquiry &nbsp;·&nbsp; Handled personally by Daniel
             </p>
           </div>

@@ -19,12 +19,18 @@
 
 html {
   scroll-behavior: smooth;
+  /* Prevent horizontal scroll on narrow viewports (Instagram in-app browser, Android WebView) */
+  overflow-x: hidden;
+  max-width: 100%;
 }
 
 body {
   background-color: #0A0A08;
   color: #F0EAD6;
   font-family: var(--font-inter), Arial, Helvetica, sans-serif;
+  overflow-x: hidden;
+  /* Safety net: break genuinely overflowing words rather than blow the layout */
+  overflow-wrap: break-word;
 }
 
 :focus-visible {

@@ -57,7 +57,7 @@ export default function CommunityTiers() {
           </ul>
 
           {/* CTA */}
-          <Button href="#community" variant="primary" size="lg" className="w-full justify-center">
+          <Button href="https://skool.com/rootflute" target="_blank" rel="noopener noreferrer" variant="primary" size="lg" className="w-full justify-center">
             Join the Community →
           </Button>
 

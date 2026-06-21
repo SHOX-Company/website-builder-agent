@@ -52,19 +52,21 @@ export default function HeroFlutes() {
       />
 
       {/* Content */}
-      <div className="relative z-10 max-w-3xl mx-auto px-6 text-center flex flex-col items-center gap-8">
+      <div className="relative z-10 w-full max-w-3xl mx-auto px-6 text-center flex flex-col items-center gap-5 sm:gap-8">
 
-        <p className="text-brand-gold text-3xl sm:text-4xl font-display font-normal [text-shadow:0_0_28px_rgba(196,151,58,0.35),0_2px_12px_rgba(0,0,0,0.95)]">
+        {/* Brand name — hidden on mobile (FloatingLogo carries it once scrolled; hero text visible on sm+) */}
+        <p className="hidden sm:block text-brand-gold text-3xl sm:text-4xl font-display font-normal [text-shadow:0_0_28px_rgba(196,151,58,0.35),0_2px_12px_rgba(0,0,0,0.95)]">
           RootFlute
         </p>
 
-        <h1 className="font-display text-6xl sm:text-7xl md:text-8xl font-light text-brand-text leading-none tracking-tight">
+        {/* h1 — clamp scales 36px→60px across 360–600px, then sm:text-7xl takes over */}
+        <h1 className="font-display text-[clamp(2.25rem,10vw,3.75rem)] sm:text-7xl md:text-8xl font-light text-brand-text leading-[1.05] sm:leading-none tracking-tight w-full">
           Rare Instruments
           <br />
           <span className="italic text-brand-gold">With a Soul.</span>
         </h1>
 
-        <p className="text-white/85 text-lg sm:text-xl font-light leading-relaxed max-w-lg [text-shadow:0_2px_12px_rgba(0,0,0,0.7)]">
+        <p className="text-white/85 text-base sm:text-xl font-light leading-relaxed max-w-lg [text-shadow:0_2px_12px_rgba(0,0,0,0.7)]">
           Handcrafted ceremonial instruments built for depth, resonance, and presence.
         </p>
 
@@ -77,7 +79,7 @@ export default function HeroFlutes() {
         </Button>
 
         {/* Micro-copy accent */}
-        <div className="flex flex-col items-center gap-2 pt-2">
+        <div className="flex flex-col items-center gap-2 pt-1 sm:pt-2">
           <p className="text-white/40 text-xs font-sans uppercase tracking-[0.35em]">
             No forest. No farm. No factory.
           </p>

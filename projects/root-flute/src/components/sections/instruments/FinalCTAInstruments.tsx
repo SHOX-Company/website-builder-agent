@@ -67,7 +67,7 @@ export default function FinalCTAInstruments() {
 
       <InstrumentsInquiryModal
         isOpen={modalOpen}
-        defaultItem="Handcrafted Instrument"
+        defaultItem="General Inquiry"
         onClose={() => setModalOpen(false)}
       />
     </>

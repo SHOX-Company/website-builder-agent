@@ -140,7 +140,7 @@ export default function Authority() {
 
         {/* ── Section CTA ─────────────────────────────────────── */}
         <div className="flex flex-col items-center gap-4">
-          <Button href="#community" variant="primary" size="lg">
+          <Button href="https://skool.com/rootflute" target="_blank" rel="noopener noreferrer" variant="primary" size="lg">
             Join the Community →
           </Button>
           <p className="text-brand-muted text-xs uppercase tracking-widest">

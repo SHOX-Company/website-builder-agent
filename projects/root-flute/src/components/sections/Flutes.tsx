@@ -213,7 +213,9 @@ export default function Flutes() {
       <p className="text-center text-brand-muted text-sm max-w-lg mx-auto leading-relaxed">
         Past drops are not available. Future drops are announced to Circle members first.{" "}
         <a
-          href="#community"
+          href="https://skool.com/rootflute"
+          target="_blank"
+          rel="noopener noreferrer"
           className="text-brand-gold hover:text-brand-gold-light transition-colors duration-200"
         >
           Join to be the first to know.

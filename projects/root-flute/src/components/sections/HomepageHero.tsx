@@ -69,26 +69,14 @@ export default function HomepageHero() {
           Three pathways into the RootFlute world. One creator. Everything made by hand.
         </p>
 
-        <a
-          href="#pathways"
-          className="text-brand-muted text-xs font-sans uppercase tracking-[0.3em] hover:text-brand-gold transition-colors duration-200"
-        >
-          Explore ↓
-        </a>
 
       </div>
 
       {/* Bottom fade */}
       <div
         aria-hidden="true"
-        className="absolute bottom-0 inset-x-0 z-[3] h-48 bg-gradient-to-t from-brand-dark to-transparent"
+        className="absolute bottom-0 inset-x-0 z-[3] h-24 sm:h-48 bg-gradient-to-t from-brand-dark to-transparent"
       />
-
-      {/* Scroll indicator */}
-      <div className="absolute bottom-10 left-1/2 -translate-x-1/2 z-10 flex flex-col items-center gap-2 opacity-40">
-        <span className="text-brand-muted text-xs uppercase tracking-[0.2em]">Scroll</span>
-        <div className="w-px h-8 bg-brand-muted animate-pulse" />
-      </div>
 
     </section>
   );

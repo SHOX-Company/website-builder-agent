@@ -5,9 +5,11 @@ import { useState, useEffect, useRef } from "react";
 interface FormData {
   name: string;
   email: string;
+  phone: string;
   instagram: string;
   piece: string;
   message: string;
+  website: string;
 }
 
 interface Props {
@@ -24,9 +26,11 @@ export default function JewelryInquiryModal({ isOpen, defaultPiece, onClose }: P
   const [form, setForm] = useState<FormData>({
     name: "",
     email: "",
+    phone: "",
     instagram: "",
     piece: defaultPiece,
     message: "",
+    website: "",
   });
   const firstFieldRef = useRef<HTMLInputElement>(null);
 
@@ -37,7 +41,7 @@ export default function JewelryInquiryModal({ isOpen, defaultPiece, onClose }: P
   useEffect(() => {
     if (isOpen) {
       setStatus("idle");
-      setForm({ name: "", email: "", instagram: "", piece: defaultPiece, message: "" });
+      setForm({ name: "", email: "", phone: "", instagram: "", piece: defaultPiece, message: "", website: "" });
       const t = setTimeout(() => firstFieldRef.current?.focus(), 240);
       return () => clearTimeout(t);
     }
@@ -196,6 +200,23 @@ export default function JewelryInquiryModal({ isOpen, defaultPiece, onClose }: P
                   />
                 </div>
 
+                {/* Phone (optional) */}
+                <div className="flex flex-col gap-1.5">
+                  <label htmlFor="inq-phone" className="text-brand-muted/50 text-[10px] uppercase tracking-[0.2em] font-sans">
+                    Phone <span className="text-brand-muted/30">(optional)</span>
+                  </label>
+                  <input
+                    id="inq-phone"
+                    name="phone"
+                    type="tel"
+                    autoComplete="tel"
+                    placeholder="+1 (555) 000-0000"
+                    value={form.phone}
+                    onChange={handleChange}
+                    className={FIELD_BASE}
+                  />
+                </div>
+
                 {/* Instagram (optional) */}
                 <div className="flex flex-col gap-1.5">
                   <label htmlFor="inq-instagram" className="text-brand-muted/50 text-[10px] uppercase tracking-[0.2em] font-sans">
@@ -239,6 +260,18 @@ export default function JewelryInquiryModal({ isOpen, defaultPiece, onClose }: P
                     value={form.message}
                     onChange={handleChange}
                     className={`${FIELD_BASE} resize-none`}
+                  />
+                </div>
+
+                {/* Honeypot — hidden from real users, catches bots */}
+                <div aria-hidden="true" style={{ position: "absolute", left: "-9999px", width: "1px", height: "1px", overflow: "hidden" }}>
+                  <input
+                    type="text"
+                    name="website"
+                    value={form.website}
+                    onChange={handleChange}
+                    tabIndex={-1}
+                    autoComplete="off"
                   />
                 </div>
 

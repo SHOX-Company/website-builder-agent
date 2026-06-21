@@ -7,9 +7,9 @@ export default function StickyBar() {
   const [visible, setVisible] = useState(false);
   const pathname = usePathname();
   const isFlutes = pathname === "/flutes";
+  const isHome = pathname === "/";
   const isJewelry = pathname === "/jewelry";
   const isInstruments = pathname === "/instruments";
-  const isHome = pathname === "/";
 
   useEffect(() => {
     const onScroll = () => {
@@ -19,8 +19,8 @@ export default function StickyBar() {
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
 
-  // No sticky bar on the brand hub homepage — let the pathways card do the routing
-  if (isHome) return null;
+  // No sticky bar on homepage, jewelry, or instruments — those pages have per-item CTAs
+  if (isHome || isJewelry || isInstruments) return null;
 
   return (
     <div
@@ -43,48 +43,13 @@ export default function StickyBar() {
               <p className="text-brand-gold font-semibold text-sm sm:hidden">
                 One instrument available now.
               </p>
-              <a
-                href="#acquire"
+              <button
+                type="button"
+                onClick={() => window.dispatchEvent(new CustomEvent("rootflute:open-flute-modal"))}
                 className="inline-flex items-center justify-center px-5 py-2.5 text-sm font-bold bg-brand-gold text-brand-dark hover:bg-brand-gold-light transition-colors duration-200 flex-shrink-0"
               >
                 Inquire →
-              </a>
-            </>
-          ) : isInstruments ? (
-            <>
-              <p className="text-brand-muted text-sm hidden sm:block">
-                Six ceremonial instruments.{" "}
-                <span className="text-brand-gold font-semibold">
-                  Each handcrafted. Each unrepeatable.
-                </span>
-              </p>
-              <p className="text-brand-gold font-semibold text-sm sm:hidden">
-                Six ceremonial instruments.
-              </p>
-              <a
-                href="#inquire"
-                className="inline-flex items-center justify-center px-5 py-2.5 text-sm font-bold bg-brand-gold text-brand-dark hover:bg-brand-gold-light transition-colors duration-200 flex-shrink-0"
-              >
-                Acquire →
-              </a>
-            </>
-          ) : isJewelry ? (
-            <>
-              <p className="text-brand-muted text-sm hidden sm:block">
-                Three ceremonial pieces.{" "}
-                <span className="text-brand-gold font-semibold">
-                  Each handcrafted. Each unrepeatable.
-                </span>
-              </p>
-              <p className="text-brand-gold font-semibold text-sm sm:hidden">
-                Three ceremonial pieces.
-              </p>
-              <a
-                href="#inquire"
-                className="inline-flex items-center justify-center px-5 py-2.5 text-sm font-bold bg-brand-gold text-brand-dark hover:bg-brand-gold-light transition-colors duration-200 flex-shrink-0"
-              >
-                Acquire →
-              </a>
+              </button>
             </>
           ) : (
             // /society and any other route
@@ -99,7 +64,9 @@ export default function StickyBar() {
                 Founding seats are limited.
               </p>
               <a
-                href="#community"
+                href="https://skool.com/rootflute"
+                target="_blank"
+                rel="noopener noreferrer"
                 className="inline-flex items-center justify-center px-5 py-2.5 text-sm font-bold bg-brand-gold text-brand-dark hover:bg-brand-gold-light transition-colors duration-200 flex-shrink-0"
               >
                 Claim Your Seat →

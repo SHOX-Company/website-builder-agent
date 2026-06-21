@@ -70,7 +70,9 @@ export default function Hero() {
         </p>
 
         <Button
-          href="#community"
+          href="https://skool.com/rootflute"
+          target="_blank"
+          rel="noopener noreferrer"
           size="lg"
           className="hover:scale-105 hover:brightness-110 active:scale-100 transition-all duration-200 ease-out"
         >

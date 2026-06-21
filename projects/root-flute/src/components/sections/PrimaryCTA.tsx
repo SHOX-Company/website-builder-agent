@@ -24,7 +24,7 @@ export default function PrimaryCTA() {
           Founding membership is limited. When the seats are gone, the rate goes up.
         </p>
 
-        <Button href="#community" size="lg" variant="primary">
+        <Button href="https://skool.com/rootflute" target="_blank" rel="noopener noreferrer" size="lg" variant="primary">
           Claim Your Founding Seat →
         </Button>
 
