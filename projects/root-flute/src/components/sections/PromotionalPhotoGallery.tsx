@@ -4,17 +4,17 @@ import { useState } from "react";
 import Image from "next/image";
 
 const promotionalPhotos = [
-  { src: "/press-kit/photos/IMG_6001.jpg", alt: "Promotional photo 1" },
-  { src: "/press-kit/photos/IMG_EBA118AAA523-1.jpeg", alt: "Promotional photo 2" },
-  { src: "/press-kit/photos/Screenshot 2025-04-05 at 10.13.58 AM.JPEG", alt: "Promotional photo 3" },
-  { src: "/press-kit/photos/22A9089A-3214-4930-A880-D05C1688C053 2.JPG", alt: "Promotional photo 4" },
-  { src: "/press-kit/photos/930e787c-fa71-481c-a17a-c426f20ace0b.jpg", alt: "Promotional photo 5" },
-  { src: "/press-kit/photos/IMG_5039.jpg", alt: "Promotional photo 6" },
-  { src: "/press-kit/photos/ccd15128-af2f-4f44-8c1a-132498d7c1d0 2.JPG", alt: "Promotional photo 7" },
-  { src: "/press-kit/photos/View recent photos.PNG", alt: "Promotional photo 8" },
-  { src: "/press-kit/photos/View recent photos 2.png", alt: "Promotional photo 9" },
-  { src: "/press-kit/photos/View recent photos 3.png", alt: "Promotional photo 10" },
-  { src: "/press-kit/photos/View recent photos 4.png", alt: "Promotional photo 11" },
+  { src: "/promotional-photos/IMG_6001.jpg", alt: "Promotional photo 1" },
+  { src: "/promotional-photos/IMG_EBA118AAA523-1.jpeg", alt: "Promotional photo 2" },
+  { src: "/promotional-photos/Screenshot 2025-04-05 at 10.13.58 AM.JPEG", alt: "Promotional photo 3" },
+  { src: "/promotional-photos/22A9089A-3214-4930-A880-D05C1688C053 2.JPG", alt: "Promotional photo 4" },
+  { src: "/promotional-photos/930e787c-fa71-481c-a17a-c426f20ace0b.jpg", alt: "Promotional photo 5" },
+  { src: "/promotional-photos/IMG_5039.jpg", alt: "Promotional photo 6" },
+  { src: "/promotional-photos/ccd15128-af2f-4f44-8c1a-132498d7c1d0 2.JPG", alt: "Promotional photo 7" },
+  { src: "/promotional-photos/View recent photos.PNG", alt: "Promotional photo 8" },
+  { src: "/promotional-photos/View recent photos 2.png", alt: "Promotional photo 9" },
+  { src: "/promotional-photos/View recent photos 3.png", alt: "Promotional photo 10" },
+  { src: "/promotional-photos/View recent photos 4.png", alt: "Promotional photo 11" },
 ];
 
 export default function PromotionalPhotoGallery() {

@@ -17,13 +17,13 @@ const pressKitAssets = {
     { name: "Lucid Meditation Description", path: "/press-kit/descriptions/Lucid Meditation Description.docx" },
   ],
   logos: [
-    { variant: "", filename: "rootflute thin.PNG" },
-    { variant: "-1", filename: "rootflute thin-1.PNG" },
-    { variant: "-2", filename: "rootflute thin-2.PNG" },
-    { variant: "-3", filename: "rootflute thin-3.PNG" },
-    { variant: "-1 2", filename: "rootflute thin-1 2.PNG" },
-    { variant: "-2 2", filename: "rootflute thin-2 2.PNG" },
-    { variant: " 2", filename: "rootflute thin 2.PNG" },
+    { id: 1, path: "/logos/1.PNG" },
+    { id: 2, path: "/logos/2.PNG" },
+    { id: 3, path: "/logos/3.PNG" },
+    { id: 4, path: "/logos/4.PNG" },
+    { id: 5, path: "/logos/5.PNG" },
+    { id: 6, path: "/logos/6.PNG" },
+    { id: 7, path: "/logos/7.PNG" },
   ],
   techRider: [
     { name: "Tech Rider", path: "/press-kit/Tech Rider.docx" },
@@ -136,43 +136,30 @@ export default function PressKitPage() {
               7 professional logo variations in PNG format
             </p>
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 p-6 bg-brand-surface-2 rounded-sm">
-              {pressKitAssets.logos.map((logo) => {
-                const isLoading = downloadingId === logo.filename;
-                const handleLogoDownload = (e: React.MouseEvent<HTMLButtonElement>) => {
-                  e.preventDefault();
-                  e.stopPropagation();
-                  handleFileDownload(`/press-kit/logos/${logo.filename}`, logo.filename);
-                };
-                return (
-                  <button
-                    key={logo.filename}
-                    type="button"
-                    onMouseDown={handleLogoDownload}
-                    onClick={(e) => {
-                      e.preventDefault();
-                      e.stopPropagation();
-                    }}
-                    className={`aspect-square bg-brand-surface rounded overflow-hidden flex items-center justify-center hover:bg-brand-surface-2 transition-all group relative cursor-pointer ${
-                      isLoading ? "ring-2 ring-brand-gold" : ""
-                    }`}
-                    title={`Download Logo${logo.variant}`}
-                  >
-                    <div className="w-full h-full relative flex items-center justify-center p-2 pointer-events-none">
-                      <img
-                        src={`/press-kit/logos/${logo.filename}`}
-                        alt={`Logo${logo.variant}`}
-                        className="object-contain max-w-full max-h-full"
-                        draggable={false}
-                      />
-                    </div>
-                    <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-colors flex items-center justify-center pointer-events-none">
-                      <span className={`text-xs opacity-0 group-hover:opacity-100 transition-opacity ${isLoading ? "text-brand-gold" : "text-white"}`}>
-                        {isLoading ? "⟳" : "↓"}
-                      </span>
-                    </div>
-                  </button>
-                );
-              })}
+              {pressKitAssets.logos.map((logo) => (
+                <a
+                  key={logo.id}
+                  href={logo.path}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="aspect-square bg-brand-surface rounded overflow-hidden flex items-center justify-center hover:bg-brand-surface-2 transition-all group relative cursor-pointer"
+                  title={`Open Logo ${logo.id}`}
+                >
+                  <div className="w-full h-full relative flex items-center justify-center p-2">
+                    <img
+                      src={logo.path}
+                      alt={`Logo ${logo.id}`}
+                      className="object-contain max-w-full max-h-full"
+                      draggable={false}
+                    />
+                  </div>
+                  <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-colors flex items-center justify-center">
+                    <span className="text-xs opacity-0 group-hover:opacity-100 transition-opacity text-white">
+                      ↗
+                    </span>
+                  </div>
+                </a>
+              ))}
             </div>
           </section>
 
