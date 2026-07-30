@@ -19,8 +19,9 @@ export default function StickyBar() {
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
 
-  // No sticky bar on homepage, jewelry, or instruments — those pages have per-item CTAs
-  if (isHome || isJewelry || isInstruments) return null;
+  // No sticky bar on homepage, jewelry, or instruments — those pages have per-item CTAs.
+  // RootFlute Studio (/studio) is a separate private app and never shows the public CTA bar.
+  if (isHome || isJewelry || isInstruments || pathname.startsWith("/studio")) return null;
 
   return (
     <div

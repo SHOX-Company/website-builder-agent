@@ -104,7 +104,7 @@ export default function Commission() {
         <p className="text-brand-muted text-base leading-relaxed max-w-xl mx-auto mb-5">
           Each instrument is shaped by hand, from ancient materials,
           for a single owner. One-of-one, built personally by Daniel
-          with intention for ceremonial or personal use.
+          with intention for meaningful or personal use.
         </p>
         <p className="text-brand-gold text-xs uppercase tracking-[0.3em] font-sans">
           Only 25 Woolly Mammoth tusks remain for custom commissions.
@@ -276,7 +276,7 @@ export default function Commission() {
                     name="intendedUse"
                     value={form.intendedUse}
                     onChange={handleChange}
-                    placeholder="Ceremony, personal practice, gifting…"
+                    placeholder="Sound journey, personal practice, gifting…"
                     className={inputClass(errors.intendedUse)}
                   />
                 </Field>

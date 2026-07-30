@@ -5,7 +5,7 @@
 import type { Metadata } from "next";
 import { Inter, Cormorant_Garamond } from "next/font/google";
 import "./globals.css";
-import FloatingLogo from "@/components/FloatingLogo";
+import Navbar from "@/components/Navbar";
 import StickyBar from "@/components/StickyBar";
 import ScrollReset from "@/components/ScrollReset";
 import { SITE_URL, buildPageMetadata } from "@/lib/siteMetadata";
@@ -43,7 +43,7 @@ export default function RootLayout({
     >
       <body className="bg-brand-dark text-brand-text antialiased">
         <ScrollReset />
-        <FloatingLogo />
+        <Navbar />
         {children}
         <StickyBar />
       </body>

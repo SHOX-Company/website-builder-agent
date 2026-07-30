@@ -91,7 +91,7 @@ export default function HeroJewelry() {
 
         {/* Eyebrow */}
         <p className="text-brand-gold/50 text-[9px] sm:text-[10px] uppercase tracking-[0.60em] font-sans">
-          Sacred Adornment &nbsp;·&nbsp; RootFlute
+          Rare Adornment &nbsp;·&nbsp; RootFlute
         </p>
 
         {/* Headline — sits directly over the pendant array */}
@@ -124,7 +124,7 @@ export default function HeroJewelry() {
           className="text-white/50 text-[0.84rem] sm:text-[0.9rem] font-light leading-relaxed max-w-[210px] sm:max-w-[235px]"
           style={{ textShadow: "0 2px 20px rgba(0,0,0,1)" }}
         >
-          Handcrafted ceremonial adornment for those who carry the practice into their body.
+          Handcrafted, intentional adornment for those who carry the practice into their body.
         </p>
 
         {/* CTA — luxury text link */}

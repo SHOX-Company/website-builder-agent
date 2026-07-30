@@ -84,7 +84,7 @@ export default function HeroInstruments() {
 
         {/* Eyebrow */}
         <p className="text-brand-gold/50 text-[9px] sm:text-[10px] uppercase tracking-[0.60em] font-sans">
-          Ceremonial Instruments &nbsp;·&nbsp; RootFlute
+          Handcrafted Instruments &nbsp;·&nbsp; RootFlute
         </p>
 
         {/* Headline */}
@@ -102,7 +102,7 @@ export default function HeroInstruments() {
             className="block italic text-brand-gold text-[3.75rem] sm:text-[4.5rem] md:text-[5.25rem]"
             style={{ textShadow: "0 0 28px rgba(196,151,58,0.18), 0 2px 48px rgba(0,0,0,0.92)" }}
           >
-            Sacred.
+            Presence.
           </span>
         </div>
 
@@ -117,7 +117,7 @@ export default function HeroInstruments() {
           className="text-white/50 text-[0.84rem] sm:text-[0.9rem] font-light leading-relaxed max-w-[215px] sm:max-w-[240px]"
           style={{ textShadow: "0 2px 20px rgba(0,0,0,1)" }}
         >
-          Handcrafted ceremonial instruments for those who understand that sound is not produced — it is revealed.
+          Handcrafted, intentional instruments for those who understand that sound is not produced — it is revealed.
         </p>
 
         {/* CTA */}

@@ -157,7 +157,7 @@ export default function JewelryInquiryModal({ isOpen, defaultPiece, onClose }: P
                   {defaultPiece || "Private Acquisition"}
                 </h3>
                 <p className="text-brand-muted/50 text-xs font-sans mt-2">
-                  One-of-one ceremonial artifact &nbsp;·&nbsp; Handled personally by Daniel
+                  One-of-one handcrafted artifact &nbsp;·&nbsp; Handled personally by Daniel
                 </p>
               </div>
 

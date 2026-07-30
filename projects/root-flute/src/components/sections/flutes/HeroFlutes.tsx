@@ -67,7 +67,7 @@ export default function HeroFlutes() {
         </h1>
 
         <p className="text-white/85 text-base sm:text-xl font-light leading-relaxed max-w-lg [text-shadow:0_2px_12px_rgba(0,0,0,0.7)]">
-          Handcrafted ceremonial instruments built for depth, resonance, and presence.
+          Handcrafted, intentional instruments built for depth, resonance, and presence.
         </p>
 
         <Button

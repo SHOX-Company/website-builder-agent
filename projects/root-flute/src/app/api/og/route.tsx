@@ -6,7 +6,21 @@ export const runtime = "edge";
 const BASE = "https://root-flute.vercel.app";
 const GOLD = "#C4973A";
 
-type Page = "home" | "community" | "flutes" | "instruments" | "jewelry";
+type Page =
+  | "home"
+  | "community"
+  | "flutes"
+  | "instruments"
+  | "jewelry"
+  | "rootfluteLive"
+  | "instrumentVideos"
+  | "lucidMeditation"
+  | "music"
+  | "about"
+  | "materials"
+  | "tickets"
+  | "testimonials"
+  | "contact";
 
 const CONFIGS: Record<Page, { label: string | null; tagline: string; bg: string; bgPosition?: string }> = {
   home: {
@@ -33,8 +47,61 @@ const CONFIGS: Record<Page, { label: string | null; tagline: string; bg: string;
   },
   jewelry: {
     label: "ADORNMENT",
-    tagline: "SACRED ADORNMENT",
+    tagline: "RARE ADORNMENT",
     bg: `${BASE}/images/jewelry/pearl-of-vision-1.png`,
+  },
+  rootfluteLive: {
+    label: "VIDEOS · ROOTFLUTE LIVE",
+    tagline: "LIVE LOOPING PERFORMANCES",
+    bg: `${BASE}/images/community-hero.png`,
+    bgPosition: "center 22%",
+  },
+  instrumentVideos: {
+    label: "VIDEOS · INSTRUMENTS",
+    tagline: "SOUND · RITUAL · PRESENCE",
+    bg: `${BASE}/images/instruments/instruments-hero.png`,
+  },
+  lucidMeditation: {
+    label: "VIDEOS · LUCID MEDITATION",
+    tagline: "BREATH · TONE · PRESENCE",
+    bg: `${BASE}/images/homepage-community.jpg`,
+    bgPosition: "center 30%",
+  },
+  music: {
+    label: "MUSIC",
+    tagline: "ORGANIC DOWNTEMPO LIVE LOOPING FUSION",
+    bg: `${BASE}/images/homepage-flutes.jpg`,
+    bgPosition: "center 25%",
+  },
+  about: {
+    label: "ABOUT",
+    tagline: "DANIEL HANSEN, CRAFTSMAN",
+    bg: `${BASE}/images/about/daniel-hansen-elephant-hero-wide.jpg`,
+    bgPosition: "center 40%",
+  },
+  materials: {
+    label: "MATERIALS",
+    tagline: "WILD SHED · ANCIENT · HONORED",
+    bg: `${BASE}/images/materials/materials-antler-flute-hero-wide.jpg`,
+    bgPosition: "center 35%",
+  },
+  tickets: {
+    label: "TICKETS",
+    tagline: "UPCOMING SOUND JOURNEYS",
+    bg: `${BASE}/images/community-hero.png`,
+    bgPosition: "center 22%",
+  },
+  testimonials: {
+    label: "TESTIMONIALS",
+    tagline: "WORDS FROM THE CIRCLE",
+    bg: `${BASE}/images/homepage-community.jpg`,
+    bgPosition: "center 30%",
+  },
+  contact: {
+    label: "CONTACT",
+    tagline: "SOUND  ·  CRAFT  ·  ADORNMENT",
+    bg: `${BASE}/og/rootflute-home-og-v8.png`,
+    bgPosition: "center 30%",
   },
 };
 

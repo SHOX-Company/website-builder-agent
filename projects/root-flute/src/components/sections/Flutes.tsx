@@ -163,7 +163,7 @@ export default function Flutes() {
             <p className="text-brand-muted text-sm leading-relaxed mt-1">
               Carved from a single piece of 200-year-old cedar, with obsidian inlay
               at the mouthpiece. Its voice sits deep in the chest — meditative,
-              grounding, ceremonial. There is one. It will not be re-made.
+              grounding, intentional. There is one. It will not be re-made.
             </p>
 
             <p className="font-display text-3xl font-light text-brand-text mt-1">

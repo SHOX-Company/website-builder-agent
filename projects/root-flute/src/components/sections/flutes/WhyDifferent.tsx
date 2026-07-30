@@ -23,8 +23,8 @@ const reasons = [
   },
   {
     number: "05",
-    heading: "Ceremonial Energy",
-    body: "These instruments are built with intention. Played in healing circles, ceremonies, and private practices across the world. The energy of that work lives in the object.",
+    heading: "Intentional Energy",
+    body: "These instruments are built with intention. Played in healing circles, sound journeys, and private practices across the world. The energy of that work lives in the object.",
   },
   {
     number: "06",

@@ -5,7 +5,7 @@ const statements = [
   "You play flute — or are beginning — and want direct feedback and community.",
   "Sound healing is a serious practice for you, not a hobby.",
   "You want access to live sessions, not just recorded content.",
-  "You're drawn to the intersection of music, ceremony, and presence.",
+  "You're drawn to the intersection of music, practice, and presence.",
   "You take your craft seriously and want to be around others who do too.",
 ];
 

@@ -71,7 +71,7 @@ export default function SoundJourneys() {
 
           <blockquote className="font-display text-xl sm:text-2xl md:text-3xl font-light italic text-white leading-relaxed">
             &ldquo;A sound journey is not a performance. It is an invitation into breath,
-            tone, and the silence between notes. Every session is ceremonial, guided by
+            tone, and the silence between notes. Every session is immersive, guided by
             intention, shaped by the instrument, held in community.&rdquo;
           </blockquote>
 

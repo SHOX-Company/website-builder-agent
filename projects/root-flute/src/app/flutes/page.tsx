@@ -8,14 +8,18 @@ import SoundDemo from "@/components/sections/flutes/SoundDemo";
 import FluteFAQ from "@/components/sections/flutes/FluteFAQ";
 import FinalCTAFlutes from "@/components/sections/flutes/FinalCTAFlutes";
 import Footer from "@/components/sections/Footer";
+import { getPublicInventory } from "@/lib/inventoryStore";
 
 export const metadata = buildPageMetadata("flutes");
+export const dynamic = "force-dynamic";
 
-export default function FlutesPage() {
+export default async function FlutesPage() {
+  const items = await getPublicInventory("flute");
+
   return (
     <main>
       <HeroFlutes />
-      <CurrentDrop />
+      <CurrentDrop items={items} />
       <CraftsmanAuthority />
       <SoundDemo />
       <FluteFAQ />

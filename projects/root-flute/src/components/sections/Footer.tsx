@@ -8,7 +8,7 @@ export default function Footer() {
         </a>
 
         <p className="text-brand-muted text-xs uppercase tracking-widest">
-          Sacred Sound &nbsp;·&nbsp; Handcrafted Instruments &nbsp;·&nbsp; Rare Adornment
+          Resonant Sound &nbsp;·&nbsp; Handcrafted Instruments &nbsp;·&nbsp; Rare Adornment
         </p>
 
         <nav className="flex flex-wrap justify-center gap-x-8 gap-y-3 items-center" aria-label="Footer navigation">
