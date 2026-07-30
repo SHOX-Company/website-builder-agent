@@ -5,7 +5,6 @@ import Footer from "@/components/sections/Footer";
 import { Toast, useToast } from "@/components/ui/Toast";
 import { useDownload } from "@/hooks/useDownload";
 import { useState } from "react";
-import Image from "next/image";
 import PromotionalPhotoGallery from "@/components/sections/PromotionalPhotoGallery";
 
 const pressKitAssets = {
@@ -32,14 +31,10 @@ const pressKitAssets = {
 };
 
 function DownloadButton({
-  href,
-  filename,
   children,
   isLoading,
   onDownload,
 }: {
-  href: string;
-  filename?: string;
   children: React.ReactNode;
   isLoading: boolean;
   onDownload: () => void;
@@ -105,8 +100,6 @@ export default function PressKitPage() {
               {pressKitAssets.bios.map((bio) => (
                 <DownloadButton
                   key={bio.name}
-                  href={bio.path}
-                  filename={bio.name}
                   isLoading={downloadingId === bio.name}
                   onDownload={() => handleFileDownload(bio.path, bio.name)}
                 >
@@ -125,8 +118,6 @@ export default function PressKitPage() {
               {pressKitAssets.descriptions.map((desc) => (
                 <DownloadButton
                   key={desc.name}
-                  href={desc.path}
-                  filename={desc.name}
                   isLoading={downloadingId === desc.name}
                   onDownload={() => handleFileDownload(desc.path, desc.name)}
                 >
@@ -147,25 +138,34 @@ export default function PressKitPage() {
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 p-6 bg-brand-surface-2 rounded-sm">
               {pressKitAssets.logos.map((logo) => {
                 const isLoading = downloadingId === logo.filename;
+                const handleLogoDownload = (e: React.MouseEvent<HTMLButtonElement>) => {
+                  e.preventDefault();
+                  e.stopPropagation();
+                  handleFileDownload(`/press-kit/logos/${logo.filename}`, logo.filename);
+                };
                 return (
                   <button
                     key={logo.filename}
-                    onClick={() => handleFileDownload(`/press-kit/logos/${logo.filename}`, logo.filename)}
-                    className={`aspect-square bg-brand-surface rounded overflow-hidden flex items-center justify-center hover:bg-brand-surface-2 transition-all group relative ${
+                    type="button"
+                    onMouseDown={handleLogoDownload}
+                    onClick={(e) => {
+                      e.preventDefault();
+                      e.stopPropagation();
+                    }}
+                    className={`aspect-square bg-brand-surface rounded overflow-hidden flex items-center justify-center hover:bg-brand-surface-2 transition-all group relative cursor-pointer ${
                       isLoading ? "ring-2 ring-brand-gold" : ""
                     }`}
                     title={`Download Logo${logo.variant}`}
                   >
-                    <div className="w-full h-full relative flex items-center justify-center p-2">
-                      <Image
+                    <div className="w-full h-full relative flex items-center justify-center p-2 pointer-events-none">
+                      <img
                         src={`/press-kit/logos/${logo.filename}`}
                         alt={`Logo${logo.variant}`}
-                        width={120}
-                        height={120}
                         className="object-contain max-w-full max-h-full"
+                        draggable={false}
                       />
                     </div>
-                    <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-colors flex items-center justify-center">
+                    <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-colors flex items-center justify-center pointer-events-none">
                       <span className={`text-xs opacity-0 group-hover:opacity-100 transition-opacity ${isLoading ? "text-brand-gold" : "text-white"}`}>
                         {isLoading ? "⟳" : "↓"}
                       </span>
@@ -186,16 +186,26 @@ export default function PressKitPage() {
             </p>
             {!showGallery ? (
               <button
-                onClick={() => setShowGallery(true)}
-                className="inline-block px-6 py-3 border border-brand-gold/50 hover:border-brand-gold text-brand-gold hover:bg-brand-gold/10 rounded-sm transition-colors"
+                type="button"
+                onClick={(e) => {
+                  e.preventDefault();
+                  e.stopPropagation();
+                  setShowGallery(true);
+                }}
+                className="inline-block px-6 py-3 border border-brand-gold/50 hover:border-brand-gold text-brand-gold hover:bg-brand-gold/10 rounded-sm transition-colors cursor-pointer"
               >
                 View Photo Gallery
               </button>
             ) : (
               <div>
                 <button
-                  onClick={() => setShowGallery(false)}
-                  className="mb-4 inline-block px-4 py-2 text-sm border border-brand-gold/50 hover:border-brand-gold text-brand-gold hover:bg-brand-gold/10 rounded-sm transition-colors"
+                  type="button"
+                  onClick={(e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    setShowGallery(false);
+                  }}
+                  className="mb-4 inline-block px-4 py-2 text-sm border border-brand-gold/50 hover:border-brand-gold text-brand-gold hover:bg-brand-gold/10 rounded-sm transition-colors cursor-pointer"
                 >
                   ← Back
                 </button>
@@ -210,8 +220,6 @@ export default function PressKitPage() {
               Technical Specifications
             </h2>
             <DownloadButton
-              href={pressKitAssets.techRider[0].path}
-              filename="Tech Rider.docx"
               isLoading={downloadingId === "Tech Rider.docx"}
               onDownload={() =>
                 handleFileDownload(pressKitAssets.techRider[0].path, "Tech Rider.docx")
