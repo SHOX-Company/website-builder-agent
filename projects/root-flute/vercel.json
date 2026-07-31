@@ -19,7 +19,7 @@
       ]
     },
     {
-      "source": "/assets/(.*)",
+      "source": "/brand-assets/(.*)",
       "headers": [
         {
           "key": "Cache-Control",

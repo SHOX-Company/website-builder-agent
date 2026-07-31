@@ -4,17 +4,17 @@ import { useState } from "react";
 import Image from "next/image";
 
 const promotionalPhotos = [
-  { src: "/assets/promotional-photos/IMG_6001.jpg", alt: "Promotional photo 1" },
-  { src: "/assets/promotional-photos/IMG_EBA118AAA523-1.jpeg", alt: "Promotional photo 2" },
-  { src: "/assets/promotional-photos/Screenshot 2025-04-05 at 10.13.58 AM.JPEG", alt: "Promotional photo 3" },
-  { src: "/assets/promotional-photos/22A9089A-3214-4930-A880-D05C1688C053 2.JPG", alt: "Promotional photo 4" },
-  { src: "/assets/promotional-photos/930e787c-fa71-481c-a17a-c426f20ace0b.jpg", alt: "Promotional photo 5" },
-  { src: "/assets/promotional-photos/IMG_5039.jpg", alt: "Promotional photo 6" },
-  { src: "/assets/promotional-photos/ccd15128-af2f-4f44-8c1a-132498d7c1d0 2.JPG", alt: "Promotional photo 7" },
-  { src: "/assets/promotional-photos/View recent photos.PNG", alt: "Promotional photo 8" },
-  { src: "/assets/promotional-photos/View recent photos 2.png", alt: "Promotional photo 9" },
-  { src: "/assets/promotional-photos/View recent photos 3.png", alt: "Promotional photo 10" },
-  { src: "/assets/promotional-photos/View recent photos 4.png", alt: "Promotional photo 11" },
+  { src: "/brand-assets/promotional-photos/IMG_6001.jpg", alt: "Promotional photo 1" },
+  { src: "/brand-assets/promotional-photos/IMG_EBA118AAA523-1.jpeg", alt: "Promotional photo 2" },
+  { src: "/brand-assets/promotional-photos/Screenshot 2025-04-05 at 10.13.58 AM.JPEG", alt: "Promotional photo 3" },
+  { src: "/brand-assets/promotional-photos/22A9089A-3214-4930-A880-D05C1688C053 2.JPG", alt: "Promotional photo 4" },
+  { src: "/brand-assets/promotional-photos/930e787c-fa71-481c-a17a-c426f20ace0b.jpg", alt: "Promotional photo 5" },
+  { src: "/brand-assets/promotional-photos/IMG_5039.jpg", alt: "Promotional photo 6" },
+  { src: "/brand-assets/promotional-photos/ccd15128-af2f-4f44-8c1a-132498d7c1d0 2.JPG", alt: "Promotional photo 7" },
+  { src: "/brand-assets/promotional-photos/View recent photos.PNG", alt: "Promotional photo 8" },
+  { src: "/brand-assets/promotional-photos/View recent photos 2.png", alt: "Promotional photo 9" },
+  { src: "/brand-assets/promotional-photos/View recent photos 3.png", alt: "Promotional photo 10" },
+  { src: "/brand-assets/promotional-photos/View recent photos 4.png", alt: "Promotional photo 11" },
 ];
 
 export default function PromotionalPhotoGallery() {
