@@ -1,0 +1,5 @@
+{
+  "buildCommand": "cd projects/root-flute && npm run build",
+  "outputDirectory": "projects/root-flute/.next",
+  "publicDirectory": "projects/root-flute/public"
+}
