@@ -38,7 +38,11 @@ async function readAll(): Promise<InventoryItem[]> {
     // normalize to a real boolean here so every consumer (Studio UI and the
     // public site alike) sees the same thing, instead of `undefined` reading
     // as falsy in some places and truthy in others.
-    return items.map((item) => ({ ...item, published: item.published !== false }));
+    return items.map((item) => ({
+      ...item,
+      published: item.published !== false,
+      stripeCheckoutSessionId: item.stripeCheckoutSessionId ?? null,
+    }));
   } catch {
     return [];
   }
@@ -92,6 +96,7 @@ export async function createInventoryItem(input: InventoryItemInput): Promise<In
     createdAt: now,
     updatedAt: now,
     soldAt: null,
+    stripeCheckoutSessionId: null,
   };
   items.unshift(item);
   await writeAll(items);
@@ -124,13 +129,22 @@ export async function updateInventoryItem(
   return updated;
 }
 
-export async function markInventoryItemSold(id: string): Promise<InventoryItem | null> {
+export async function markInventoryItemSold(
+  id: string,
+  stripeCheckoutSessionId: string | null = null
+): Promise<InventoryItem | null> {
   const items = await readAll();
   const index = items.findIndex((item) => item.id === id);
   if (index === -1) return null;
 
   const now = new Date().toISOString();
-  const updated: InventoryItem = { ...items[index], status: "sold", soldAt: now, updatedAt: now };
+  const updated: InventoryItem = {
+    ...items[index],
+    status: "sold",
+    soldAt: now,
+    updatedAt: now,
+    stripeCheckoutSessionId,
+  };
   items[index] = updated;
   await writeAll(items);
   return updated;
@@ -153,6 +167,7 @@ export async function relistInventoryItem(id: string): Promise<InventoryItem | n
     status: "available",
     soldAt: null,
     published: true,
+    stripeCheckoutSessionId: null,
     updatedAt: new Date().toISOString(),
   };
   items[index] = updated;
