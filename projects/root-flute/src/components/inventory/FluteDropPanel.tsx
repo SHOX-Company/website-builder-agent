@@ -65,6 +65,16 @@ export default function FluteDropPanel({
     }
   }, [item.video]);
 
+  // Resets a stuck "Redirecting…" button when the customer returns via
+  // browser Back and the page is restored from bfcache (no fresh mount).
+  useEffect(() => {
+    function handlePageShow(event: PageTransitionEvent) {
+      if (event.persisted) setCheckoutStatus("idle");
+    }
+    window.addEventListener("pageshow", handlePageShow);
+    return () => window.removeEventListener("pageshow", handlePageShow);
+  }, []);
+
   return (
     <>
       <div className="grid grid-cols-1 lg:grid-cols-2 border border-brand-border overflow-hidden mb-3">

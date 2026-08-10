@@ -11,10 +11,14 @@ export default function FinalCTAFlutes({ items }: { items: InventoryItem[] }) {
   const current = items[0] ?? null;
   const eligible = current ? isCheckoutEligible(current) : false;
 
+  // Resets a stuck "Redirecting…" button when the customer returns via
+  // browser Back and the page is restored from bfcache (no fresh mount).
   useEffect(() => {
-    const open = () => setModalOpen(true);
-    window.addEventListener("rootflute:open-flute-modal", open);
-    return () => window.removeEventListener("rootflute:open-flute-modal", open);
+    function handlePageShow(event: PageTransitionEvent) {
+      if (event.persisted) setCheckoutStatus("idle");
+    }
+    window.addEventListener("pageshow", handlePageShow);
+    return () => window.removeEventListener("pageshow", handlePageShow);
   }, []);
 
   async function handleAcquireClick() {

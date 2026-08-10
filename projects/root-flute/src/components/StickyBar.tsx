@@ -44,13 +44,12 @@ export default function StickyBar() {
               <p className="text-brand-gold font-semibold text-sm sm:hidden">
                 One instrument available now.
               </p>
-              <button
-                type="button"
-                onClick={() => window.dispatchEvent(new CustomEvent("rootflute:open-flute-modal"))}
+              <a
+                href="#acquire"
                 className="inline-flex items-center justify-center px-5 py-2.5 text-sm font-bold bg-brand-gold text-brand-dark hover:bg-brand-gold-light transition-colors duration-200 flex-shrink-0"
               >
-                Inquire →
-              </button>
+                Claim This Instrument →
+              </a>
             </>
           ) : (
             // /society and any other route

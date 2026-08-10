@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Image from "next/image";
 import { isCheckoutEligible, type InventoryItem } from "@/lib/inventory";
 import { startCheckout } from "@/lib/checkoutClient";
@@ -45,6 +45,16 @@ export default function ItemBlock({ item, noun, layout, isLast = false, priority
       setCheckoutStatus("error");
     }
   }
+
+  // Resets a stuck "Redirecting…" button when the customer returns via
+  // browser Back and the page is restored from bfcache (no fresh mount).
+  useEffect(() => {
+    function handlePageShow(event: PageTransitionEvent) {
+      if (event.persisted) setCheckoutStatus("idle");
+    }
+    window.addEventListener("pageshow", handlePageShow);
+    return () => window.removeEventListener("pageshow", handlePageShow);
+  }, []);
 
   return (
     <div id={item.id} className="scroll-mt-24">
