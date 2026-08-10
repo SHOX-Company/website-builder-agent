@@ -8,10 +8,12 @@ import type { InventoryItem } from "@/lib/inventory";
 
 export default function JewelryCollection({ items }: { items: InventoryItem[] }) {
   const [modalOpen, setModalOpen] = useState(false);
-  const [selectedPiece, setSelectedPiece] = useState("");
+  const [selectedItem, setSelectedItem] = useState<InventoryItem | null>(null);
 
-  function openAcquire(pieceName: string) {
-    setSelectedPiece(pieceName);
+  // Only reached for inquiry-only items — checkout-eligible items redirect
+  // straight to Stripe from within ItemBlock and never call this.
+  function openAcquire(item: InventoryItem) {
+    setSelectedItem(item);
     setModalOpen(true);
   }
 
@@ -64,7 +66,7 @@ export default function JewelryCollection({ items }: { items: InventoryItem[] })
 
       <JewelryInquiryModal
         isOpen={modalOpen}
-        defaultPiece={selectedPiece}
+        defaultPiece={selectedItem?.name ?? ""}
         onClose={() => setModalOpen(false)}
       />
     </>

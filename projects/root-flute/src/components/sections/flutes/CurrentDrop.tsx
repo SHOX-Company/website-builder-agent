@@ -10,6 +10,12 @@ export default function CurrentDrop({ items }: { items: InventoryItem[] }) {
   const [modalOpen, setModalOpen] = useState(false);
   const current = items[0] ?? null;
 
+  // Only reached for inquiry-only items — checkout-eligible items redirect
+  // straight to Stripe from within FluteDropPanel and never call this.
+  function openAcquire() {
+    setModalOpen(true);
+  }
+
   return (
     <>
       <SectionWrapper className="bg-brand-surface-2">
@@ -30,7 +36,7 @@ export default function CurrentDrop({ items }: { items: InventoryItem[] }) {
         </div>
 
         {current ? (
-          <FluteDropPanel item={current} onAcquire={() => setModalOpen(true)} />
+          <FluteDropPanel item={current} onAcquire={openAcquire} />
         ) : (
           <div className="border border-brand-border py-24 px-6 text-center">
             <p className="font-display text-2xl font-light text-brand-text mb-3">

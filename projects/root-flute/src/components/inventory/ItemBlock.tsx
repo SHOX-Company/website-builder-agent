@@ -2,7 +2,8 @@
 
 import { useState } from "react";
 import Image from "next/image";
-import type { InventoryItem } from "@/lib/inventory";
+import { isCheckoutEligible, type InventoryItem } from "@/lib/inventory";
+import { startCheckout } from "@/lib/checkoutClient";
 import PriceDisplay from "./PriceDisplay";
 import ItemLightbox from "./ItemLightbox";
 
@@ -13,7 +14,8 @@ interface ItemBlockProps {
   layout: "left" | "right";
   isLast?: boolean;
   priority?: boolean;
-  onAcquire: (name: string) => void;
+  /** Passes the full trusted inventory item (id, price, name) — not just its display name. */
+  onAcquire: (item: InventoryItem) => void;
 }
 
 // Shared editorial "collection" layout for Jewelry and Instruments — a single
@@ -24,8 +26,25 @@ interface ItemBlockProps {
 // the Preview modal both only ever render "available" pieces.
 export default function ItemBlock({ item, noun, layout, isLast = false, priority = false, onAcquire }: ItemBlockProps) {
   const [lightbox, setLightbox] = useState<number | null>(null);
+  const [checkoutStatus, setCheckoutStatus] = useState<"idle" | "redirecting" | "error">("idle");
   const isRight = layout === "right";
+  const eligible = isCheckoutEligible(item);
   const gallery = item.featuredImage ? [item.featuredImage, ...item.additionalImages] : item.additionalImages;
+
+  async function handleAcquireClick() {
+    if (!eligible) {
+      onAcquire(item);
+      return;
+    }
+    if (checkoutStatus === "redirecting") return;
+    setCheckoutStatus("redirecting");
+    const url = await startCheckout(item.id);
+    if (url) {
+      window.location.href = url;
+    } else {
+      setCheckoutStatus("error");
+    }
+  }
 
   return (
     <div id={item.id} className="scroll-mt-24">
@@ -41,7 +60,7 @@ export default function ItemBlock({ item, noun, layout, isLast = false, priority
           }`}
           onClick={() => setLightbox(0)}
           role="button"
-          aria-label={`View full image of ${item.name}`}
+          aria-label={item.name ? `View full image of ${item.name}` : "View full image"}
           tabIndex={0}
           onKeyDown={(e) => e.key === "Enter" && setLightbox(0)}
           style={{
@@ -105,13 +124,23 @@ export default function ItemBlock({ item, noun, layout, isLast = false, priority
           }`}
         >
           <div className="flex flex-col gap-4">
-            <p className="text-brand-gold text-xs uppercase tracking-widest font-sans">{item.name}</p>
-            <h2 className="font-display text-4xl sm:text-5xl font-light text-brand-text leading-tight">
-              {item.name}
-            </h2>
-            <p className="text-brand-muted text-xs uppercase tracking-widest">{item.materials}</p>
-            <p className="font-display text-xl italic text-brand-text/60">{item.shortDescription}</p>
-            <p className="text-brand-muted text-sm leading-relaxed mt-1">{item.story}</p>
+            {item.name && (
+              <>
+                <p className="text-brand-gold text-xs uppercase tracking-widest font-sans">{item.name}</p>
+                <h2 className="font-display text-4xl sm:text-5xl font-light text-brand-text leading-tight">
+                  {item.name}
+                </h2>
+              </>
+            )}
+            {item.materials && (
+              <p className="text-brand-muted text-xs uppercase tracking-widest">{item.materials}</p>
+            )}
+            {item.shortDescription && (
+              <p className="font-display text-xl italic text-brand-text/60">{item.shortDescription}</p>
+            )}
+            {item.story && (
+              <p className="text-brand-muted text-sm leading-relaxed mt-1">{item.story}</p>
+            )}
             {item.specifications && (
               <div className="pt-4 border-t border-brand-border">
                 <p className="text-brand-gold text-xs uppercase tracking-[0.3em] font-sans">
@@ -128,13 +157,21 @@ export default function ItemBlock({ item, noun, layout, isLast = false, priority
             </span>
             <button
               type="button"
-              onClick={() => onAcquire(item.name)}
-              className="inline-flex items-center justify-center font-semibold transition-colors duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-gold bg-brand-gold text-brand-dark hover:bg-brand-gold-light px-8 py-4 text-lg self-start"
+              onClick={handleAcquireClick}
+              disabled={checkoutStatus === "redirecting"}
+              className="inline-flex items-center justify-center font-semibold transition-colors duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-gold bg-brand-gold text-brand-dark hover:bg-brand-gold-light disabled:opacity-40 disabled:cursor-not-allowed px-8 py-4 text-lg self-start"
             >
-              Acquire This {noun} →
+              {checkoutStatus === "redirecting" ? "Redirecting…" : `Acquire This ${noun} →`}
             </button>
+            {checkoutStatus === "error" && (
+              <p className="text-red-400/90 text-xs font-sans">
+                Something went wrong starting checkout — please try again.
+              </p>
+            )}
             <p className="text-brand-muted/60 text-xs font-sans">
-              Private acquisition inquiry &nbsp;·&nbsp; Handled personally by Daniel
+              {eligible
+                ? "Secure checkout via Stripe"
+                : <>Private acquisition inquiry &nbsp;·&nbsp; Handled personally by Daniel</>}
             </p>
           </div>
         </div>

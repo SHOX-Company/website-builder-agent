@@ -8,10 +8,12 @@ import type { InventoryItem } from "@/lib/inventory";
 
 export default function InstrumentsCollection({ items }: { items: InventoryItem[] }) {
   const [modalOpen, setModalOpen] = useState(false);
-  const [selectedInstrument, setSelectedInstrument] = useState("");
+  const [selectedItem, setSelectedItem] = useState<InventoryItem | null>(null);
 
-  function openAcquire(instrumentName: string) {
-    setSelectedInstrument(instrumentName);
+  // Only reached for inquiry-only items — checkout-eligible items redirect
+  // straight to Stripe from within ItemBlock and never call this.
+  function openAcquire(item: InventoryItem) {
+    setSelectedItem(item);
     setModalOpen(true);
   }
 
@@ -64,7 +66,7 @@ export default function InstrumentsCollection({ items }: { items: InventoryItem[
 
       <InstrumentsInquiryModal
         isOpen={modalOpen}
-        defaultItem={selectedInstrument}
+        defaultItem={selectedItem?.name ?? ""}
         onClose={() => setModalOpen(false)}
       />
     </>

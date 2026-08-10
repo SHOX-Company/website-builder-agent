@@ -2,7 +2,8 @@
 
 import { useState, useRef, useEffect } from "react";
 import Image from "next/image";
-import type { InventoryItem } from "@/lib/inventory";
+import { isCheckoutEligible, type InventoryItem } from "@/lib/inventory";
+import { startCheckout } from "@/lib/checkoutClient";
 import PriceDisplay from "./PriceDisplay";
 import ItemLightbox from "./ItemLightbox";
 
@@ -16,12 +17,30 @@ export default function FluteDropPanel({
   onAcquire,
 }: {
   item: InventoryItem;
-  onAcquire: () => void;
+  /** Passes the full trusted inventory item (id, price, name) — not just its display name. */
+  onAcquire: (item: InventoryItem) => void;
 }) {
   const [muted, setMuted] = useState(true);
   const [lightbox, setLightbox] = useState<number | null>(null);
+  const [checkoutStatus, setCheckoutStatus] = useState<"idle" | "redirecting" | "error">("idle");
   const videoRef = useRef<HTMLVideoElement>(null);
+  const eligible = isCheckoutEligible(item);
   const gallery = item.featuredImage ? [item.featuredImage, ...item.additionalImages] : item.additionalImages;
+
+  async function handleAcquireClick() {
+    if (!eligible) {
+      onAcquire(item);
+      return;
+    }
+    if (checkoutStatus === "redirecting") return;
+    setCheckoutStatus("redirecting");
+    const url = await startCheckout(item.id);
+    if (url) {
+      window.location.href = url;
+    } else {
+      setCheckoutStatus("error");
+    }
+  }
 
   function handleListen() {
     const v = videoRef.current;
@@ -100,12 +119,20 @@ export default function FluteDropPanel({
         <div className="bg-brand-surface p-5 sm:p-10 lg:p-14 flex flex-col justify-between gap-8 sm:gap-10">
           <div className="flex flex-col gap-4">
             <p className="text-brand-gold text-xs uppercase tracking-widest font-sans">Current Drop</p>
-            <h3 className="font-display text-3xl sm:text-5xl font-light text-brand-text leading-tight">
-              {item.name}
-            </h3>
-            <p className="text-brand-muted text-xs uppercase tracking-widest">{item.materials}</p>
-            <p className="text-brand-muted/60 text-xs font-sans italic">{item.shortDescription}</p>
-            <p className="text-brand-muted text-sm leading-relaxed mt-1">{item.story}</p>
+            {item.name && (
+              <h3 className="font-display text-3xl sm:text-5xl font-light text-brand-text leading-tight">
+                {item.name}
+              </h3>
+            )}
+            {item.materials && (
+              <p className="text-brand-muted text-xs uppercase tracking-widest">{item.materials}</p>
+            )}
+            {item.shortDescription && (
+              <p className="text-brand-muted/60 text-xs font-sans italic">{item.shortDescription}</p>
+            )}
+            {item.story && (
+              <p className="text-brand-muted text-sm leading-relaxed mt-1">{item.story}</p>
+            )}
             {item.specifications && (
               <div className="pt-4 border-t border-brand-border">
                 <p className="text-brand-gold text-xs uppercase tracking-[0.3em] font-sans">
@@ -122,13 +149,21 @@ export default function FluteDropPanel({
             </span>
             <button
               type="button"
-              onClick={onAcquire}
-              className="inline-flex items-center justify-center font-semibold transition-colors duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-gold bg-brand-gold text-brand-dark hover:bg-brand-gold-light px-8 py-4 text-base sm:text-lg w-full sm:self-start sm:w-auto"
+              onClick={handleAcquireClick}
+              disabled={checkoutStatus === "redirecting"}
+              className="inline-flex items-center justify-center font-semibold transition-colors duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-gold bg-brand-gold text-brand-dark hover:bg-brand-gold-light disabled:opacity-40 disabled:cursor-not-allowed px-8 py-4 text-base sm:text-lg w-full sm:self-start sm:w-auto"
             >
-              Claim This Instrument →
+              {checkoutStatus === "redirecting" ? "Redirecting…" : "Claim This Instrument →"}
             </button>
+            {checkoutStatus === "error" && (
+              <p className="text-red-400/90 text-xs font-sans text-center sm:text-left">
+                Something went wrong starting checkout — please try again.
+              </p>
+            )}
             <p className="text-brand-muted/60 text-xs font-sans text-center sm:text-left">
-              Private acquisition inquiry &nbsp;·&nbsp; Handled personally by Daniel
+              {eligible
+                ? "Secure checkout via Stripe"
+                : <>Private acquisition inquiry &nbsp;·&nbsp; Handled personally by Daniel</>}
             </p>
           </div>
         </div>
