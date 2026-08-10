@@ -1,8 +1,16 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getInventoryItem } from "@/lib/inventoryStore";
-import { isCheckoutEligible } from "@/lib/inventory";
+import { isCheckoutEligible, type InventoryCategory } from "@/lib/inventory";
 import { getStripeClient } from "@/lib/stripe";
 import { SITE_URL } from "@/lib/siteMetadata";
+
+// Where a cancelled checkout sends the customer back to browse — the same
+// vertical they were purchasing from, not a dead end.
+const CATEGORY_PATH: Record<InventoryCategory, string> = {
+  flute: "/flutes",
+  instrument: "/instruments",
+  jewelry: "/jewelry",
+};
 
 // Stripe Checkout Task S2 — server-side Checkout Session creation only.
 // The browser may submit nothing but a trusted inventory item ID; every
@@ -57,8 +65,8 @@ export async function POST(req: NextRequest) {
         },
       ],
       metadata: { inventoryItemId: item.id },
-      success_url: `${SITE_URL}/?checkout=success&session_id={CHECKOUT_SESSION_ID}`,
-      cancel_url: `${SITE_URL}/?checkout=cancelled`,
+      success_url: `${SITE_URL}/checkout/success`,
+      cancel_url: `${SITE_URL}${CATEGORY_PATH[item.category]}`,
     });
 
     return NextResponse.json({ url: session.url });
