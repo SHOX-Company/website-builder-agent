@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import FluteInquiryModal from "./FluteInquiryModal";
 import { isCheckoutEligible, type InventoryItem } from "@/lib/inventory";
 import { startCheckout } from "@/lib/checkoutClient";
+import { setCurrentFluteRef } from "@/lib/currentFluteRef";
 
 export default function FinalCTAFlutes({ items }: { items: InventoryItem[] }) {
   const [modalOpen, setModalOpen] = useState(false);
@@ -20,6 +21,13 @@ export default function FinalCTAFlutes({ items }: { items: InventoryItem[] }) {
     window.addEventListener("pageshow", handlePageShow);
     return () => window.removeEventListener("pageshow", handlePageShow);
   }, []);
+
+  // Publishes the current drop's item/eligibility so the sticky bar can
+  // initiate the same direct Stripe checkout without its own inventory fetch.
+  useEffect(() => {
+    setCurrentFluteRef(current ? { id: current.id, eligible } : null);
+    return () => setCurrentFluteRef(null);
+  }, [current, eligible]);
 
   async function handleAcquireClick() {
     if (!current || !eligible) {
@@ -91,7 +99,7 @@ export default function FinalCTAFlutes({ items }: { items: InventoryItem[] }) {
               {checkoutStatus === "redirecting"
                 ? "Redirecting…"
                 : eligible
-                ? "Begin Acquisition →"
+                ? "Claim This Instrument →"
                 : "Begin Acquisition Inquiry →"}
             </button>
             <a
