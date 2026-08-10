@@ -2,15 +2,35 @@
 
 import { useState, useEffect } from "react";
 import FluteInquiryModal from "./FluteInquiryModal";
+import { isCheckoutEligible, type InventoryItem } from "@/lib/inventory";
+import { startCheckout } from "@/lib/checkoutClient";
 
-export default function FinalCTAFlutes() {
+export default function FinalCTAFlutes({ items }: { items: InventoryItem[] }) {
   const [modalOpen, setModalOpen] = useState(false);
+  const [checkoutStatus, setCheckoutStatus] = useState<"idle" | "redirecting" | "error">("idle");
+  const current = items[0] ?? null;
+  const eligible = current ? isCheckoutEligible(current) : false;
 
   useEffect(() => {
     const open = () => setModalOpen(true);
     window.addEventListener("rootflute:open-flute-modal", open);
     return () => window.removeEventListener("rootflute:open-flute-modal", open);
   }, []);
+
+  async function handleAcquireClick() {
+    if (!current || !eligible) {
+      setModalOpen(true);
+      return;
+    }
+    if (checkoutStatus === "redirecting") return;
+    setCheckoutStatus("redirecting");
+    const url = await startCheckout(current.id);
+    if (url) {
+      window.location.href = url;
+    } else {
+      setCheckoutStatus("error");
+    }
+  }
 
   return (
     <>
@@ -60,10 +80,15 @@ export default function FinalCTAFlutes() {
           <div className="flex flex-col sm:flex-row gap-4 items-stretch sm:items-center justify-center w-full sm:w-auto">
             <button
               type="button"
-              onClick={() => setModalOpen(true)}
-              className="inline-flex items-center justify-center font-semibold transition-colors duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-gold bg-brand-gold text-brand-dark hover:bg-brand-gold-light px-8 py-4 text-base sm:text-lg"
+              onClick={handleAcquireClick}
+              disabled={checkoutStatus === "redirecting"}
+              className="inline-flex items-center justify-center font-semibold transition-colors duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-gold bg-brand-gold text-brand-dark hover:bg-brand-gold-light disabled:opacity-40 disabled:cursor-not-allowed px-8 py-4 text-base sm:text-lg"
             >
-              Begin Acquisition Inquiry →
+              {checkoutStatus === "redirecting"
+                ? "Redirecting…"
+                : eligible
+                ? "Begin Acquisition →"
+                : "Begin Acquisition Inquiry →"}
             </button>
             <a
               href="#current-drop"
@@ -73,8 +98,16 @@ export default function FinalCTAFlutes() {
             </a>
           </div>
 
+          {checkoutStatus === "error" && (
+            <p className="text-red-400/90 text-xs font-sans">
+              Something went wrong starting checkout — please try again.
+            </p>
+          )}
+
           <p className="text-brand-muted/50 text-xs">
-            Only 25 Woolly Mammoth tusks remain. Each acquisition is handled personally by Daniel.
+            {eligible
+              ? "Secure checkout via Stripe."
+              : "Only 25 Woolly Mammoth tusks remain. Each acquisition is handled personally by Daniel."}
           </p>
 
         </div>
@@ -82,7 +115,7 @@ export default function FinalCTAFlutes() {
 
       <FluteInquiryModal
         isOpen={modalOpen}
-        defaultItem="Woolly Mammoth Tusk Flute"
+        defaultItem={current?.name ?? ""}
         onClose={() => setModalOpen(false)}
       />
     </>

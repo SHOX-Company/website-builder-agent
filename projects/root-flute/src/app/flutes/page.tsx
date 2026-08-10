@@ -23,7 +23,7 @@ export default async function FlutesPage() {
       <CraftsmanAuthority />
       <SoundDemo />
       <FluteFAQ />
-      <FinalCTAFlutes />
+      <FinalCTAFlutes items={items} />
       <Footer />
     </main>
   );
