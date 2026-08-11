@@ -275,10 +275,8 @@ export default function Navbar() {
                           href={child.href}
                           role="menuitem"
                           onClick={() => setFlutesOpen(false)}
-                          className={`block px-5 py-3 text-sm font-sans transition-colors duration-150 ${
-                            isActive(child.href)
-                              ? "text-brand-gold bg-brand-dark/40"
-                              : "text-brand-text/85 hover:text-brand-gold hover:bg-brand-dark/40"
+                          className={`block px-5 py-3 text-sm font-sans text-brand-gold transition-colors duration-150 hover:bg-brand-dark/40 ${
+                            isActive(child.href) ? "bg-brand-dark/40" : ""
                           }`}
                         >
                           {child.label}
@@ -443,9 +441,7 @@ export default function Navbar() {
                             <a
                               href={child.href}
                               onClick={closeMobileMenu}
-                              className={`block py-3 text-sm font-sans transition-colors duration-150 ${
-                                isActive(child.href) ? "text-brand-gold" : "text-brand-muted hover:text-brand-gold"
-                              }`}
+                              className="block py-3 text-sm font-sans text-brand-gold transition-colors duration-150"
                             >
                               {child.label}
                             </a>
