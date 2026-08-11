@@ -17,7 +17,11 @@ interface NavItem {
 const NAV_ITEMS: NavItem[] = [
   { label: "Home", href: "/" },
   { label: "Society", href: "/society" },
-  { label: "Flutes", href: "/flutes" },
+  {
+    label: "Flutes",
+    href: "/flutes",
+    children: [{ label: "Custom Flutes", href: "/custom-flutes" }],
+  },
   { label: "Jewelry", href: "/jewelry" },
   { label: "Instruments", href: "/instruments" },
   { label: "Materials", href: "/materials" },
@@ -41,9 +45,17 @@ export default function Navbar() {
   const [videosOpen, setVideosOpen] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
   const [mobileVideosOpen, setMobileVideosOpen] = useState(false);
+  // Flutes dropdown — a second, independent instance of the exact same
+  // hover-dropdown mechanism used for Videos below, kept fully separate
+  // (own state/ref/timer) rather than generalized, since unlike Videos the
+  // "Flutes" label must also remain a working link to /flutes.
+  const [flutesOpen, setFlutesOpen] = useState(false);
+  const [mobileFlutesOpen, setMobileFlutesOpen] = useState(false);
   const pathname = usePathname();
   const videosRef = useRef<HTMLLIElement>(null);
+  const flutesRef = useRef<HTMLLIElement>(null);
   const closeTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const flutesCloseTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const lockedScrollY = useRef(0);
 
   useEffect(() => {
@@ -60,6 +72,15 @@ export default function Navbar() {
 
   function closeVideosDelayed() {
     closeTimer.current = setTimeout(() => setVideosOpen(false), 120);
+  }
+
+  function openFlutesNow() {
+    if (flutesCloseTimer.current) clearTimeout(flutesCloseTimer.current);
+    setFlutesOpen(true);
+  }
+
+  function closeFlutesDelayed() {
+    flutesCloseTimer.current = setTimeout(() => setFlutesOpen(false), 120);
   }
 
   // Body scroll lock, applied/removed synchronously and imperatively (never
@@ -119,12 +140,14 @@ export default function Navbar() {
     unlockBody();
     setMobileOpen(false);
     setMobileVideosOpen(false);
+    setMobileFlutesOpen(false);
   }, [unlockBody]);
 
   // Belt-and-braces reset for anything outside a normal tap: Escape, and the
   // page lifecycle/history events below.
   const resetAllMenus = useCallback(() => {
     setVideosOpen(false);
+    setFlutesOpen(false);
     closeMobileMenu();
   }, [closeMobileMenu]);
 
@@ -133,6 +156,9 @@ export default function Navbar() {
     function handleClick(e: MouseEvent) {
       if (videosRef.current && !videosRef.current.contains(e.target as Node)) {
         setVideosOpen(false);
+      }
+      if (flutesRef.current && !flutesRef.current.contains(e.target as Node)) {
+        setFlutesOpen(false);
       }
     }
     function handleKey(e: KeyboardEvent) {
@@ -204,6 +230,63 @@ export default function Navbar() {
         {/* Desktop nav */}
         <ul className="hidden lg:flex items-center gap-7">
           {NAV_ITEMS.map((item) => {
+            if (item.label === "Flutes" && item.children) {
+              const open = flutesOpen;
+              return (
+                <li
+                  key={item.label}
+                  ref={flutesRef}
+                  className="relative"
+                  onMouseEnter={openFlutesNow}
+                  onMouseLeave={closeFlutesDelayed}
+                >
+                  <a
+                    href={item.href}
+                    aria-haspopup="true"
+                    aria-expanded={open}
+                    className={`flex items-center gap-1.5 text-xs uppercase tracking-widest font-sans transition-colors duration-200 [text-shadow:0_1px_6px_rgba(0,0,0,0.6)] ${
+                      isActive(item.href) ? "text-brand-gold" : "text-brand-text/85 hover:text-brand-gold"
+                    }`}
+                  >
+                    {item.label}
+                    <svg
+                      viewBox="0 0 10 6"
+                      aria-hidden="true"
+                      className={`w-2.5 h-2.5 transition-transform duration-200 ${open ? "rotate-180" : ""}`}
+                      fill="none"
+                    >
+                      <path d="M1 1l4 4 4-4" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round" />
+                    </svg>
+                  </a>
+
+                  <div
+                    role="menu"
+                    className={`absolute top-full right-0 pt-4 transition-all duration-200 ${
+                      open ? "opacity-100 translate-y-0 pointer-events-auto" : "opacity-0 -translate-y-1 pointer-events-none"
+                    }`}
+                  >
+                    <div className="min-w-[220px] bg-brand-surface/95 backdrop-blur-md border border-brand-border shadow-2xl py-2">
+                      {item.children.map((child) => (
+                        <a
+                          key={child.href}
+                          href={child.href}
+                          role="menuitem"
+                          onClick={() => setFlutesOpen(false)}
+                          className={`block px-5 py-3 text-sm font-sans transition-colors duration-150 ${
+                            isActive(child.href)
+                              ? "text-brand-gold bg-brand-dark/40"
+                              : "text-brand-text/85 hover:text-brand-gold hover:bg-brand-dark/40"
+                          }`}
+                        >
+                          {child.label}
+                        </a>
+                      ))}
+                    </div>
+                  </div>
+                </li>
+              );
+            }
+
             if (item.children) {
               const open = videosOpen;
               return (
@@ -315,6 +398,63 @@ export default function Navbar() {
       >
         <ul className="flex flex-col px-6 py-8 gap-1">
           {NAV_ITEMS.map((item) => {
+            if (item.label === "Flutes" && item.children) {
+              return (
+                <li key={item.label} className="border-b border-brand-border/50">
+                  <div className="flex items-center">
+                    <a
+                      href={item.href}
+                      onClick={closeMobileMenu}
+                      className={`flex-1 py-4 text-base uppercase tracking-widest font-sans transition-colors duration-200 ${
+                        isActive(item.href) ? "text-brand-gold" : "text-brand-text"
+                      }`}
+                    >
+                      {item.label}
+                    </a>
+                    <button
+                      type="button"
+                      aria-label={mobileFlutesOpen ? "Collapse Flutes menu" : "Expand Flutes menu"}
+                      aria-expanded={mobileFlutesOpen}
+                      onClick={() => setMobileFlutesOpen((v) => !v)}
+                      className="p-3 -mr-1"
+                    >
+                      <svg
+                        viewBox="0 0 10 6"
+                        aria-hidden="true"
+                        className={`w-3 h-3 transition-transform duration-200 ${mobileFlutesOpen ? "rotate-180" : ""}`}
+                        fill="none"
+                      >
+                        <path d="M1 1l4 4 4-4" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round" />
+                      </svg>
+                    </button>
+                  </div>
+                  <div
+                    className={`grid transition-all duration-300 ease-out ${
+                      mobileFlutesOpen ? "grid-rows-[1fr] opacity-100" : "grid-rows-[0fr] opacity-0"
+                    }`}
+                  >
+                    <div className="overflow-hidden">
+                      <ul className="flex flex-col pb-3 pl-4">
+                        {item.children.map((child) => (
+                          <li key={child.href}>
+                            <a
+                              href={child.href}
+                              onClick={closeMobileMenu}
+                              className={`block py-3 text-sm font-sans transition-colors duration-150 ${
+                                isActive(child.href) ? "text-brand-gold" : "text-brand-muted hover:text-brand-gold"
+                              }`}
+                            >
+                              {child.label}
+                            </a>
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                  </div>
+                </li>
+              );
+            }
+
             if (item.children) {
               return (
                 <li key={item.label} className="border-b border-brand-border/50">
