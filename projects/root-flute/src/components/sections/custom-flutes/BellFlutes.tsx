@@ -27,18 +27,6 @@ export default function BellFlutes() {
           </p>
         </div>
 
-        {/* Hero photograph */}
-        <div className="w-full max-w-md mx-auto mb-14 border border-brand-border overflow-hidden">
-          <Image
-            src="/images/custom-flutes/bell-flutes/bell-flute-hero.jpg"
-            alt="Timeless treasures crafted from found natural materials."
-            width={1160}
-            height={1290}
-            className="w-full h-auto object-cover"
-            sizes="(max-width: 640px) 90vw, 448px"
-          />
-        </div>
-
         {/* Video */}
         <div className="aspect-video w-full max-w-2xl mx-auto mb-16 border border-brand-border overflow-hidden bg-black">
           <iframe
