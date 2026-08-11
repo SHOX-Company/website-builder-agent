@@ -20,7 +20,10 @@ const NAV_ITEMS: NavItem[] = [
   {
     label: "Flutes",
     href: "/flutes",
-    children: [{ label: "Custom Flutes", href: "/custom-flutes" }],
+    children: [
+      { label: "Available Now", href: "/flutes" },
+      { label: "Custom Flute Styles", href: "/custom-flutes" },
+    ],
   },
   { label: "Jewelry", href: "/jewelry" },
   { label: "Instruments", href: "/instruments" },

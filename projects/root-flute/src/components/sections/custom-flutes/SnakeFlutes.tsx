@@ -2,9 +2,11 @@ import Image from "next/image";
 import SectionWrapper from "@/components/ui/SectionWrapper";
 
 // Content migrated verbatim from the old RootFlute site
-// (https://www.rootflute.com/snake-flutes-1) — price note, "MADE TO ORER"
-// label (source typo preserved exactly, not corrected), and the sold-piece
-// caption are Daniel's original words, not rewritten. The standalone
+// (https://www.rootflute.com/snake-flutes-1) — price note and the sold-piece
+// caption are Daniel's original words, not rewritten. The source's "MADE TO
+// ORER" typo and "2400$" formatting were corrected per explicit operator
+// instruction (price displayed as "$2,400", label as "MADE TO ORDER"). The
+// standalone
 // RootFlute logo graphic present on the old page was intentionally not
 // migrated (site chrome, not Snake-Flute-specific content — same rule
 // established for every prior Custom Flutes section). One video was a
@@ -61,8 +63,8 @@ export default function SnakeFlutes() {
           <h2 className="font-display text-4xl sm:text-5xl font-light text-brand-text mb-4">
             Snake Flutes
           </h2>
-          <p className="text-brand-muted text-sm">starting at 2400$</p>
-          <p className="text-brand-muted text-sm">MADE TO ORER</p>
+          <p className="text-brand-muted text-sm">starting at $2,400</p>
+          <p className="text-brand-muted text-sm">MADE TO ORDER</p>
         </div>
 
         {/* Videos */}
