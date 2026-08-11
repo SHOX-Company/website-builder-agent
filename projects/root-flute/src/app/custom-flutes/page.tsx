@@ -4,6 +4,7 @@ import BellFlutes from "@/components/sections/custom-flutes/BellFlutes";
 import PointFlutes from "@/components/sections/custom-flutes/PointFlutes";
 import DroneFlutes from "@/components/sections/custom-flutes/DroneFlutes";
 import MayanHarmonyFlutes from "@/components/sections/custom-flutes/MayanHarmonyFlutes";
+import TripleMayanChord from "@/components/sections/custom-flutes/TripleMayanChord";
 
 // Local metadata (not routed through the protected siteMetadata.ts registry)
 // — this page doesn't need bespoke OG/social card treatment yet.
@@ -39,6 +40,7 @@ export default function CustomFlutesPage() {
       <PointFlutes />
       <DroneFlutes />
       <MayanHarmonyFlutes />
+      <TripleMayanChord />
 
       <Footer />
     </main>
