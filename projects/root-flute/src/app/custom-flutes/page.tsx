@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Footer from "@/components/sections/Footer";
 import BellFlutes from "@/components/sections/custom-flutes/BellFlutes";
+import PointFlutes from "@/components/sections/custom-flutes/PointFlutes";
 
 // Local metadata (not routed through the protected siteMetadata.ts registry)
 // — this page doesn't need bespoke OG/social card treatment yet.
@@ -33,6 +34,7 @@ export default function CustomFlutesPage() {
       </section>
 
       <BellFlutes />
+      <PointFlutes />
 
       <Footer />
     </main>
