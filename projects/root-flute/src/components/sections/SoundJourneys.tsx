@@ -4,9 +4,13 @@ export default function SoundJourneys() {
       Raw <section> — SectionWrapper can't host a full-bleed video background
       because its inner div would cover it. Padding/container replicated manually.
 
-      Video: /public/video/journey.mp4
-        Ideal footage: slow nature ritual, hands on flute, smoke, water, forest.
-        poster="/images/journey-poster.jpg" shows before playback begins.
+      Video: the Blob-hosted hero-web.mp4 below (vertical elk footage — the
+        same footage as /public/video/hero-web-fs.mp4, verified frame-for-frame),
+        so it reuses that clip's existing poster. The previous
+        poster="/images/journey-poster.jpg" was a placeholder for footage that
+        was never added: the file does not exist, so it 404'd on every /society
+        view and the "show something before playback begins" intent never
+        actually shipped.
     */
     <section className="relative overflow-hidden py-32">
 
@@ -26,7 +30,7 @@ export default function SoundJourneys() {
         muted
         loop
         playsInline
-        poster="/images/journey-poster.jpg"
+        poster="/video/hero-web-fs-poster.jpg"
         aria-hidden="true"
         className="absolute inset-0 z-[1] w-full h-full object-cover"
         src="https://p2pvgplym6odmfbh.public.blob.vercel-storage.com/hero-web.mp4"

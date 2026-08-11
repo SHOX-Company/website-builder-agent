@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { SITE_URL } from "@/lib/siteMetadata";
 import Footer from "@/components/sections/Footer";
 import BellFlutes from "@/components/sections/custom-flutes/BellFlutes";
 import PointFlutes from "@/components/sections/custom-flutes/PointFlutes";
@@ -11,10 +12,16 @@ import SnakeFlutes from "@/components/sections/custom-flutes/SnakeFlutes";
 import MammothTuskFlutes from "@/components/sections/custom-flutes/MammothTuskFlutes";
 
 // Local metadata (not routed through the protected siteMetadata.ts registry)
-// — this page doesn't need bespoke OG/social card treatment yet.
+// — this page doesn't need bespoke OG/social card treatment yet. The explicit
+// canonical is required: without `alternates`, Next falls back to the root
+// layout's metadataBase alone, which rendered this page's canonical as the
+// homepage and told crawlers the entire Custom Flute Styles catalog was a
+// duplicate of "/". Every page built through buildPageMetadata() already sets
+// a self-referencing canonical the same way.
 export const metadata: Metadata = {
   title: "Custom Flute Styles | RootFlute",
   description: "Custom flute styles made to order by RootFlute.",
+  alternates: { canonical: `${SITE_URL}/custom-flutes` },
 };
 
 export default function CustomFlutesPage() {
