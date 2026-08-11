@@ -413,33 +413,28 @@ export default function Navbar() {
             if (item.label === "Flutes" && item.children) {
               return (
                 <li key={item.label} className="border-b border-brand-border/50">
-                  <div className="flex items-center">
-                    <a
-                      href={item.href}
-                      onClick={closeMobileMenu}
-                      className={`flex-1 py-4 text-base uppercase tracking-widest font-sans transition-colors duration-200 ${
-                        isActive(item.href) ? "text-brand-gold" : "text-brand-text"
-                      }`}
+                  {/* Whole row is one toggle target — same interaction as the
+                      Videos row below. The label itself no longer links to
+                      /flutes; that destination is reached through "Available
+                      Now" in the submenu this row opens. */}
+                  <button
+                    type="button"
+                    aria-expanded={mobileFlutesOpen}
+                    onClick={() => setMobileFlutesOpen((v) => !v)}
+                    className={`w-full flex items-center justify-between py-4 text-base uppercase tracking-widest font-sans transition-colors duration-200 ${
+                      isActive(item.href) ? "text-brand-gold" : "text-brand-text"
+                    }`}
+                  >
+                    {item.label}
+                    <svg
+                      viewBox="0 0 10 6"
+                      aria-hidden="true"
+                      className={`w-3 h-3 transition-transform duration-200 ${mobileFlutesOpen ? "rotate-180" : ""}`}
+                      fill="none"
                     >
-                      {item.label}
-                    </a>
-                    <button
-                      type="button"
-                      aria-label={mobileFlutesOpen ? "Collapse Flutes menu" : "Expand Flutes menu"}
-                      aria-expanded={mobileFlutesOpen}
-                      onClick={() => setMobileFlutesOpen((v) => !v)}
-                      className="p-3 -mr-1"
-                    >
-                      <svg
-                        viewBox="0 0 10 6"
-                        aria-hidden="true"
-                        className={`w-3 h-3 transition-transform duration-200 ${mobileFlutesOpen ? "rotate-180" : ""}`}
-                        fill="none"
-                      >
-                        <path d="M1 1l4 4 4-4" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round" />
-                      </svg>
-                    </button>
-                  </div>
+                      <path d="M1 1l4 4 4-4" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round" />
+                    </svg>
+                  </button>
                   <div
                     className={`grid transition-all duration-300 ease-out ${
                       mobileFlutesOpen ? "grid-rows-[1fr] opacity-100" : "grid-rows-[0fr] opacity-0"
@@ -498,9 +493,7 @@ export default function Navbar() {
                             <a
                               href={child.href}
                               onClick={closeMobileMenu}
-                              className={`block py-3 text-sm font-sans transition-colors duration-150 ${
-                                isActive(child.href) ? "text-brand-gold" : "text-brand-muted hover:text-brand-gold"
-                              }`}
+                              className="block py-3 text-sm font-sans text-brand-gold transition-colors duration-150"
                             >
                               {child.label}
                             </a>
