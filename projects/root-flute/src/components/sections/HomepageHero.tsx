@@ -35,7 +35,8 @@ export default function HomepageHero() {
         muted
         playsInline
         loop
-        preload="auto"
+        preload="metadata"
+        poster="/video/hero-web-poster.jpg"
         disablePictureInPicture
         controls={false}
         aria-hidden="true"

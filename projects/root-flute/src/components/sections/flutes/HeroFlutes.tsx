@@ -36,7 +36,8 @@ export default function HeroFlutes() {
         muted
         playsInline
         loop
-        preload="auto"
+        preload="metadata"
+        poster="/video/hero-web-fs-poster.jpg"
         disablePictureInPicture
         controls={false}
         aria-hidden="true"

@@ -32,12 +32,22 @@ export default function DroneFlutes() {
         {/* Videos */}
         <div className="grid sm:grid-cols-2 gap-6 max-w-2xl mx-auto mb-16">
           <div className="aspect-[4/5] w-full border border-brand-border overflow-hidden bg-black">
-            <video controls preload="metadata" className="w-full h-full object-contain">
+            <video
+              controls
+              preload="none"
+              poster="/videos/custom-flutes/drone-flutes/drone-flute-video-1-poster.jpg"
+              className="w-full h-full object-contain"
+            >
               <source src="/videos/custom-flutes/drone-flutes/drone-flute-video-1.mp4" type="video/mp4" />
             </video>
           </div>
           <div className="aspect-[9/16] w-full border border-brand-border overflow-hidden bg-black">
-            <video controls preload="metadata" className="w-full h-full object-contain">
+            <video
+              controls
+              preload="none"
+              poster="/videos/custom-flutes/drone-flutes/drone-flute-video-2-poster.jpg"
+              className="w-full h-full object-contain"
+            >
               <source src="/videos/custom-flutes/drone-flutes/drone-flute-video-2.mp4" type="video/mp4" />
             </video>
           </div>

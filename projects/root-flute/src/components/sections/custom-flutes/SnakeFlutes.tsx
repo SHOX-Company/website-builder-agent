@@ -72,7 +72,12 @@ export default function SnakeFlutes() {
           {videos.map((video) =>
             video.type === "native" ? (
               <div key={video.src} className="aspect-[9/16] w-full border border-brand-border overflow-hidden bg-black">
-                <video controls preload="metadata" className="w-full h-full object-contain">
+                <video
+                  controls
+                  preload="none"
+                  poster="/videos/custom-flutes/snake-flutes/snake-flutes-video-1-poster.jpg"
+                  className="w-full h-full object-contain"
+                >
                   <source src={video.src} type="video/mp4" />
                 </video>
               </div>

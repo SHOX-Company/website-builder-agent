@@ -41,7 +41,12 @@ export default function FourChamberMayanChord() {
         {/* Videos */}
         <div className="grid sm:grid-cols-2 gap-6 max-w-3xl mx-auto mb-16">
           <div className="aspect-video w-full border border-brand-border overflow-hidden bg-black">
-            <video controls preload="metadata" className="w-full h-full object-contain">
+            <video
+              controls
+              preload="none"
+              poster="/videos/custom-flutes/four-chamber-mayan-chord/four-chamber-mayan-chord-video-1-poster.jpg"
+              className="w-full h-full object-contain"
+            >
               <source
                 src="/videos/custom-flutes/four-chamber-mayan-chord/four-chamber-mayan-chord-video-1.mp4"
                 type="video/mp4"

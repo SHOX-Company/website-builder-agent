@@ -36,7 +36,8 @@ export default function Hero() {
         muted
         playsInline
         loop
-        preload="auto"
+        preload="metadata"
+        poster="/video/community-hero-web-poster.jpg"
         disablePictureInPicture
         controls={false}
         aria-hidden="true"

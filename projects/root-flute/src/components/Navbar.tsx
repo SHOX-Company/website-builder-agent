@@ -179,19 +179,30 @@ export default function Navbar() {
 
   // bfcache / history resilience. pagehide fires just before the page is
   // hidden or frozen into bfcache — reset proactively so nothing is ever
-  // captured mid-transition. pageshow fires on every page load AND on a
-  // bfcache restore (event.persisted) — reset again defensively the instant
-  // the page becomes visible, in case a stale open/locked snapshot was ever
-  // captured despite the above. popstate covers Back/Forward navigation
-  // directly. All three are idempotent no-ops when the menu is already
-  // closed and unlocked.
+  // captured mid-transition. popstate covers Back/Forward navigation
+  // directly. Both are idempotent no-ops when the menu is already closed.
+  //
+  // pageshow must be handled far more narrowly. It fires on a bfcache restore
+  // (`persisted: true`) — the case this guard actually exists for — but it
+  // ALSO fires after the window `load` event on every ordinary navigation,
+  // and `load` waits for every subresource on the page. On a hero page
+  // carrying multi-megabyte video that lands *seconds* after the nav is
+  // already hydrated and interactive, so an unconditional reset here would
+  // silently close a menu the user had deliberately opened moments earlier —
+  // and, worse, run unlockBody()'s window.scrollTo() and yank them back up to
+  // the hero. Gating on `persisted` keeps the real bfcache protection while
+  // making a normal page load incapable of touching menu state, so the menu
+  // can only ever close from a genuine user action.
   useEffect(() => {
+    function handlePageShow(event: PageTransitionEvent) {
+      if (event.persisted) resetAllMenus();
+    }
     window.addEventListener("pagehide", resetAllMenus);
-    window.addEventListener("pageshow", resetAllMenus);
+    window.addEventListener("pageshow", handlePageShow);
     window.addEventListener("popstate", resetAllMenus);
     return () => {
       window.removeEventListener("pagehide", resetAllMenus);
-      window.removeEventListener("pageshow", resetAllMenus);
+      window.removeEventListener("pageshow", handlePageShow);
       window.removeEventListener("popstate", resetAllMenus);
     };
   }, [resetAllMenus]);

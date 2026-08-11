@@ -6,12 +6,36 @@ import Button from "@/components/ui/Button";
 export default function SoundDemo() {
   const videoRef = useRef<HTMLVideoElement>(null);
 
+  // This is a decorative, muted, aria-hidden background loop that sits well
+  // below the fold, behind a heavy dark overlay — but it shares the same
+  // ~11MB file as the hero at the top of this page. Calling play() on mount
+  // (as the visible heroes do) made the browser fetch that file eagerly a
+  // second time while the customer was still looking at the hero, which is
+  // the single largest chunk of wasted bandwidth on /flutes. Starting it only
+  // once it's actually approaching the viewport keeps the identical visual
+  // result while leaving the initial load to the content the customer can
+  // actually see. The poster still paints instantly either way.
   useEffect(() => {
     const v = videoRef.current;
-    if (v) {
-      v.muted = true;
+    if (!v) return;
+    v.muted = true;
+
+    if (typeof IntersectionObserver === "undefined") {
       v.play().catch(() => {});
+      return;
     }
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (entries.some((entry) => entry.isIntersecting)) {
+          v.play().catch(() => {});
+          observer.disconnect();
+        }
+      },
+      { rootMargin: "200px" }
+    );
+    observer.observe(v);
+    return () => observer.disconnect();
   }, []);
 
   return (
@@ -27,11 +51,11 @@ export default function SoundDemo() {
       {/* Video — elk footage */}
       <video
         ref={videoRef}
-        autoPlay
         muted
         playsInline
         loop
-        preload="auto"
+        preload="none"
+        poster="/video/hero-web-fs-poster.jpg"
         disablePictureInPicture
         controls={false}
         aria-hidden="true"
