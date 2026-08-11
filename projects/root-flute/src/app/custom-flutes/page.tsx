@@ -7,6 +7,8 @@ import MayanHarmonyFlutes from "@/components/sections/custom-flutes/MayanHarmony
 import TripleMayanChord from "@/components/sections/custom-flutes/TripleMayanChord";
 import FourChamberMayanChord from "@/components/sections/custom-flutes/FourChamberMayanChord";
 import RackFlute from "@/components/sections/custom-flutes/RackFlute";
+import SnakeFlutes from "@/components/sections/custom-flutes/SnakeFlutes";
+import MammothTuskFlutes from "@/components/sections/custom-flutes/MammothTuskFlutes";
 
 // Local metadata (not routed through the protected siteMetadata.ts registry)
 // — this page doesn't need bespoke OG/social card treatment yet.
@@ -45,6 +47,8 @@ export default function CustomFlutesPage() {
       <TripleMayanChord />
       <FourChamberMayanChord />
       <RackFlute />
+      <SnakeFlutes />
+      <MammothTuskFlutes />
 
       <Footer />
     </main>
