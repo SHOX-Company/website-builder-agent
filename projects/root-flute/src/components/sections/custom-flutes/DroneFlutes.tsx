@@ -6,9 +6,9 @@ import SectionWrapper from "@/components/ui/SectionWrapper";
 // caption are Daniel's original words, not rewritten. The standalone
 // RootFlute logo graphic present on the old page was intentionally not
 // migrated (site chrome, not Drone-Flute-specific content — same rule
-// established for Bell Flutes and Point Flutes). The source page's video
-// is a self-hosted Squarespace native video (not YouTube) with no
-// retrievable public URL — it was not migrated; see CF-3 report.
+// established for Bell Flutes and Point Flutes). Both source videos were
+// self-hosted Squarespace native videos (not YouTube); recovered from their
+// publicly-served HLS streams and stored locally as mp4 — see CF-3.1 report.
 const soldPieces = [
   { src: "/images/custom-flutes/drone-flutes/drone-flute-sold-2000.jpg", caption: "sold for $2,000" },
 ];
@@ -27,6 +27,20 @@ export default function DroneFlutes() {
           <p className="text-brand-muted text-sm">
             from $2,000 - price based on labor and materials used
           </p>
+        </div>
+
+        {/* Videos */}
+        <div className="grid sm:grid-cols-2 gap-6 max-w-2xl mx-auto mb-16">
+          <div className="aspect-[4/5] w-full border border-brand-border overflow-hidden bg-black">
+            <video controls preload="metadata" className="w-full h-full object-contain">
+              <source src="/videos/custom-flutes/drone-flutes/drone-flute-video-1.mp4" type="video/mp4" />
+            </video>
+          </div>
+          <div className="aspect-[9/16] w-full border border-brand-border overflow-hidden bg-black">
+            <video controls preload="metadata" className="w-full h-full object-contain">
+              <source src="/videos/custom-flutes/drone-flutes/drone-flute-video-2.mp4" type="video/mp4" />
+            </video>
+          </div>
         </div>
 
         {/* Sold pieces */}
