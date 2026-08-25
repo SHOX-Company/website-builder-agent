@@ -5,6 +5,7 @@ import SectionWrapper from "@/components/ui/SectionWrapper";
 import ItemBlock from "@/components/inventory/ItemBlock";
 import InstrumentsInquiryModal from "./InstrumentsInquiryModal";
 import type { InventoryItem } from "@/lib/inventory";
+import { slugify } from "@/lib/slug";
 
 export default function InstrumentsCollection({ items }: { items: InventoryItem[] }) {
   const [modalOpen, setModalOpen] = useState(false);
@@ -48,6 +49,7 @@ export default function InstrumentsCollection({ items }: { items: InventoryItem[
                 isLast={i === items.length - 1}
                 priority={i === 0}
                 onAcquire={openAcquire}
+                detailHref={`/instruments/${slugify(item.name)}`}
               />
             ))}
           </div>

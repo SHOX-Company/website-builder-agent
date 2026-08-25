@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import Image from "next/image";
+import Link from "next/link";
 import { isCheckoutEligible, type InventoryItem } from "@/lib/inventory";
 import { startCheckout } from "@/lib/checkoutClient";
 import PriceDisplay from "./PriceDisplay";
@@ -16,6 +17,8 @@ interface ItemBlockProps {
   priority?: boolean;
   /** Passes the full trusted inventory item (id, price, name) — not just its display name. */
   onAcquire: (item: InventoryItem) => void;
+  /** Optional dedicated single-item route (e.g. "/instruments/harp"). Omit to hide the link — categories without a detail route (Jewelry) simply don't pass it. */
+  detailHref?: string;
 }
 
 // Shared editorial "collection" layout for Jewelry and Instruments — a single
@@ -24,7 +27,7 @@ interface ItemBlockProps {
 // the Studio Preview modal so the preview is pixel-identical to what
 // publishes. Sold items never reach this component — the public pages and
 // the Preview modal both only ever render "available" pieces.
-export default function ItemBlock({ item, noun, layout, isLast = false, priority = false, onAcquire }: ItemBlockProps) {
+export default function ItemBlock({ item, noun, layout, isLast = false, priority = false, onAcquire, detailHref }: ItemBlockProps) {
   const [lightbox, setLightbox] = useState<number | null>(null);
   const [checkoutStatus, setCheckoutStatus] = useState<"idle" | "redirecting" | "error">("idle");
   const isRight = layout === "right";
@@ -183,6 +186,16 @@ export default function ItemBlock({ item, noun, layout, isLast = false, priority
                 ? "Secure checkout via Stripe"
                 : <>Private acquisition inquiry &nbsp;·&nbsp; Handled personally by Daniel</>}
             </p>
+            {detailHref && (
+              <Link
+                href={detailHref}
+                className="group self-start inline-block text-brand-gold/60 text-[11px] uppercase tracking-[0.4em] font-sans transition-colors duration-300 hover:text-brand-gold/90"
+              >
+                <span className="border-b border-brand-gold/18 pb-[2px] transition-colors duration-300 group-hover:border-brand-gold/45">
+                  View &amp; Share This {noun} →
+                </span>
+              </Link>
+            )}
           </div>
         </div>
       </div>
