@@ -20,7 +20,7 @@ export default function MaterialsIntro({ intro }: { intro: string }) {
           className="w-10 h-px bg-gradient-to-r from-transparent via-brand-gold/40 to-transparent"
         />
 
-        <p className="text-brand-muted text-base sm:text-lg leading-relaxed max-w-lg">
+        <p className="font-display italic font-bold text-2xl sm:text-3xl text-brand-text/85 leading-relaxed max-w-lg">
           {intro}
         </p>
       </div>

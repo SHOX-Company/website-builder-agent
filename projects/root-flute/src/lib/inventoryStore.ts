@@ -24,7 +24,68 @@ import type { InventoryCategory, InventoryItem, InventoryItemInput } from "@/lib
 const INVENTORY_PREFIX = "data/inventory/";
 const VERSIONS_TO_KEEP = 2;
 
-async function readAll(): Promise<InventoryItem[]> {
+// An item only occupies a slot in its category's Display Order sequence
+// while it's actually visible on the public site.
+function isActive(item: InventoryItem): boolean {
+  return item.status === "available" && item.published !== false;
+}
+
+// Guarantees every active item has a valid, gapless, 1-based Display Order
+// within its category — self-healing on every read regardless of what's
+// actually persisted. This is what lets legacy items (created before this
+// field existed) and not-yet-reordered categories (Flutes, Instruments)
+// "just work": items missing an explicit order fall back to the site's
+// original sort (featured first, then newest), so nothing visually changes
+// until someone actually reorders that category for the first time. Once a
+// category is reordered, real values get persisted via `writeAll` and this
+// becomes a no-op for it.
+function normalizeOrders(items: InventoryItem[]): InventoryItem[] {
+  const byCategory = new Map<InventoryCategory, InventoryItem[]>();
+  for (const item of items) {
+    if (!isActive(item)) continue;
+    const peers = byCategory.get(item.category) ?? [];
+    peers.push(item);
+    byCategory.set(item.category, peers);
+  }
+
+  const resolvedOrder = new Map<string, number>();
+  for (const peers of byCategory.values()) {
+    const sorted = [...peers].sort((a, b) => {
+      const aHas = typeof a.order === "number";
+      const bHas = typeof b.order === "number";
+      if (aHas && bHas) return a.order - b.order;
+      if (aHas !== bHas) return aHas ? -1 : 1;
+      if (a.featured !== b.featured) return a.featured ? -1 : 1;
+      return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
+    });
+    sorted.forEach((item, i) => resolvedOrder.set(item.id, i + 1));
+  }
+
+  return items.map((item) => (resolvedOrder.has(item.id) ? { ...item, order: resolvedOrder.get(item.id)! } : item));
+}
+
+// Moves `targetId` to `newOrder` (1-based) among its category's active
+// items, renumbering everyone else in that category to keep the sequence
+// gapless and unique. Category-agnostic by design — this is the one
+// function any future category's reordering UI needs to call.
+function reorderWithinCategory(items: InventoryItem[], targetId: string, newOrder: number): InventoryItem[] {
+  const target = items.find((item) => item.id === targetId);
+  if (!target) return items;
+
+  const peers = items
+    .filter((item) => isActive(item) && item.category === target.category && item.id !== targetId)
+    .sort((a, b) => a.order - b.order);
+
+  const clamped = Math.max(1, Math.min(newOrder, peers.length + 1));
+  peers.splice(clamped - 1, 0, target);
+
+  const resolvedOrder = new Map<string, number>();
+  peers.forEach((item, i) => resolvedOrder.set(item.id, i + 1));
+
+  return items.map((item) => (resolvedOrder.has(item.id) ? { ...item, order: resolvedOrder.get(item.id)! } : item));
+}
+
+async function readAllRaw(): Promise<InventoryItem[]> {
   try {
     const { blobs } = await list({ prefix: INVENTORY_PREFIX, limit: 20 });
     if (blobs.length === 0) return [];
@@ -46,6 +107,10 @@ async function readAll(): Promise<InventoryItem[]> {
   } catch {
     return [];
   }
+}
+
+async function readAll(): Promise<InventoryItem[]> {
+  return normalizeOrders(await readAllRaw());
 }
 
 async function writeAll(items: InventoryItem[]): Promise<void> {
@@ -76,38 +141,44 @@ export async function getInventoryItem(id: string): Promise<InventoryItem | null
 export async function getPublicInventory(category?: InventoryCategory): Promise<InventoryItem[]> {
   const items = await readAll();
   return items
-    .filter(
-      (item) =>
-        item.status === "available" && item.published !== false && (!category || item.category === category)
-    )
-    .sort((a, b) => {
-      if (a.featured !== b.featured) return a.featured ? -1 : 1;
-      return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
-    });
+    .filter((item) => isActive(item) && (!category || item.category === category))
+    .sort((a, b) => a.order - b.order);
 }
 
 export async function createInventoryItem(input: InventoryItemInput): Promise<InventoryItem> {
   const items = await readAll();
   const now = new Date().toISOString();
-  const item: InventoryItem = {
-    ...input,
+  const { order: requestedOrder, ...rest } = input;
+  const draft: InventoryItem = {
+    ...rest,
     id: crypto.randomUUID(),
     status: "available",
+    order: 0,
     createdAt: now,
     updatedAt: now,
     soldAt: null,
     stripeCheckoutSessionId: null,
   };
-  items.unshift(item);
-  await writeAll(items);
-  return item;
+
+  let nextItems: InventoryItem[];
+  if (isActive(draft)) {
+    const activePeers = items.filter((item) => isActive(item) && item.category === draft.category).length;
+    const targetOrder = typeof requestedOrder === "number" ? requestedOrder : activePeers + 1;
+    nextItems = reorderWithinCategory([draft, ...items], draft.id, targetOrder);
+  } else {
+    nextItems = [draft, ...items];
+  }
+
+  await writeAll(nextItems);
+  return nextItems.find((item) => item.id === draft.id)!;
 }
 
 export async function deleteInventoryItem(id: string): Promise<boolean> {
   const items = await readAll();
   const next = items.filter((item) => item.id !== id);
   if (next.length === items.length) return false;
-  await writeAll(next);
+  // Closes the gap left behind in the deleted item's category, if it was active.
+  await writeAll(normalizeOrders(next));
   return true;
 }
 
@@ -119,14 +190,33 @@ export async function updateInventoryItem(
   const index = items.findIndex((item) => item.id === id);
   if (index === -1) return null;
 
-  const updated: InventoryItem = {
-    ...items[index],
-    ...patch,
-    updatedAt: new Date().toISOString(),
-  };
-  items[index] = updated;
-  await writeAll(items);
-  return updated;
+  const current = items[index];
+  const { order: requestedOrder, ...restPatch } = patch;
+  const updatedTarget: InventoryItem = { ...current, ...restPatch, updatedAt: new Date().toISOString() };
+  const itemsWithTarget = items.map((item, i) => (i === index ? updatedTarget : item));
+
+  const wasActive = isActive(current);
+  const stillActive = isActive(updatedTarget);
+  const categoryChanged = restPatch.category !== undefined && restPatch.category !== current.category;
+  const orderChanged = typeof requestedOrder === "number" && requestedOrder !== current.order;
+
+  let nextItems: InventoryItem[];
+  if (stillActive && (categoryChanged || !wasActive || orderChanged)) {
+    const activePeers = itemsWithTarget.filter(
+      (item) => isActive(item) && item.category === updatedTarget.category && item.id !== id
+    ).length;
+    const targetOrder = orderChanged ? requestedOrder! : activePeers + 1;
+    nextItems = reorderWithinCategory(itemsWithTarget, id, targetOrder);
+  } else if (!stillActive && wasActive) {
+    // Left the active set (unpublished or marked sold via a direct patch) —
+    // close the gap it left behind in its old category.
+    nextItems = normalizeOrders(itemsWithTarget);
+  } else {
+    nextItems = itemsWithTarget;
+  }
+
+  await writeAll(nextItems);
+  return nextItems.find((item) => item.id === id) ?? updatedTarget;
 }
 
 export async function markInventoryItemSold(
@@ -145,17 +235,18 @@ export async function markInventoryItemSold(
     updatedAt: now,
     stripeCheckoutSessionId,
   };
-  items[index] = updated;
-  await writeAll(items);
+  const nextItems = items.map((item, i) => (i === index ? updated : item));
+  // Closes the gap the sold item leaves behind among its category's actives.
+  await writeAll(normalizeOrders(nextItems));
   return updated;
 }
 
 /**
  * Relists a piece — whether it was Sold, soft-deleted (published: false), or
  * both — restoring it to fully live (available + published) without
- * touching anything else (images, video, story, order, metadata all
- * untouched), so it immediately reappears on the public site with zero
- * recreation.
+ * touching anything else (images, video, story, metadata all untouched), so
+ * it immediately reappears on the public site with zero recreation. It
+ * re-enters its category's Display Order sequence at the end.
  */
 export async function relistInventoryItem(id: string): Promise<InventoryItem | null> {
   const items = await readAll();
@@ -170,7 +261,12 @@ export async function relistInventoryItem(id: string): Promise<InventoryItem | n
     stripeCheckoutSessionId: null,
     updatedAt: new Date().toISOString(),
   };
-  items[index] = updated;
-  await writeAll(items);
-  return updated;
+  const itemsWithTarget = items.map((item, i) => (i === index ? updated : item));
+  const activePeers = itemsWithTarget.filter(
+    (item) => isActive(item) && item.category === updated.category && item.id !== id
+  ).length;
+  const nextItems = reorderWithinCategory(itemsWithTarget, id, activePeers + 1);
+
+  await writeAll(nextItems);
+  return nextItems.find((item) => item.id === id) ?? updated;
 }

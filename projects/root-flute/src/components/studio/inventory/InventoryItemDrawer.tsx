@@ -31,9 +31,20 @@ interface FormState {
   featuredImage: InventoryImage | null;
   additionalImages: InventoryImage[];
   video: string | null;
+  /** 1-based Display Order among this item's active category-mates. */
+  order: number;
 }
 
-function emptyForm(defaultCategory: InventoryCategory = "flute"): FormState {
+// How many active (available + published) items in `category` this item
+// would be competing for a position among — used both to size the Display
+// Order dropdown and to default new/incoming items to "append at the end."
+function activePeerCount(allItems: InventoryItem[], category: InventoryCategory, excludeId?: string): number {
+  return allItems.filter(
+    (item) => item.category === category && item.status === "available" && item.published !== false && item.id !== excludeId
+  ).length;
+}
+
+function emptyForm(defaultCategory: InventoryCategory = "flute", order = 1): FormState {
   return {
     category: defaultCategory,
     name: "",
@@ -48,10 +59,11 @@ function emptyForm(defaultCategory: InventoryCategory = "flute"): FormState {
     featuredImage: null,
     additionalImages: [],
     video: null,
+    order,
   };
 }
 
-function formFromItem(item: InventoryItem): FormState {
+function formFromItem(item: InventoryItem, order: number): FormState {
   return {
     category: item.category,
     name: item.name,
@@ -66,23 +78,22 @@ function formFromItem(item: InventoryItem): FormState {
     featuredImage: item.featuredImage,
     additionalImages: item.additionalImages,
     video: item.video,
+    order,
   };
 }
 
+// A piece can be published with just an image — everything else (name,
+// price, description, story, materials) is filled in whenever it's ready,
+// including after publishing.
 function isValid(form: FormState): boolean {
-  return (
-    form.name.trim().length > 0 &&
-    form.shortDescription.trim().length > 0 &&
-    form.story.trim().length > 0 &&
-    form.materials.trim().length > 0 &&
-    form.featuredImage !== null &&
-    (form.priceOnInquiry || form.price.trim().length > 0)
-  );
+  return form.featuredImage !== null;
 }
 
 interface InventoryItemDrawerProps {
   open: boolean;
   item: InventoryItem | null;
+  /** Full current inventory, across every category — used to size and default the Display Order dropdown. */
+  allItems: InventoryItem[];
   defaultCategory?: InventoryCategory;
   onClose: () => void;
   onSaved: (item: InventoryItem) => void;
@@ -93,6 +104,7 @@ interface InventoryItemDrawerProps {
 export default function InventoryItemDrawer({
   open,
   item,
+  allItems,
   defaultCategory,
   onClose,
   onSaved,
@@ -100,7 +112,16 @@ export default function InventoryItemDrawer({
   onDeleted,
 }: InventoryItemDrawerProps) {
   const mode = item ? "edit" : "create";
-  const [form, setForm] = useState<FormState>(() => (item ? formFromItem(item) : emptyForm(defaultCategory)));
+  const [form, setForm] = useState<FormState>(() => {
+    const category = item ? item.category : defaultCategory ?? "flute";
+    // An already-active item keeps its current position by default;
+    // anything else (new, or currently sold/unpublished) defaults to the end.
+    const order =
+      item && item.status === "available" && item.published !== false
+        ? item.order
+        : activePeerCount(allItems, category, item?.id) + 1;
+    return item ? formFromItem(item, order) : emptyForm(category, order);
+  });
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [actionPending, setActionPending] = useState<"sold" | "relist" | null>(null);
@@ -115,10 +136,17 @@ export default function InventoryItemDrawer({
   if (open !== wasOpen) {
     setWasOpen(open);
     if (open) {
-      setForm(item ? formFromItem(item) : emptyForm(defaultCategory));
+      const category = item ? item.category : defaultCategory ?? "flute";
+      const order =
+        item && item.status === "available" && item.published !== false
+          ? item.order
+          : activePeerCount(allItems, category, item?.id) + 1;
+      setForm(item ? formFromItem(item, order) : emptyForm(category, order));
       setError(null);
     }
   }
+
+  const maxOrder = activePeerCount(allItems, form.category, item?.id) + 1;
 
   useEffect(() => {
     if (!open) return;
@@ -145,7 +173,7 @@ export default function InventoryItemDrawer({
     const input: InventoryItemInput = {
       category: form.category,
       name: form.name.trim(),
-      price: form.priceOnInquiry ? null : Number(form.price),
+      price: form.priceOnInquiry || form.price.trim().length === 0 ? null : Number(form.price),
       published: form.published,
       featured: form.featured,
       shortDescription: form.shortDescription.trim(),
@@ -155,6 +183,7 @@ export default function InventoryItemDrawer({
       featuredImage: form.featuredImage,
       additionalImages: form.additionalImages,
       video: form.video,
+      order: form.category === "jewelry" ? form.order : undefined,
     };
 
     try {
@@ -307,7 +336,16 @@ export default function InventoryItemDrawer({
                 <button
                   key={cat}
                   type="button"
-                  onClick={() => update("category", cat)}
+                  onClick={() =>
+                    setForm((prev) => ({
+                      ...prev,
+                      category: cat,
+                      // Moving categories means a different sequence — default
+                      // to the end of the new one rather than carrying over a
+                      // position number that belonged to the old category.
+                      order: activePeerCount(allItems, cat, item?.id) + 1,
+                    }))
+                  }
                   className={`px-3 py-2.5 rounded-md text-sm font-sans border transition-colors duration-150 ${
                     form.category === cat
                       ? "bg-brand-gold/10 border-brand-gold text-brand-gold"
@@ -319,6 +357,28 @@ export default function InventoryItemDrawer({
               ))}
             </div>
           </div>
+
+          {form.category === "jewelry" && (
+            <div className="flex flex-col gap-2">
+              <span className="text-xs uppercase tracking-widest text-brand-muted font-sans">
+                Display Order on Website
+              </span>
+              <select
+                value={form.order}
+                onChange={(e) => update("order", Number(e.target.value))}
+                className="w-full bg-brand-dark border border-brand-border rounded-md px-4 py-2.5 text-sm text-brand-text focus:outline-none focus:ring-2 focus:ring-brand-gold focus:border-brand-gold transition-colors duration-150"
+              >
+                {Array.from({ length: maxOrder }, (_, i) => i + 1).map((n) => (
+                  <option key={n} value={n}>
+                    {n}
+                  </option>
+                ))}
+              </select>
+              <p className="text-xs text-brand-muted/70 font-sans">
+                Choose where this piece appears on the Jewelry page. 1 = First, 2 = Second, etc.
+              </p>
+            </div>
+          )}
 
           <Input
             id="name"

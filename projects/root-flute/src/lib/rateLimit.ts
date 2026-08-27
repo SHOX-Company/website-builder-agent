@@ -18,13 +18,17 @@ function getClientIp(req: Request): string {
   );
 }
 
-export function checkRateLimit(req: Request): { allowed: boolean } {
-  const ip = getClientIp(req);
+// `purpose` namespaces the bucket (e.g. "login" vs "inquiry") so a burst of
+// public inquiry submissions can never lock out Studio login attempts from
+// the same IP, or vice versa — each purpose gets its own independent 5/15min
+// allowance.
+export function checkRateLimit(req: Request, purpose: string): { allowed: boolean } {
+  const key = `${purpose}:${getClientIp(req)}`;
   const now = Date.now();
-  const entry = store.get(ip);
+  const entry = store.get(key);
 
   if (!entry || entry.resetAt <= now) {
-    store.set(ip, { count: 1, resetAt: now + WINDOW_MS });
+    store.set(key, { count: 1, resetAt: now + WINDOW_MS });
     return { allowed: true };
   }
 

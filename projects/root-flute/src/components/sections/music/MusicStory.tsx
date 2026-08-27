@@ -3,7 +3,7 @@ import type { MusicCopy } from "@/lib/music";
 
 export default function MusicStory({ copy }: { copy: MusicCopy }) {
   return (
-    <SectionWrapper className="bg-brand-surface py-12">
+    <SectionWrapper className="bg-brand-surface py-12 !pt-4">
       <div className="max-w-2xl mx-auto text-center flex flex-col items-center gap-5">
         <p className="text-brand-gold/70 text-xs uppercase tracking-[0.25em] font-sans">
           {copy.stats}

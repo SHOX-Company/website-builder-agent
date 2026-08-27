@@ -10,12 +10,32 @@ const PATHWAYS = [
       "Immersive sound journeys, conscious gathering, and guided experiences designed to reconnect you with presence, clarity, and emotional release.",
     cta: "Join the Society",
     accent: "Founding seats · $35/month · Live twice monthly",
-    imageSrc: "/images/community-hero.png",
+    imageSrc: "/images/homepage-society.png",
     imageAlt: "Daniel playing handcrafted flute in an immersive sound journey",
     variant: "gold" as const,
     watermarkLine: "Gather in Resonance",
     imageObjectPosition: "center",
   },
+
+  {
+    href: "/music",
+    eyebrow: "Music",
+    name: "Live Sound Sessions",
+    description:
+      "Original songs, live looping sessions, and celestial soundscapes crafted to move the body and still the mind.",
+    cta: "Listen to the Sessions",
+    accent: "Original sessions · Studio & live · Streaming everywhere",
+    imageSrc: "/images/homepage-music-2.png",
+    imageAlt: "Daniel in the studio, headphones on, surrounded by handcrafted flutes and instruments",
+    variant: "neutral" as const,
+    watermarkLine: "Rhythm • Resonance • Release",
+    imageObjectPosition: "center",
+  },
+
+  // Phase 2 (remaining): Available Now inserts here, before Flutes. The grid
+  // below reflows automatically from array order/count, so no layout change
+  // is needed to add it — just splice its object in at this position.
+
   {
     href: "/flutes",
     eyebrow: "Flutes",
@@ -28,20 +48,6 @@ const PATHWAYS = [
     imageAlt: "Daniel on dock holding rare antler flute — mountains and lake backdrop",
     variant: "neutral" as const,
     watermarkLine: "Breath • Resonance • Craft",
-    imageObjectPosition: "center",
-  },
-  {
-    href: "/jewelry",
-    eyebrow: "Adornment",
-    name: "Handcrafted Adornment",
-    description:
-      "Timeless, intentional pieces crafted from natural materials to embody beauty, symbolism, and intentional living.",
-    cta: "View the Collection",
-    accent: "Three pieces · Handcrafted · Inquire directly",
-    imageSrc: "/images/jewelry/pearl-of-vision-1.png",
-    imageAlt: "Pearl of Vision — handcrafted intentional adornment",
-    variant: "neutral" as const,
-    watermarkLine: "Rare Adornment",
     imageObjectPosition: "center",
   },
   {
@@ -58,6 +64,20 @@ const PATHWAYS = [
     watermarkLine: "Sound • Ritual • Presence",
     imageObjectPosition: "center",
   },
+  {
+    href: "/jewelry",
+    eyebrow: "Talismans",
+    name: "Handcrafted Talismans",
+    description:
+      "Timeless, intentional pieces crafted from natural materials to embody beauty, symbolism, and intentional living.",
+    cta: "View the Collection",
+    accent: "Three pieces · Handcrafted · Inquire directly",
+    imageSrc: "/images/homepage-talismans.png",
+    imageAlt: "Pearl of Vision — handcrafted intentional adornment",
+    variant: "neutral" as const,
+    watermarkLine: "Rare Talismans",
+    imageObjectPosition: "center",
+  },
 ];
 
 export default function HomepagePathways() {
@@ -68,7 +88,7 @@ export default function HomepagePathways() {
       {/* Section label */}
       <div className="text-center mb-16">
         <p className="text-brand-gold text-xs uppercase tracking-[0.3em] font-sans mb-4">
-          Four Pathways
+          Begin Your Journey
         </p>
         <h2 className="font-display text-4xl sm:text-5xl font-light text-brand-text">
           Where do you begin?
@@ -89,7 +109,6 @@ export default function HomepagePathways() {
                 src={p.imageSrc}
                 alt={p.imageAlt}
                 fill
-                unoptimized
                 className="object-cover opacity-72 group-hover:opacity-86 transition-opacity duration-500 group-hover:scale-[1.03] transition-transform"
                 style={{ objectPosition: p.imageObjectPosition }}
                 sizes="(max-width: 1024px) 100vw, 33vw"

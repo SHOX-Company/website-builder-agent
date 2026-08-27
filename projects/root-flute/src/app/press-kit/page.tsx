@@ -6,6 +6,7 @@ import { Toast, useToast } from "@/components/ui/Toast";
 import { useDownload } from "@/hooks/useDownload";
 import { useState } from "react";
 import PromotionalPhotoGallery from "@/components/sections/PromotionalPhotoGallery";
+import LogoAssetGallery from "@/components/sections/press-kit/LogoAssetGallery";
 
 const pressKitAssets = {
   bios: [
@@ -135,32 +136,7 @@ export default function PressKitPage() {
             <p className="text-brand-muted text-sm mb-6">
               7 professional logo variations in PNG format
             </p>
-            <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 p-6 bg-brand-surface-2 rounded-sm">
-              {pressKitAssets.logos.map((logo) => (
-                <a
-                  key={logo.id}
-                  href={logo.path}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="aspect-square bg-brand-surface rounded overflow-hidden flex items-center justify-center hover:bg-brand-surface-2 transition-all group relative cursor-pointer"
-                  title={`Open Logo ${logo.id}`}
-                >
-                  <div className="w-full h-full relative flex items-center justify-center p-2">
-                    <img
-                      src={logo.path}
-                      alt={`Logo ${logo.id}`}
-                      className="object-contain max-w-full max-h-full"
-                      draggable={false}
-                    />
-                  </div>
-                  <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-colors flex items-center justify-center">
-                    <span className="text-xs opacity-0 group-hover:opacity-100 transition-opacity text-white">
-                      ↗
-                    </span>
-                  </div>
-                </a>
-              ))}
-            </div>
+            <LogoAssetGallery logos={pressKitAssets.logos} />
           </section>
 
           {/* Photos */}

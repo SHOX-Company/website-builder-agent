@@ -14,7 +14,7 @@ export default function HomepageHero() {
   }, []);
 
   return (
-    <section className="relative min-h-screen flex flex-col items-center justify-center overflow-hidden">
+    <section className="relative min-h-screen flex flex-col items-center justify-start sm:justify-center overflow-hidden pt-24 sm:pt-0">
 
       {/* Cinematic gradient base */}
       <div
@@ -67,7 +67,7 @@ export default function HomepageHero() {
         </h1>
 
         <p className="text-white/80 text-lg sm:text-xl font-light leading-relaxed max-w-sm [text-shadow:0_2px_12px_rgba(0,0,0,0.7)]">
-          Three pathways into the RootFlute world. One creator. Everything made by hand.
+          Enter the RootFlute world. One creator. Everything made by hand.
         </p>
 
 

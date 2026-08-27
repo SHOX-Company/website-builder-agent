@@ -17,7 +17,7 @@ const PUBLIC_PAGES = [
   { label: "Home", path: "/" },
   { label: "Society", path: "/society" },
   { label: "Flutes", path: "/flutes" },
-  { label: "Jewelry", path: "/jewelry" },
+  { label: "Talismans", path: "/jewelry" },
   { label: "Instruments", path: "/instruments" },
   { label: "Materials", path: "/materials" },
   { label: "RootFlute Live", path: "/videos/rootflute-live" },

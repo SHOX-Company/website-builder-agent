@@ -197,7 +197,6 @@ export default function Flutes() {
               src={src}
               alt={alt}
               fill
-              unoptimized
               className="object-cover object-center opacity-55 group-hover:opacity-80 transition-opacity duration-300"
               sizes="(max-width: 640px) 50vw, 25vw"
             />
@@ -249,7 +248,6 @@ export default function Flutes() {
               src={GALLERY[lightbox].src}
               alt={GALLERY[lightbox].alt}
               fill
-              unoptimized
               className="object-contain"
               sizes="(max-width: 640px) 100vw, 576px"
             />

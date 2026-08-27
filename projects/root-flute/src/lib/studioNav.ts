@@ -33,7 +33,7 @@ export const STUDIO_NAV: StudioNavItem[] = [
     label: "Inventory",
     href: "/studio/inventory",
     icon: Package,
-    description: "Flutes, instruments & jewelry",
+    description: "Flutes, instruments & talismans",
   },
   {
     label: "Videos",

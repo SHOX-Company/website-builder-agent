@@ -7,7 +7,6 @@ import SectionWrapper from "@/components/ui/SectionWrapper";
 import Footer from "@/components/sections/Footer";
 import type { MaterialsCopy } from "@/lib/materials";
 import copy from "@/content/materials/materials-copy.json";
-import { getMaterialsStatement } from "@/lib/materialStore";
 
 export const metadata = buildPageMetadata("materials");
 export const dynamic = "force-dynamic";
@@ -15,7 +14,6 @@ export const dynamic = "force-dynamic";
 export default async function MaterialsPage() {
   const materialsCopy = copy as MaterialsCopy;
   const [intro, ...remainingStatements] = materialsCopy.statements;
-  const { statement: materialsStatement } = await getMaterialsStatement();
 
   return (
     <main>
@@ -37,18 +35,6 @@ export default async function MaterialsPage() {
           ))}
         </div>
       </SectionWrapper>
-
-      {materialsStatement && (
-        <SectionWrapper className="bg-brand-surface-2">
-          <div className="max-w-2xl mx-auto flex flex-col gap-6 text-center">
-            {materialsStatement.split("\n\n").map((paragraph, i) => (
-              <p key={i} className="text-brand-muted text-base sm:text-lg leading-relaxed whitespace-pre-line">
-                {paragraph}
-              </p>
-            ))}
-          </div>
-        </SectionWrapper>
-      )}
 
       <Footer />
     </main>

@@ -3,7 +3,7 @@ import { sendInquiryEmail } from "@/lib/email";
 import { checkRateLimit, isHoneypot } from "@/lib/rateLimit";
 
 export async function POST(req: NextRequest) {
-  const { allowed } = checkRateLimit(req);
+  const { allowed } = checkRateLimit(req, "inquiry");
   if (!allowed) {
     return NextResponse.json({ ok: true });
   }

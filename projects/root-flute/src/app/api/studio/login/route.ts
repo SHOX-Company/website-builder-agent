@@ -3,7 +3,7 @@ import { checkRateLimit } from "@/lib/rateLimit";
 import { STUDIO_COOKIE, STUDIO_SESSION_MAX_AGE_SECONDS, createSessionToken } from "@/lib/studioAuth";
 
 export async function POST(req: NextRequest) {
-  const { allowed } = checkRateLimit(req);
+  const { allowed } = checkRateLimit(req, "login");
   if (!allowed) {
     return NextResponse.json({ error: "Too many attempts. Try again later." }, { status: 429 });
   }

@@ -24,6 +24,14 @@ export interface InventoryItem {
   featuredImage: InventoryImage | null;
   additionalImages: InventoryImage[];
   video: string | null;
+  /**
+   * 1-based position among this item's *active* (available + published)
+   * category-mates — the single source of truth for listing order on the
+   * public site. Always resolved to a valid, gapless sequence by the store
+   * layer (see `inventoryStore.ts`), even for items that predate this
+   * field, so every reader can treat it as present and correct.
+   */
+  order: number;
   createdAt: string;
   updatedAt: string;
   soldAt: string | null;
@@ -34,7 +42,7 @@ export interface InventoryItem {
 export const CATEGORY_LABELS: Record<InventoryCategory, string> = {
   flute: "Flute",
   instrument: "Instrument",
-  jewelry: "Jewelry",
+  jewelry: "Talismans",
 };
 
 export function formatPrice(price: number | null): string {
@@ -50,7 +58,10 @@ export function isCheckoutEligible(item: InventoryItem): boolean {
   return item.price !== null;
 }
 
+// `order` is optional on input: omit it to auto-append at the end of its
+// category, or pass an explicit 1-based position to place/move it there —
+// the store cascades the shift across every other affected item.
 export type InventoryItemInput = Omit<
   InventoryItem,
-  "id" | "createdAt" | "updatedAt" | "soldAt" | "status" | "stripeCheckoutSessionId"
->;
+  "id" | "createdAt" | "updatedAt" | "soldAt" | "status" | "order" | "stripeCheckoutSessionId"
+> & { order?: number };

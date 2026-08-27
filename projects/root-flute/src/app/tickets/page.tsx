@@ -4,13 +4,13 @@ import { buildPageMetadata } from "@/lib/siteMetadata";
 import TicketCard from "@/components/sections/tickets/TicketCard";
 import SectionWrapper from "@/components/ui/SectionWrapper";
 import Footer from "@/components/sections/Footer";
-import type { TicketEvent } from "@/lib/tickets";
-import events from "@/content/tickets/tickets.json";
+import { getPublicEvents } from "@/lib/eventStore";
 
 export const metadata = buildPageMetadata("tickets");
+export const dynamic = "force-dynamic";
 
-export default function TicketsPage() {
-  const entries = events as TicketEvent[];
+export default async function TicketsPage() {
+  const entries = await getPublicEvents();
 
   return (
     <main>
@@ -43,9 +43,13 @@ export default function TicketsPage() {
 
       <SectionWrapper className="bg-brand-surface-2">
         <div className="max-w-3xl mx-auto flex flex-col gap-5">
-          {entries.map((event, i) => (
-            <TicketCard key={i} event={event} />
-          ))}
+          {entries.length > 0 ? (
+            entries.map((event) => <TicketCard key={event.id} event={event} />)
+          ) : (
+            <p className="text-center text-brand-muted text-sm py-16">
+              New events are on the way.
+            </p>
+          )}
         </div>
       </SectionWrapper>
 

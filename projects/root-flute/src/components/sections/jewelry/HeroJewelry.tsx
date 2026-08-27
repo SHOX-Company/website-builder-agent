@@ -29,7 +29,6 @@ export default function HeroJewelry() {
           alt=""
           fill
           priority
-          unoptimized
           aria-hidden="true"
           className="object-contain object-center brightness-[0.60] saturate-[0.44]"
           sizes="(max-width: 640px) 88vw, 64vw"

@@ -17,7 +17,7 @@ const CATEGORY_TABS: { value: CategoryFilter; label: string }[] = [
   { value: "all", label: "All" },
   { value: "flute", label: "Flutes" },
   { value: "instrument", label: "Instruments" },
-  { value: "jewelry", label: "Jewelry" },
+  { value: "jewelry", label: "Talismans" },
 ];
 
 const STATUS_TABS: { value: StatusFilter; label: string }[] = [
@@ -81,7 +81,7 @@ export default function InventoryDashboard({ initialItems }: { initialItems: Inv
       <PageHeader
         eyebrow="Inventory"
         title="Inventory"
-        description={`${availableCount} piece${availableCount === 1 ? "" : "s"} available across Flutes, Instruments & Jewelry.`}
+        description={`${availableCount} piece${availableCount === 1 ? "" : "s"} available across Flutes, Instruments & Talismans.`}
         actions={
           <StudioButton onClick={openNewPiece} size="lg">
             <Plus className="w-4 h-4" strokeWidth={2} /> New Piece
@@ -148,6 +148,7 @@ export default function InventoryDashboard({ initialItems }: { initialItems: Inv
       <InventoryItemDrawer
         open={drawerOpen}
         item={editingItem}
+        allItems={items}
         defaultCategory={categoryFilter !== "all" ? categoryFilter : undefined}
         onClose={() => setDrawerOpen(false)}
         onSaved={handleSaved}

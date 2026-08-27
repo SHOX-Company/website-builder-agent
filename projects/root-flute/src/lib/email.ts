@@ -1,4 +1,5 @@
 import { Resend } from "resend";
+import { saveLead } from "@/lib/leadStore";
 
 export interface InquiryPayload {
   name: string;
@@ -132,13 +133,37 @@ function buildEmailText(payload: InquiryPayload, timestamp: string): string {
   return lines.join("\n");
 }
 
+// Persists a durable backup of the lead regardless of email outcome — a
+// Resend outage or misconfiguration must never mean the lead is simply gone.
+// Wrapped so a Blob failure here can never mask or block the caller's actual
+// email result.
+async function backupLead(payload: InquiryPayload, emailDelivered: boolean): Promise<void> {
+  try {
+    await saveLead({
+      formType: payload.formType,
+      product: payload.product,
+      name: payload.name,
+      email: payload.email,
+      phone: payload.phone ?? "",
+      instagram: payload.instagram ?? "",
+      message: payload.message ?? "",
+      source: payload.source,
+      extraFields: payload.extraFields ?? null,
+      emailDelivered,
+    });
+  } catch (err) {
+    console.error(`[inquiry] Failed to save durable lead backup:`, err);
+  }
+}
+
 export async function sendInquiryEmail(payload: InquiryPayload): Promise<{ ok: boolean }> {
   const timestamp = formatTimestamp();
 
   if (!process.env.RESEND_API_KEY) {
     console.error(`[inquiry] RESEND_API_KEY is not set — email NOT sent. Add it to Vercel env vars.`);
     console.info(`[inquiry] Captured payload:`, JSON.stringify({ ...payload, timestamp }));
-    return { ok: true };
+    await backupLead(payload, false);
+    return { ok: false };
   }
 
   console.info(`[inquiry] Sending email — from: ${FROM_EMAIL} to: ${TO_EMAIL} form: ${payload.formType}`);
@@ -157,9 +182,11 @@ export async function sendInquiryEmail(payload: InquiryPayload): Promise<{ ok: b
   if (error) {
     console.error(`[inquiry] Resend rejected the send:`, JSON.stringify(error));
     console.info(`[inquiry] Payload that failed:`, JSON.stringify({ ...payload, timestamp }));
-  } else {
-    console.info(`[inquiry] Email sent successfully. Resend id: ${data?.id}`);
+    await backupLead(payload, false);
+    return { ok: false };
   }
 
+  console.info(`[inquiry] Email sent successfully. Resend id: ${data?.id}`);
+  await backupLead(payload, true);
   return { ok: true };
 }

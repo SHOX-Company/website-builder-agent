@@ -15,6 +15,7 @@ const PATCHABLE_KEYS: (keyof InventoryItemInput)[] = [
   "featuredImage",
   "additionalImages",
   "video",
+  "order",
 ];
 
 export async function GET(_req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
@@ -29,14 +30,14 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
   const body = await req.json().catch(() => null);
   if (!body) return NextResponse.json({ error: "Invalid JSON body." }, { status: 400 });
 
-  if (typeof body.name === "string" && body.name.trim().length === 0) {
-    return NextResponse.json({ error: "Product name cannot be empty." }, { status: 400 });
-  }
   if (
     body.featuredImage !== undefined &&
     (!body.featuredImage || typeof body.featuredImage.url !== "string" || body.featuredImage.url.trim().length === 0)
   ) {
     return NextResponse.json({ error: "A featured image is required." }, { status: 400 });
+  }
+  if (body.order !== undefined && (!Number.isInteger(body.order) || body.order < 1)) {
+    return NextResponse.json({ error: "Display order must be a positive whole number." }, { status: 400 });
   }
 
   const patch: Partial<InventoryItemInput> = {};

@@ -15,7 +15,6 @@ export default function MaterialsHero({ copy }: { copy: MaterialsCopy }) {
         alt={copy.heroImage.alt}
         fill
         priority
-        unoptimized
         className="absolute inset-0 z-0 object-contain object-center"
         sizes="100vw"
       />

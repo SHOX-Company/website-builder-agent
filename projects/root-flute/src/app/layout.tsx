@@ -4,10 +4,12 @@
 // a site-level fallback. Page-specific metadata is in each page file.
 import type { Metadata } from "next";
 import { Inter, Cormorant_Garamond } from "next/font/google";
+import { Analytics } from "@vercel/analytics/next";
 import "./globals.css";
 import Navbar from "@/components/Navbar";
 import StickyBar from "@/components/StickyBar";
 import ScrollReset from "@/components/ScrollReset";
+import MetaPixel from "@/components/MetaPixel";
 import { SITE_URL, buildPageMetadata } from "@/lib/siteMetadata";
 
 const inter = Inter({
@@ -46,6 +48,8 @@ export default function RootLayout({
         <Navbar />
         {children}
         <StickyBar />
+        <Analytics />
+        <MetaPixel />
       </body>
     </html>
   );

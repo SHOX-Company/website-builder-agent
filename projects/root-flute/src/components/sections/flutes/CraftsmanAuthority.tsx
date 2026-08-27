@@ -35,7 +35,6 @@ export default function CraftsmanAuthority() {
                 src="/images/daniel-portrait.jpg"
                 alt="Daniel — flute craftsman and sound healer"
                 fill
-                unoptimized
                 className="object-cover object-[50%_48%]"
                 sizes="(max-width: 768px) 100vw, 50vw"
                 priority={false}

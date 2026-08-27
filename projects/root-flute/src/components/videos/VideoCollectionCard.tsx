@@ -81,6 +81,30 @@ export default function VideoCollectionCard({ video }: { video: VideoItem }) {
     </h3>
   );
 
+  // Native YouTube embed — same pattern as the Music section: plays inline
+  // via YouTube's own player/controls instead of linking out to a thumbnail.
+  if (youTubeId) {
+    return (
+      <div className="group block">
+        <div className="relative aspect-video overflow-hidden bg-brand-surface-2 border border-brand-border transition-colors duration-300 group-hover:border-brand-gold/50 group-focus-visible:border-brand-gold">
+          <iframe
+            className="absolute inset-0 w-full h-full"
+            src={`https://www.youtube.com/embed/${youTubeId}?autoplay=0&rel=0`}
+            title={video.title}
+            allowFullScreen
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+          />
+          {video.duration && (
+            <span className="absolute bottom-2 right-2 px-1.5 py-0.5 bg-brand-dark/80 text-brand-text/90 text-[11px] font-sans rounded">
+              {video.duration}
+            </span>
+          )}
+        </div>
+        {titleEl}
+      </div>
+    );
+  }
+
   if (video.hostedUrl) {
     return (
       <a

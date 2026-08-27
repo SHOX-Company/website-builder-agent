@@ -53,7 +53,6 @@ export default function Authority() {
                 src="/images/daniel-portrait.jpg"
                 alt="Daniel — sound healer and community guide"
                 fill
-                unoptimized
                 className="object-cover object-[50%_48%]"
                 sizes="(max-width: 768px) 100vw, 50vw"
                 priority={false}

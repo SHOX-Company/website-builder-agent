@@ -25,7 +25,8 @@ const NAV_ITEMS: NavItem[] = [
       { label: "Custom Flute Styles", href: "/custom-flutes" },
     ],
   },
-  { label: "Jewelry", href: "/jewelry" },
+  { label: "Music", href: "/music" },
+  { label: "Talismans", href: "/jewelry" },
   { label: "Instruments", href: "/instruments" },
   { label: "Materials", href: "/materials" },
   {
@@ -36,7 +37,6 @@ const NAV_ITEMS: NavItem[] = [
       { label: "Lucid Meditation", href: "/videos/lucid-meditation" },
     ],
   },
-  { label: "Music", href: "/music" },
   { label: "Tickets", href: "/tickets" },
   { label: "About", href: "/about" },
   { label: "Testimonials", href: "/testimonials" },
@@ -44,7 +44,23 @@ const NAV_ITEMS: NavItem[] = [
 ];
 
 export default function Navbar() {
-  const [scrolled, setScrolled] = useState(false);
+  const pathname = usePathname();
+
+  // Promoter mirror: /promoter/* renders the same pages as the public site
+  // (see src/middleware.ts). Needed here, ahead of the `scrolled` state
+  // below, to identify the home page regardless of which mirror it's
+  // viewed through.
+  const isPromoterPath = pathname === "/promoter" || pathname.startsWith("/promoter/");
+  const promoterPrefix = isPromoterPath ? "/promoter" : "";
+  const logicalPathname = isPromoterPath ? pathname.slice("/promoter".length) || "/" : pathname;
+  const isHomePage = logicalPathname === "/";
+
+  // The home hero now renders in its final "scrolled" dark-header state
+  // from first paint (see HomepageHero.tsx) — the header must match
+  // immediately, not transition into it. Every other page keeps starting
+  // transparent, exactly as before; the scroll listener below still drives
+  // ordinary scroll-linked toggling on all pages, including home.
+  const [scrolled, setScrolled] = useState(isHomePage);
   const [videosOpen, setVideosOpen] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
   const [mobileVideosOpen, setMobileVideosOpen] = useState(false);
@@ -54,7 +70,6 @@ export default function Navbar() {
   // "Flutes" label must also remain a working link to /flutes.
   const [flutesOpen, setFlutesOpen] = useState(false);
   const [mobileFlutesOpen, setMobileFlutesOpen] = useState(false);
-  const pathname = usePathname();
   const videosRef = useRef<HTMLLIElement>(null);
   const flutesRef = useRef<HTMLLIElement>(null);
   const closeTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -63,10 +78,15 @@ export default function Navbar() {
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 24);
-    onScroll();
+    // Home starts forced-dark (see the `scrolled` initializer above) — skip
+    // this one recalculation-on-mount so that forced value survives until a
+    // real scroll event fires, instead of being immediately overwritten by
+    // the actual (zero) scroll position. Every other page still recalculates
+    // on mount exactly as before.
+    if (!isHomePage) onScroll();
     window.addEventListener("scroll", onScroll, { passive: true });
     return () => window.removeEventListener("scroll", onScroll);
-  }, []);
+  }, [isHomePage]);
 
   function openVideosNow() {
     if (closeTimer.current) clearTimeout(closeTimer.current);
@@ -209,31 +229,42 @@ export default function Navbar() {
 
   function isActive(href?: string) {
     if (!href) return false;
-    if (href === "/") return pathname === "/";
-    return pathname === href || pathname.startsWith(href + "/");
+    if (href === "/") return logicalPathname === "/";
+    return logicalPathname === href || logicalPathname.startsWith(href + "/");
   }
 
-  const videosActive = pathname.startsWith("/videos");
+  const videosActive = logicalPathname.startsWith("/videos");
 
   // RootFlute Studio (/studio) is a separate private app with its own shell —
   // never render the public marketing nav on top of it.
   if (pathname.startsWith("/studio")) return null;
 
   return (
-    <header
-      className={`fixed top-0 inset-x-0 z-50 transition-all duration-500 ${
-        scrolled
-          ? "bg-brand-dark/85 backdrop-blur-md border-b border-brand-border/60 shadow-[0_4px_30px_rgba(0,0,0,0.35)]"
-          : "bg-transparent border-b border-transparent"
-      }`}
-    >
+    <header className="fixed top-0 inset-x-0 z-50">
+      {/* Decorative background layer, separate from `header` itself: a
+          `backdrop-filter` (from `backdrop-blur-md` below) makes the element
+          it's set on the CSS containing block for any `position: fixed`
+          descendants — which used to be `header` directly, silently
+          collapsing the fixed-position mobile menu overlay (also a
+          descendant of `header`) to `header`'s own ~80px height instead of
+          the viewport. Isolating the blur on this inset-0 sibling layer
+          keeps the identical visual look while leaving `header` filter-free,
+          so its fixed children size against the viewport as intended. */}
+      <div
+        aria-hidden="true"
+        className={`absolute inset-0 -z-10 pointer-events-none transition-all duration-500 ${
+          scrolled
+            ? "bg-brand-dark/85 backdrop-blur-md border-b border-brand-border/60 shadow-[0_4px_30px_rgba(0,0,0,0.35)]"
+            : "bg-transparent border-b border-transparent"
+        }`}
+      />
       <nav
         aria-label="Primary navigation"
         className="max-w-7xl mx-auto px-6 h-20 flex items-center justify-between"
       >
         {/* Brand */}
         <a
-          href="/"
+          href={`${promoterPrefix}/`}
           aria-label="RootFlute — return to homepage"
           onClick={closeMobileMenu}
           className="font-display text-2xl sm:text-3xl font-normal text-brand-text [text-shadow:0_2px_10px_rgba(0,0,0,0.75)] transition-colors duration-200 hover:text-brand-text"
@@ -255,7 +286,7 @@ export default function Navbar() {
                   onMouseLeave={closeFlutesDelayed}
                 >
                   <a
-                    href={item.href}
+                    href={`${promoterPrefix}${item.href}`}
                     aria-haspopup="true"
                     aria-expanded={open}
                     className={`flex items-center gap-1.5 text-xs uppercase tracking-widest font-sans transition-colors duration-200 [text-shadow:0_1px_6px_rgba(0,0,0,0.6)] ${
@@ -283,7 +314,7 @@ export default function Navbar() {
                       {item.children.map((child) => (
                         <a
                           key={child.href}
-                          href={child.href}
+                          href={`${promoterPrefix}${child.href}`}
                           role="menuitem"
                           onClick={() => setFlutesOpen(false)}
                           className={`block px-5 py-3 text-sm font-sans text-brand-gold transition-colors duration-150 hover:bg-brand-dark/40 ${
@@ -339,7 +370,7 @@ export default function Navbar() {
                       {item.children.map((child) => (
                         <a
                           key={child.href}
-                          href={child.href}
+                          href={`${promoterPrefix}${child.href}`}
                           role="menuitem"
                           onClick={() => setVideosOpen(false)}
                           className={`block px-5 py-3 text-sm font-sans transition-colors duration-150 ${
@@ -360,7 +391,7 @@ export default function Navbar() {
             return (
               <li key={item.label}>
                 <a
-                  href={item.href}
+                  href={`${promoterPrefix}${item.href}`}
                   className={`text-xs uppercase tracking-widest font-sans transition-colors duration-200 [text-shadow:0_1px_6px_rgba(0,0,0,0.6)] ${
                     isActive(item.href) ? "text-brand-gold" : "text-brand-text/85 hover:text-brand-gold"
                   }`}
@@ -445,7 +476,7 @@ export default function Navbar() {
                         {item.children.map((child) => (
                           <li key={child.href}>
                             <a
-                              href={child.href}
+                              href={`${promoterPrefix}${child.href}`}
                               onClick={closeMobileMenu}
                               className="block py-3 text-sm font-sans text-brand-gold transition-colors duration-150"
                             >
@@ -491,7 +522,7 @@ export default function Navbar() {
                         {item.children.map((child) => (
                           <li key={child.href}>
                             <a
-                              href={child.href}
+                              href={`${promoterPrefix}${child.href}`}
                               onClick={closeMobileMenu}
                               className="block py-3 text-sm font-sans text-brand-gold transition-colors duration-150"
                             >
@@ -509,7 +540,7 @@ export default function Navbar() {
             return (
               <li key={item.label} className="border-b border-brand-border/50">
                 <a
-                  href={item.href}
+                  href={`${promoterPrefix}${item.href}`}
                   onClick={closeMobileMenu}
                   className={`block py-4 text-base uppercase tracking-widest font-sans transition-colors duration-200 ${
                     isActive(item.href) ? "text-brand-gold" : "text-brand-text"
