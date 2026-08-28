@@ -20,7 +20,7 @@ const PATHWAYS = [
   {
     href: "/music",
     eyebrow: "Music",
-    name: "Live Sound Sessions",
+    name: "Music",
     description:
       "Original songs, live looping sessions, and celestial soundscapes crafted to move the body and still the mind.",
     cta: "Listen to the Sessions",
