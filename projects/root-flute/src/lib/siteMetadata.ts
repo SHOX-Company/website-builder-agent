@@ -26,7 +26,7 @@
 import type { Metadata } from "next";
 
 // PROTECTED — canonical base URL. Change only when DNS is updated.
-export const SITE_URL = "https://root-flute.vercel.app";
+export const SITE_URL = "https://www.rootflute.com";
 
 // PROTECTED — OG image dimensions used across all pages.
 const OG_WIDTH = 1200;
