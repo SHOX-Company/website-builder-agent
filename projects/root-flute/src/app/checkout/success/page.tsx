@@ -43,6 +43,13 @@ export default function CheckoutSuccessPage() {
           >
             Return to RootFlute
           </Link>
+
+          <Link
+            href="/acquisition-support"
+            className="text-brand-muted/60 hover:text-brand-gold text-xs uppercase tracking-[0.25em] font-sans transition-colors duration-200"
+          >
+            Need help with your acquisition?
+          </Link>
         </div>
       </section>
 
