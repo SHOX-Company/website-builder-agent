@@ -6,6 +6,7 @@ import { usePathname } from "next/navigation";
 interface NavChild {
   label: string;
   href: string;
+  children?: NavChild[];
 }
 
 interface NavItem {
@@ -13,6 +14,22 @@ interface NavItem {
   href?: string;
   children?: NavChild[];
 }
+
+// The nine custom flute designs, each already a standalone, directly
+// shareable page at /custom-flutes/<slug> (see the STYLES map in
+// src/app/custom-flutes/[style]/page.tsx). Order and labels match that
+// route verbatim — no new pages, just navigation into the existing ones.
+const CUSTOM_FLUTE_DESIGNS: NavChild[] = [
+  { label: "Bell Flutes", href: "/custom-flutes/bell-flutes" },
+  { label: "Point Flutes", href: "/custom-flutes/point-flutes" },
+  { label: "Drone Flutes", href: "/custom-flutes/drone-flutes" },
+  { label: "Mayan Harmony Flutes", href: "/custom-flutes/mayan-harmony-flutes" },
+  { label: "Triple Mayan Chord Flutes", href: "/custom-flutes/triple-mayan-chord-flutes" },
+  { label: "Four Chamber Mayan Chord Flutes", href: "/custom-flutes/four-chamber-mayan-chord-flutes" },
+  { label: "Rack Flutes", href: "/custom-flutes/rack-flutes" },
+  { label: "Snake Flutes", href: "/custom-flutes/snake-flutes" },
+  { label: "Mammoth Tusk Flute", href: "/custom-flutes/mammoth-tusk-flutes" },
+];
 
 const NAV_ITEMS: NavItem[] = [
   { label: "Home", href: "/" },
@@ -22,7 +39,7 @@ const NAV_ITEMS: NavItem[] = [
     href: "/flutes",
     children: [
       { label: "Available Now", href: "/flutes" },
-      { label: "Custom Flute Styles", href: "/custom-flutes" },
+      { label: "Custom Flute Styles", href: "/custom-flutes", children: CUSTOM_FLUTE_DESIGNS },
     ],
   },
   { label: "Music", href: "/music" },
@@ -70,6 +87,10 @@ export default function Navbar() {
   // "Flutes" label must also remain a working link to /flutes.
   const [flutesOpen, setFlutesOpen] = useState(false);
   const [mobileFlutesOpen, setMobileFlutesOpen] = useState(false);
+  // Third level: the "All Designs" list nested under "Custom Flute Styles",
+  // one instance per surface (desktop flyout / mobile accordion).
+  const [flutesDesignsOpen, setFlutesDesignsOpen] = useState(false);
+  const [mobileFlutesDesignsOpen, setMobileFlutesDesignsOpen] = useState(false);
   const videosRef = useRef<HTMLLIElement>(null);
   const flutesRef = useRef<HTMLLIElement>(null);
   const closeTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -103,7 +124,10 @@ export default function Navbar() {
   }
 
   function closeFlutesDelayed() {
-    flutesCloseTimer.current = setTimeout(() => setFlutesOpen(false), 120);
+    flutesCloseTimer.current = setTimeout(() => {
+      setFlutesOpen(false);
+      setFlutesDesignsOpen(false);
+    }, 120);
   }
 
   // Body scroll lock, applied/removed synchronously and imperatively (never
@@ -164,6 +188,7 @@ export default function Navbar() {
     setMobileOpen(false);
     setMobileVideosOpen(false);
     setMobileFlutesOpen(false);
+    setMobileFlutesDesignsOpen(false);
   }, [unlockBody]);
 
   // Belt-and-braces reset for anything outside a normal tap: Escape, and the
@@ -171,6 +196,7 @@ export default function Navbar() {
   const resetAllMenus = useCallback(() => {
     setVideosOpen(false);
     setFlutesOpen(false);
+    setFlutesDesignsOpen(false);
     closeMobileMenu();
   }, [closeMobileMenu]);
 
@@ -182,6 +208,7 @@ export default function Navbar() {
       }
       if (flutesRef.current && !flutesRef.current.contains(e.target as Node)) {
         setFlutesOpen(false);
+        setFlutesDesignsOpen(false);
       }
     }
     function handleKey(e: KeyboardEvent) {
@@ -311,19 +338,72 @@ export default function Navbar() {
                     }`}
                   >
                     <div className="min-w-[220px] bg-brand-surface/95 backdrop-blur-md border border-brand-border shadow-2xl py-2">
-                      {item.children.map((child) => (
-                        <a
-                          key={child.href}
-                          href={`${promoterPrefix}${child.href}`}
-                          role="menuitem"
-                          onClick={() => setFlutesOpen(false)}
-                          className={`block px-5 py-3 text-sm font-sans text-brand-gold transition-colors duration-150 hover:bg-brand-dark/40 ${
-                            isActive(child.href) ? "bg-brand-dark/40" : ""
-                          }`}
-                        >
-                          {child.label}
-                        </a>
-                      ))}
+                      {item.children.map((child) =>
+                        child.children ? (
+                          <div key={child.href}>
+                            <a
+                              href={`${promoterPrefix}${child.href}`}
+                              role="menuitem"
+                              onClick={() => setFlutesOpen(false)}
+                              className={`block px-5 py-3 text-sm font-sans text-brand-gold transition-colors duration-150 hover:bg-brand-dark/40 ${
+                                isActive(child.href) ? "bg-brand-dark/40" : ""
+                              }`}
+                            >
+                              {child.label}
+                            </a>
+                            <button
+                              type="button"
+                              role="menuitem"
+                              aria-expanded={flutesDesignsOpen}
+                              onClick={() => setFlutesDesignsOpen((v) => !v)}
+                              className="w-full flex items-center justify-between gap-2 pl-8 pr-5 py-3 text-sm font-sans text-brand-gold transition-colors duration-150 hover:bg-brand-dark/40"
+                            >
+                              All Designs
+                              <svg
+                                viewBox="0 0 10 6"
+                                aria-hidden="true"
+                                className={`w-2.5 h-2.5 transition-transform duration-200 ${flutesDesignsOpen ? "rotate-180" : ""}`}
+                                fill="none"
+                              >
+                                <path d="M1 1l4 4 4-4" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round" />
+                              </svg>
+                            </button>
+                            <div
+                              className={`grid transition-all duration-200 ease-out ${
+                                flutesDesignsOpen ? "grid-rows-[1fr] opacity-100" : "grid-rows-[0fr] opacity-0"
+                              }`}
+                            >
+                              <div className="overflow-hidden">
+                                {child.children.map((design) => (
+                                  <a
+                                    key={design.href}
+                                    href={`${promoterPrefix}${design.href}`}
+                                    role="menuitem"
+                                    onClick={() => setFlutesOpen(false)}
+                                    className={`block whitespace-nowrap pl-12 pr-5 py-2.5 text-sm font-sans text-brand-gold transition-colors duration-150 hover:bg-brand-dark/40 ${
+                                      isActive(design.href) ? "bg-brand-dark/40" : ""
+                                    }`}
+                                  >
+                                    {design.label}
+                                  </a>
+                                ))}
+                              </div>
+                            </div>
+                          </div>
+                        ) : (
+                          <a
+                            key={child.href}
+                            href={`${promoterPrefix}${child.href}`}
+                            role="menuitem"
+                            onClick={() => setFlutesOpen(false)}
+                            className={`block px-5 py-3 text-sm font-sans text-brand-gold transition-colors duration-150 hover:bg-brand-dark/40 ${
+                              isActive(child.href) ? "bg-brand-dark/40" : ""
+                            }`}
+                          >
+                            {child.label}
+                          </a>
+                        )
+                      )}
                     </div>
                   </div>
                 </li>
@@ -482,6 +562,47 @@ export default function Navbar() {
                             >
                               {child.label}
                             </a>
+                            {child.children && (
+                              <>
+                                <button
+                                  type="button"
+                                  aria-expanded={mobileFlutesDesignsOpen}
+                                  onClick={() => setMobileFlutesDesignsOpen((v) => !v)}
+                                  className="w-full flex items-center justify-between py-3 pl-4 text-sm font-sans text-brand-gold transition-colors duration-150"
+                                >
+                                  All Designs
+                                  <svg
+                                    viewBox="0 0 10 6"
+                                    aria-hidden="true"
+                                    className={`w-3 h-3 transition-transform duration-200 ${mobileFlutesDesignsOpen ? "rotate-180" : ""}`}
+                                    fill="none"
+                                  >
+                                    <path d="M1 1l4 4 4-4" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round" />
+                                  </svg>
+                                </button>
+                                <div
+                                  className={`grid transition-all duration-300 ease-out ${
+                                    mobileFlutesDesignsOpen ? "grid-rows-[1fr] opacity-100" : "grid-rows-[0fr] opacity-0"
+                                  }`}
+                                >
+                                  <div className="overflow-hidden">
+                                    <ul className="flex flex-col pb-2 pl-8">
+                                      {child.children.map((design) => (
+                                        <li key={design.href}>
+                                          <a
+                                            href={`${promoterPrefix}${design.href}`}
+                                            onClick={closeMobileMenu}
+                                            className="block py-2.5 text-sm font-sans text-brand-gold transition-colors duration-150"
+                                          >
+                                            {design.label}
+                                          </a>
+                                        </li>
+                                      ))}
+                                    </ul>
+                                  </div>
+                                </div>
+                              </>
+                            )}
                           </li>
                         ))}
                       </ul>
