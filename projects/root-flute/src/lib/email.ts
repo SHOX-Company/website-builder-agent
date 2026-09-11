@@ -223,6 +223,11 @@ export interface PurchaseConfirmationPayload {
 
 const SUPPORT_URL = `${SITE_URL}/acquisition-support`;
 
+// The branded sender (RESEND_FROM_EMAIL, e.g. acquisitions@rootflute.com) is
+// not an operational mailbox — Daniel's actual inbox is RootFlute@gmail.com.
+// Replies to the customer confirmation email must land there.
+const PURCHASE_REPLY_TO_EMAIL = "RootFlute@gmail.com";
+
 function buildPurchaseConfirmationHtml(p: PurchaseConfirmationPayload): string {
   const greeting = p.customerName ? `${esc(p.customerName)},` : "Thank you.";
   const rows: [string, string][] = [
@@ -361,6 +366,7 @@ export async function sendPurchaseConfirmationEmail(
     {
       from,
       to: payload.to,
+      replyTo: PURCHASE_REPLY_TO_EMAIL,
       subject: `Your RootFlute acquisition — ${payload.itemName}`,
       html: buildPurchaseConfirmationHtml(payload),
       text: buildPurchaseConfirmationText(payload),
