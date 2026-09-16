@@ -78,6 +78,8 @@ export async function ensureOrder(input: OrderInput): Promise<Order> {
     createdAt: now,
     confirmationEmailSent: false,
     confirmationEmailSentAt: null,
+    internalNotificationSent: false,
+    internalNotificationSentAt: null,
   };
   orders.push(order);
   await writeAll(orders);
@@ -85,19 +87,45 @@ export async function ensureOrder(input: OrderInput): Promise<Order> {
 }
 
 /**
- * Marks the customer confirmation email as sent for this session. A no-op if
- * the order is missing or the flag is already set — safe to call on retries.
+ * Marks whichever notification(s) actually succeeded for this session in a
+ * single read-modify-write. A no-op per-flag if the order is missing or that
+ * flag is already set — safe to call on retries.
+ *
+ * Deliberately one combined write rather than two separate ones: this store
+ * discovers "the current record" via `list()` (see the header comment on
+ * this file's versioned-blob scheme), and two independent writeAll() calls
+ * issued back-to-back for the *same* order — e.g. one right after the
+ * customer confirmation succeeds, another moments later when the internal
+ * notification succeeds — can race against that listing's consistency
+ * window, with the second write silently reading a not-yet-updated "latest"
+ * blob and clobbering the first write's flag. Collapsing both flag updates
+ * into one write removes that window entirely for this call site.
  */
-export async function markOrderConfirmationSent(sessionId: string): Promise<void> {
+export async function markOrderNotificationsSent(
+  sessionId: string,
+  updates: { confirmationEmailSent?: boolean; internalNotificationSent?: boolean }
+): Promise<void> {
   const orders = await readAll();
   const index = orders.findIndex((o) => o.stripeCheckoutSessionId === sessionId);
   if (index === -1) return;
-  if (orders[index].confirmationEmailSent) return;
 
-  orders[index] = {
-    ...orders[index],
-    confirmationEmailSent: true,
-    confirmationEmailSentAt: new Date().toISOString(),
-  };
+  const current = orders[index];
+  const now = new Date().toISOString();
+  const next = { ...current };
+  let changed = false;
+
+  if (updates.confirmationEmailSent && !current.confirmationEmailSent) {
+    next.confirmationEmailSent = true;
+    next.confirmationEmailSentAt = now;
+    changed = true;
+  }
+  if (updates.internalNotificationSent && !current.internalNotificationSent) {
+    next.internalNotificationSent = true;
+    next.internalNotificationSentAt = now;
+    changed = true;
+  }
+
+  if (!changed) return;
+  orders[index] = next;
   await writeAll(orders);
 }

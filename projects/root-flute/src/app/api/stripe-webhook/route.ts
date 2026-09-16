@@ -3,8 +3,8 @@ import type Stripe from "stripe";
 import { getStripeClient } from "@/lib/stripe";
 import { getInventoryItem, markInventoryItemSold } from "@/lib/inventoryStore";
 import { CATEGORY_LABELS, formatPrice, type InventoryItem } from "@/lib/inventory";
-import { ensureOrder, markOrderConfirmationSent } from "@/lib/orderStore";
-import { sendPurchaseConfirmationEmail } from "@/lib/email";
+import { ensureOrder, markOrderNotificationsSent } from "@/lib/orderStore";
+import { sendPurchaseConfirmationEmail, sendInternalSaleNotificationEmail } from "@/lib/email";
 
 function formatStripeAddress(address: Stripe.Address | null | undefined): string | null {
   if (!address) return null;
@@ -19,18 +19,21 @@ function formatStripeAddress(address: Stripe.Address | null | undefined): string
   return parts.length > 0 ? parts.join(", ") : null;
 }
 
-// Post-sale customer communication. Runs ONLY after the sale is already
-// authoritative (inventory marked Sold). Fully best-effort: this function
-// never throws to its caller, so a failure here can never reverse the sale,
+// Post-sale communication. Runs ONLY after the sale is already authoritative
+// (inventory marked Sold). Two independent best-effort notifications live
+// here — the customer acquisition confirmation and the internal merchant
+// sale notification — each with its own dedup flag on the durable order
+// record and its own per-session Resend idempotency key, so either can fail
+// or be retried without affecting the other. Neither can reverse the sale,
 // unmark inventory, affect capture, or turn a completed transaction into a
-// non-2xx webhook response. Email dedup is anchored to the durable order
-// record's `confirmationEmailSent` flag (not the item's Sold state), plus a
-// per-session Resend idempotency key — safe across webhook retries.
+// non-2xx webhook response — every step here is individually wrapped so one
+// failing can never prevent the other from being attempted.
 async function recordOrderAndNotify(
   session: Stripe.Checkout.Session,
   item: InventoryItem,
   soldAt: string
 ): Promise<void> {
+  let order;
   try {
     const shipping = session.collected_information?.shipping_details ?? null;
     const paymentIntentId =
@@ -38,7 +41,7 @@ async function recordOrderAndNotify(
         ? session.payment_intent
         : session.payment_intent?.id ?? null;
 
-    const order = await ensureOrder({
+    order = await ensureOrder({
       stripeCheckoutSessionId: session.id,
       stripePaymentIntentId: paymentIntentId,
       inventoryItemId: item.id,
@@ -54,49 +57,119 @@ async function recordOrderAndNotify(
       shippingAddress: formatStripeAddress(shipping?.address),
       soldAt,
     });
-
-    if (order.confirmationEmailSent) return;
-
-    if (!order.customerEmail) {
-      console.error(
-        `[webhook] order ${session.id} has no customer email — confirmation not sent; confirmationEmailSent stays false.`
-      );
-      return;
-    }
-
-    const amountFormatted =
-      order.amountTotal != null
-        ? `$${(order.amountTotal / 100).toLocaleString("en-US", { minimumFractionDigits: 2 })}`
-        : formatPrice(order.itemPrice);
-    const orderReference = `RF-${session.id.slice(-8).toUpperCase()}`;
-    const shippingSummary =
-      order.shippingName && order.shippingAddress
-        ? `${order.shippingName}, ${order.shippingAddress}`
-        : order.shippingAddress ?? null;
-
-    const result = await sendPurchaseConfirmationEmail({
-      to: order.customerEmail,
-      customerName: order.customerName,
-      itemName: order.itemName || "Your RootFlute piece",
-      itemCategoryLabel: CATEGORY_LABELS[item.category],
-      amountFormatted,
-      orderReference,
-      shippingSummary,
-      idempotencyKey: `rf-purchase-confirmation-${session.id}`,
-    });
-
-    if (result.ok) {
-      await markOrderConfirmationSent(session.id);
-    } else {
-      console.error(
-        `[webhook] confirmation email not sent for ${session.id} (reason: ${result.reason}) — confirmationEmailSent stays false for later recovery.`
-      );
-    }
   } catch (err) {
     console.error(
-      `[webhook] post-sale order/notify failed for ${session?.id} — the sale itself is unaffected:`,
+      `[webhook] post-sale order persistence failed for ${session?.id} — the sale itself is unaffected:`,
       err
     );
+    return;
+  }
+
+  const amountFormatted =
+    order.amountTotal != null
+      ? `$${(order.amountTotal / 100).toLocaleString("en-US", { minimumFractionDigits: 2 })}`
+      : formatPrice(order.itemPrice);
+  const orderReference = `RF-${session.id.slice(-8).toUpperCase()}`;
+  const shippingSummary =
+    order.shippingName && order.shippingAddress
+      ? `${order.shippingName}, ${order.shippingAddress}`
+      : order.shippingAddress ?? null;
+
+  // Each notification is attempted independently below; only the *outcome*
+  // (did it just succeed?) is collected here. Both flags are persisted in a
+  // single combined write at the end — see markOrderNotificationsSent for
+  // why two separate writes to the same order, moments apart, are unsafe.
+  let confirmationJustSent = false;
+  let internalNotificationJustSent = false;
+
+  // Customer acquisition confirmation — independent, best-effort.
+  if (!order.confirmationEmailSent) {
+    try {
+      if (!order.customerEmail) {
+        console.error(
+          `[webhook] order ${session.id} has no customer email — confirmation not sent; confirmationEmailSent stays false.`
+        );
+      } else {
+        const result = await sendPurchaseConfirmationEmail({
+          to: order.customerEmail,
+          customerName: order.customerName,
+          itemName: order.itemName || "Your RootFlute piece",
+          itemCategoryLabel: CATEGORY_LABELS[item.category],
+          amountFormatted,
+          orderReference,
+          shippingSummary,
+          idempotencyKey: `rf-purchase-confirmation-${session.id}`,
+        });
+
+        if (result.ok) {
+          confirmationJustSent = true;
+        } else {
+          console.error(
+            `[webhook] confirmation email not sent for ${session.id} (reason: ${result.reason}) — confirmationEmailSent stays false for later recovery.`
+          );
+        }
+      }
+    } catch (err) {
+      console.error(
+        `[webhook] customer confirmation attempt failed for ${session.id} — the sale itself is unaffected:`,
+        err
+      );
+    }
+  }
+
+  // Internal merchant sale notification — independent, best-effort. Never
+  // shares state with the customer confirmation above: one succeeding or
+  // failing has no bearing on whether the other is attempted or retried.
+  if (order.internalNotificationSent) {
+    console.info(`[webhook] internal sale notification already sent for ${session.id} — skipping.`);
+  } else {
+    try {
+      const result = await sendInternalSaleNotificationEmail({
+        itemName: order.itemName || item.name,
+        itemCategoryLabel: CATEGORY_LABELS[item.category],
+        amountFormatted,
+        orderReference,
+        stripeCheckoutSessionId: session.id,
+        purchaseTimestamp: order.soldAt,
+        customerName: order.customerName,
+        customerEmail: order.customerEmail,
+        customerPhone: order.customerPhone,
+        shippingName: order.shippingName,
+        shippingAddress: order.shippingAddress,
+        idempotencyKey: `rf-internal-sale-notification-${session.id}`,
+      });
+
+      if (result.ok) {
+        internalNotificationJustSent = true;
+      } else {
+        console.error(
+          `[webhook] internal sale notification not sent for ${session.id} (reason: ${result.reason}) — internalNotificationSent stays false for later recovery.`
+        );
+      }
+    } catch (err) {
+      console.error(
+        `[webhook] internal sale notification attempt failed for ${session.id} — the sale itself is unaffected:`,
+        err
+      );
+    }
+  }
+
+  if (confirmationJustSent || internalNotificationJustSent) {
+    try {
+      await markOrderNotificationsSent(session.id, {
+        confirmationEmailSent: confirmationJustSent,
+        internalNotificationSent: internalNotificationJustSent,
+      });
+    } catch (err) {
+      // The emails themselves already went out — only the dedup bookkeeping
+      // failed to persist. Worst case on a future retry: Resend's per-session
+      // idempotency key (set on both sends above) recognizes the repeat and
+      // returns the original result without re-delivering.
+      console.error(
+        `[webhook] failed to persist notification-sent flags for ${session.id} — emails already sent; a retry is deduped by Resend's idempotency key, not this flag:`,
+        err
+      );
+    }
   }
 }
 

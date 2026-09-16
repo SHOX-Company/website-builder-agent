@@ -38,9 +38,23 @@ export interface Order {
   /** Whether the branded customer confirmation email has been confirmed sent. */
   confirmationEmailSent: boolean;
   confirmationEmailSentAt: string | null;
+  /**
+   * Whether the internal merchant sale-notification email has been confirmed
+   * sent. Deliberately independent of `confirmationEmailSent` — the customer
+   * email and the internal notification are separate Resend sends with
+   * separate failure modes, so one succeeding must never mask or skip a
+   * retry of the other.
+   */
+  internalNotificationSent: boolean;
+  internalNotificationSentAt: string | null;
 }
 
 export type OrderInput = Omit<
   Order,
-  "id" | "createdAt" | "confirmationEmailSent" | "confirmationEmailSentAt"
+  | "id"
+  | "createdAt"
+  | "confirmationEmailSent"
+  | "confirmationEmailSentAt"
+  | "internalNotificationSent"
+  | "internalNotificationSentAt"
 >;

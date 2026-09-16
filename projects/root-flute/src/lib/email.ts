@@ -382,3 +382,217 @@ export async function sendPurchaseConfirmationEmail(
   console.info(`[purchase-confirmation] Sent. Resend id: ${data?.id}`);
   return { ok: true };
 }
+
+// ============================================================
+// Internal merchant sale notification.
+//
+// A dedicated, operator-facing message — distinct from both the inquiry-form
+// notification (sendInquiryEmail, pre-purchase leads) and the customer
+// acquisition confirmation (sendPurchaseConfirmationEmail, post-purchase).
+// Sent by the checkout webhook after a sale is authoritative. Delivery is
+// best-effort and fully independent of the customer confirmation: a failure
+// here never affects the completed sale, never affects inventory state, and
+// never blocks or duplicates the customer email. The caller records
+// send-state in its own durable order-store field (`internalNotificationSent`)
+// so retries are safe and independent of the customer-confirmation flag.
+//
+// Recipients are never hardcoded — they come from INTERNAL_SALE_NOTIFICATION_
+// EMAILS (comma-separated) so the operational recipient list can change
+// without a code deploy.
+//
+// Requires RESEND_FROM_EMAIL (a verified-domain sender), same as the
+// customer confirmation and for the same reason: the shared onboarding@
+// resend.dev sandbox sender can only deliver to the Resend account owner's
+// own address, so it silently cannot reach a multi-recipient internal list
+// (confirmed by a live test send during implementation). This function
+// refuses to send from it and reports the reason instead of a delivery that
+// partially or fully fails.
+// ============================================================
+
+export interface InternalSaleNotificationPayload {
+  itemName: string;
+  itemCategoryLabel: string;
+  /** Human-readable amount already formatted, e.g. "$1,050.00". */
+  amountFormatted: string;
+  /** Short, human-quotable reference derived from the Stripe session id. */
+  orderReference: string;
+  stripeCheckoutSessionId: string;
+  /** ISO timestamp of the sale (Order.soldAt). */
+  purchaseTimestamp: string;
+  customerName: string | null;
+  customerEmail: string | null;
+  customerPhone: string | null;
+  shippingName: string | null;
+  shippingAddress: string | null;
+  /** Stable idempotency key (per Stripe session) passed through to Resend. */
+  idempotencyKey: string;
+}
+
+const EMAIL_ADDRESS_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+// Parses INTERNAL_SALE_NOTIFICATION_EMAILS: comma-separated, trims
+// whitespace, discards empty entries, drops anything that doesn't look like
+// an email address (rather than letting a typo silently become a broken
+// recipient array), and de-duplicates. Never throws — an absent or fully
+// invalid value simply yields an empty list, which the caller treats as a
+// configuration failure rather than sending to zero recipients silently.
+function parseInternalNotificationRecipients(): string[] {
+  const raw = process.env.INTERNAL_SALE_NOTIFICATION_EMAILS;
+  if (!raw) return [];
+
+  const seen = new Set<string>();
+  for (const candidate of raw.split(",")) {
+    const trimmed = candidate.trim();
+    if (trimmed && EMAIL_ADDRESS_RE.test(trimmed)) {
+      seen.add(trimmed);
+    }
+  }
+  return [...seen];
+}
+
+function formatOrderTimestamp(iso: string): string {
+  const date = new Date(iso);
+  if (Number.isNaN(date.getTime())) return iso;
+  return date.toLocaleString("en-US", {
+    timeZone: "America/New_York",
+    dateStyle: "full",
+    timeStyle: "short",
+  });
+}
+
+function buildInternalSaleNotificationHtml(p: InternalSaleNotificationPayload): string {
+  const rows: [string, string][] = [
+    ["Piece", esc(p.itemName)],
+    ["Category", esc(p.itemCategoryLabel)],
+    ["Amount Paid", esc(p.amountFormatted)],
+    ["Customer Name", esc(p.customerName || "—")],
+    ["Customer Email", esc(p.customerEmail || "—")],
+    ["Customer Phone", esc(p.customerPhone || "—")],
+    ["Ship To Name", esc(p.shippingName || "—")],
+    ["Shipping Address", esc(p.shippingAddress || "—")],
+    ["Order Reference", esc(p.orderReference)],
+    ["Stripe Checkout Session", esc(p.stripeCheckoutSessionId)],
+    ["Purchase Time", esc(formatOrderTimestamp(p.purchaseTimestamp))],
+  ];
+
+  const rowsHtml = rows
+    .map(
+      ([label, value]) => `
+      <tr>
+        <td style="padding:8px 16px 8px 0;color:#9a8a6a;font-size:11px;text-transform:uppercase;letter-spacing:0.08em;white-space:nowrap;vertical-align:top;font-family:Arial,sans-serif;">${label}</td>
+        <td style="padding:8px 0;color:#e8e0d0;font-size:14px;vertical-align:top;font-family:Georgia,serif;">${value}</td>
+      </tr>`
+    )
+    .join("");
+
+  return `<!DOCTYPE html>
+<html lang="en">
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"></head>
+<body style="margin:0;padding:0;background:#0d0d0b;">
+  <table width="100%" cellpadding="0" cellspacing="0" border="0" style="background:#0d0d0b;padding:40px 20px;">
+    <tr><td align="center">
+      <table width="100%" cellpadding="0" cellspacing="0" border="0" style="max-width:580px;background:#141410;border:1px solid #2a2820;">
+        <tr><td style="height:2px;background:linear-gradient(90deg,transparent,#c8a45a,transparent);font-size:0;">&nbsp;</td></tr>
+        <tr>
+          <td style="padding:32px 32px 20px;">
+            <p style="margin:0 0 10px;color:#c8a45a;font-size:10px;text-transform:uppercase;letter-spacing:0.3em;font-family:Arial,sans-serif;">Internal &middot; Sale Notification</p>
+            <p style="margin:0;color:#e8e0d0;font-size:22px;font-weight:300;font-family:Georgia,serif;">SALE CONFIRMED</p>
+            <p style="margin:6px 0 0;color:#8a8170;font-size:13px;font-family:Georgia,serif;">A Root Flute piece has been acquired.</p>
+          </td>
+        </tr>
+        <tr>
+          <td style="padding:8px 32px 24px;">
+            <table width="100%" cellpadding="0" cellspacing="0" border="0">
+              ${rowsHtml}
+            </table>
+          </td>
+        </tr>
+        <tr>
+          <td style="padding:16px 32px 26px;border-top:1px solid #2a2820;">
+            <p style="margin:0;color:#4a4336;font-size:11px;font-family:Arial,sans-serif;">
+              Internal operational notification &middot; RootFlute &middot; do not forward to the customer.
+            </p>
+          </td>
+        </tr>
+      </table>
+    </td></tr>
+  </table>
+</body>
+</html>`;
+}
+
+function buildInternalSaleNotificationText(p: InternalSaleNotificationPayload): string {
+  const lines = [
+    `SALE CONFIRMED — A Root Flute piece has been acquired.`,
+    ``,
+    `Piece:              ${p.itemName}`,
+    `Category:           ${p.itemCategoryLabel}`,
+    `Amount Paid:        ${p.amountFormatted}`,
+    `Customer Name:      ${p.customerName || "—"}`,
+    `Customer Email:     ${p.customerEmail || "—"}`,
+    `Customer Phone:     ${p.customerPhone || "—"}`,
+    `Ship To Name:       ${p.shippingName || "—"}`,
+    `Shipping Address:   ${p.shippingAddress || "—"}`,
+    `Order Reference:    ${p.orderReference}`,
+    `Stripe Session:     ${p.stripeCheckoutSessionId}`,
+    `Purchase Time:      ${formatOrderTimestamp(p.purchaseTimestamp)}`,
+    ``,
+    `—`,
+    `Internal operational notification · RootFlute · do not forward to the customer.`,
+  ];
+  return lines.join("\n");
+}
+
+export async function sendInternalSaleNotificationEmail(
+  payload: InternalSaleNotificationPayload
+): Promise<{ ok: boolean; reason?: string }> {
+  if (!process.env.RESEND_API_KEY) {
+    console.error(
+      `[internal-sale-notification] RESEND_API_KEY is not set — email NOT sent. ref: ${payload.orderReference}`
+    );
+    return { ok: false, reason: "no_api_key" };
+  }
+
+  const from = process.env.RESEND_FROM_EMAIL;
+  if (!from) {
+    console.error(
+      `[internal-sale-notification] RESEND_FROM_EMAIL is not set — refusing to send from the shared sandbox sender, which cannot deliver to a multi-recipient internal list. Configure a verified Resend domain. ref: ${payload.orderReference}`
+    );
+    return { ok: false, reason: "no_verified_sender" };
+  }
+
+  const recipients = parseInternalNotificationRecipients();
+  if (recipients.length === 0) {
+    console.error(
+      `[internal-sale-notification] INTERNAL_SALE_NOTIFICATION_EMAILS is missing or contains no valid addresses — internal notification NOT sent. ref: ${payload.orderReference} session: ${payload.stripeCheckoutSessionId}`
+    );
+    return { ok: false, reason: "no_recipients" };
+  }
+
+  console.info(
+    `[internal-sale-notification] Sending — from: ${from} recipients: ${recipients.length} ref: ${payload.orderReference} session: ${payload.stripeCheckoutSessionId}`
+  );
+
+  const resend = new Resend(process.env.RESEND_API_KEY);
+
+  const { data, error } = await resend.emails.send(
+    {
+      from,
+      to: recipients,
+      subject: `Root Flute Sale — ${payload.itemName} — ${payload.amountFormatted}`,
+      html: buildInternalSaleNotificationHtml(payload),
+      text: buildInternalSaleNotificationText(payload),
+    },
+    { idempotencyKey: payload.idempotencyKey }
+  );
+
+  if (error) {
+    console.error(
+      `[internal-sale-notification] Resend rejected the send: ${JSON.stringify(error)} ref: ${payload.orderReference}`
+    );
+    return { ok: false, reason: "resend_error" };
+  }
+
+  console.info(`[internal-sale-notification] Sent. Resend id: ${data?.id} ref: ${payload.orderReference}`);
+  return { ok: true };
+}
