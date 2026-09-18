@@ -36,6 +36,11 @@ export default function InstrumentsCollection({ items }: { items: InventoryItem[
             Each instrument is made once. There is no restocking, no reordering, no
             reproduction. When it finds its player, it is gone.
           </p>
+          <p className="text-brand-muted text-base leading-relaxed max-w-2xl mx-auto mt-4">
+            The instruments shown here are made to order. Each is individually
+            handcrafted for its player, carrying its own natural character,
+            materials, and voice.
+          </p>
         </div>
 
         {items.length > 0 ? (
