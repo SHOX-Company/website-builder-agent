@@ -35,13 +35,6 @@ export default function CurrentDrop({ items }: { items: InventoryItem[] }) {
             permafrost for millennia.
             {madeToOrder ? "" : " Released one at a time. Each one is the only one that will ever exist."}
           </p>
-          {(showcase || madeToOrder) && (
-            <p className="text-brand-muted text-base leading-relaxed max-w-2xl mx-auto mt-4">
-              Mammoth Tusk flutes are individually made to order. Each is created for its player,
-              shaped by the character of the material and Daniel&rsquo;s hand, so no two will ever
-              be exactly alike.
-            </p>
-          )}
         </div>
 
         {current ? (

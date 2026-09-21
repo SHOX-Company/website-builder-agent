@@ -1,7 +1,6 @@
 "use client";
 
 import { useRef, useEffect } from "react";
-import Button from "@/components/ui/Button";
 
 // `showcase`: the current flute is a made-to-order example, not available
 // inventory — the availability micro-copy below must not claim otherwise.
@@ -79,16 +78,8 @@ export default function HeroFlutes({
           Handcrafted, intentional instruments built for depth, resonance, and presence.
         </p>
 
-        <Button
-          href="#current-drop"
-          size="lg"
-          className="hover:scale-105 hover:brightness-110 active:scale-100 transition-all duration-200 ease-out"
-        >
-          Explore the Flutes →
-        </Button>
-
         {/* Micro-copy accent */}
-        <div className="flex flex-col items-center gap-2 pt-1 sm:pt-2">
+        <div className="flex flex-col items-center gap-2">
           <p className="text-white/40 text-xs font-sans uppercase tracking-[0.35em]">
             No forest. No farm. No factory.
           </p>
