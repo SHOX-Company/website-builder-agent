@@ -4,12 +4,13 @@ import { useState } from "react";
 import SectionWrapper from "@/components/ui/SectionWrapper";
 import FluteDropPanel from "@/components/inventory/FluteDropPanel";
 import FluteInquiryModal from "./FluteInquiryModal";
-import { inquiryContext, isShowcase, type InventoryItem } from "@/lib/inventory";
+import { inquiryContext, isMadeToOrder, isShowcase, type InventoryItem } from "@/lib/inventory";
 
 export default function CurrentDrop({ items }: { items: InventoryItem[] }) {
   const [modalOpen, setModalOpen] = useState(false);
   const current = items[0] ?? null;
   const showcase = current ? isShowcase(current) : false;
+  const madeToOrder = current ? isMadeToOrder(current) : false;
 
   // Only reached for inquiry-only items — checkout-eligible items redirect
   // straight to Stripe from within FluteDropPanel and never call this.
@@ -24,17 +25,17 @@ export default function CurrentDrop({ items }: { items: InventoryItem[] }) {
 
         <div className="text-center mb-14">
           <p className="text-brand-gold text-xs uppercase tracking-[0.3em] font-sans mb-4">
-            {showcase ? "Made to Order" : "Current Offering"}
+            {showcase || madeToOrder ? "Made to Order" : "Current Offering"}
           </p>
           <h2 className="font-display text-4xl sm:text-5xl font-light text-brand-text mb-6">
             Born from 10,000 years of time.
           </h2>
           <p className="text-brand-muted text-base leading-relaxed max-w-2xl mx-auto">
             Each instrument is carved from ancient Woolly Mammoth tusk — preserved beneath Arctic
-            permafrost for millennia. Released one at a time. Each one is the only one that will
-            ever exist.
+            permafrost for millennia.{madeToOrder ? "" : " Released one at a time."} Each one is the
+            only one that will ever exist.
           </p>
-          {showcase && (
+          {(showcase || madeToOrder) && (
             <p className="text-brand-muted text-base leading-relaxed max-w-2xl mx-auto mt-4">
               Mammoth Tusk flutes are individually made to order. Each is created for its player,
               shaped by the character of the material and Daniel&rsquo;s hand, so no two will ever

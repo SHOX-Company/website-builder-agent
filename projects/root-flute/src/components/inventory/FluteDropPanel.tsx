@@ -2,7 +2,7 @@
 
 import { useState, useRef, useEffect } from "react";
 import Image from "next/image";
-import { isCheckoutEligible, isShowcase, REFERENCE_PRICE_LABEL, type InventoryItem } from "@/lib/inventory";
+import { isCheckoutEligible, isMadeToOrder, isShowcase, REFERENCE_PRICE_LABEL, type InventoryItem } from "@/lib/inventory";
 import { startCheckout } from "@/lib/checkoutClient";
 import PriceDisplay from "./PriceDisplay";
 import ItemLightbox from "./ItemLightbox";
@@ -27,6 +27,8 @@ export default function FluteDropPanel({
   const eligible = isCheckoutEligible(item);
   // Showcase / made-to-order example: never reaches Stripe — inquiry only.
   const showcase = isShowcase(item);
+  // Permanent made-to-order flute: purchasable (when priced) and never consumed.
+  const madeToOrder = isMadeToOrder(item);
   const gallery = item.featuredImage ? [item.featuredImage, ...item.additionalImages] : item.additionalImages;
 
   async function handleAcquireClick() {
@@ -130,7 +132,7 @@ export default function FluteDropPanel({
         {/* Right: product panel */}
         <div className="bg-brand-surface p-5 sm:p-10 lg:p-14 flex flex-col justify-between gap-8 sm:gap-10">
           <div className="flex flex-col gap-4">
-            <p className="text-brand-gold text-xs uppercase tracking-widest font-sans">{showcase ? "From the Workshop" : "Current Drop"}</p>
+            <p className="text-brand-gold text-xs uppercase tracking-widest font-sans">{showcase || madeToOrder ? "From the Workshop" : "Current Drop"}</p>
             {item.name && (
               <h3 className="font-display text-3xl sm:text-5xl font-light text-brand-text leading-tight">
                 {item.name}
@@ -153,11 +155,18 @@ export default function FluteDropPanel({
               </div>
             )}
             <PriceDisplay price={item.price} label={showcase ? REFERENCE_PRICE_LABEL : undefined} />
+            {madeToOrder && (
+              <p className="text-brand-muted/70 text-xs font-sans leading-relaxed">
+                Made to order. The flute pictured is an example of Daniel&rsquo;s work. Each new flute
+                is individually handcrafted for its player, and its natural materials and details may
+                vary. This design remains available to order.
+              </p>
+            )}
           </div>
 
           <div className="flex flex-col gap-4">
             <span className="inline-block border border-brand-border text-brand-muted text-xs uppercase tracking-widest px-4 py-2 text-center sm:text-left sm:self-start">
-              {showcase ? (
+              {showcase || madeToOrder ? (
                 <>Made to Order &nbsp;·&nbsp; Each Individually Made</>
               ) : (
                 <>Extremely Limited &nbsp;·&nbsp; One Available Now</>
@@ -173,6 +182,10 @@ export default function FluteDropPanel({
                 ? "Request a Made-to-Order Flute →"
                 : checkoutStatus === "redirecting"
                 ? "Redirecting…"
+                : madeToOrder
+                ? eligible
+                  ? "Order This Flute →"
+                  : "Request a Made-to-Order Flute →"
                 : "Claim This Instrument →"}
             </button>
             {checkoutStatus === "error" && (
@@ -181,7 +194,7 @@ export default function FluteDropPanel({
               </p>
             )}
             <p className="text-brand-muted/60 text-xs font-sans text-center sm:text-left">
-              {showcase
+              {showcase || (madeToOrder && !eligible)
                 ? <>Private inquiry &nbsp;·&nbsp; Handled personally by Daniel</>
                 : eligible
                 ? "Secure checkout via Stripe"
@@ -218,7 +231,7 @@ export default function FluteDropPanel({
       )}
 
       <p className="text-center text-brand-muted text-sm max-w-lg mx-auto leading-relaxed">
-        {showcase
+        {showcase || madeToOrder
           ? "The exact instrument shown is not reproduced. Each tusk is worked once — and a new flute can be made to order."
           : "Past instruments are not available. Each tusk is worked once — and never again."}
       </p>

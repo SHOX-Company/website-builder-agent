@@ -27,7 +27,7 @@ export interface InventoryItem {
    */
   showcase?: boolean;
   /**
-   * Permanent Made-to-Order design (Instruments only). `true` = this listing
+   * Permanent Made-to-Order design (Instruments and Flutes only). `true` = this listing
    * is a standing RootFlute design, NOT a finite physical piece: a purchase
    * creates an order and Daniel builds that customer's instrument, but the
    * listing stays live, is never marked Sold, and can be ordered again.
@@ -76,16 +76,29 @@ export function isShowcase(item: Pick<InventoryItem, "showcase">): boolean {
 }
 
 /**
+ * The categories whose listings can be permanent made-to-order designs (a
+ * handcrafted Instrument or Mammoth Tusk Flute is built per order). Talismans
+ * are deliberately NOT in this list: they are finite one-of-one pieces or
+ * showcase/commission examples, never a standing design.
+ */
+export const MADE_TO_ORDER_CATEGORIES: readonly InventoryCategory[] = ["instrument", "flute"];
+
+export function canBeMadeToOrder(category: InventoryCategory): boolean {
+  return MADE_TO_ORDER_CATEGORIES.includes(category);
+}
+
+/**
  * The single definition of "permanent made-to-order design". Deliberately
- * fail-safe: it is only true for an Instrument that is explicitly flagged AND
- * is not a showcase example. A stray flag on a Flute or Talisman, or a record
- * flagged as both, falls back to ordinary finite / showcase behavior — so the
- * one-of-one commerce rules for those can never be relaxed by accident.
+ * fail-safe: it is only true for an Instrument or Flute that is explicitly
+ * flagged AND is not a showcase example. A stray flag on a Talisman, or a
+ * record flagged as both made-to-order and showcase, falls back to ordinary
+ * finite / showcase behavior — so the one-of-one and inquiry-only commerce
+ * rules for those can never be relaxed by accident.
  */
 export function isMadeToOrder(
   item: Pick<InventoryItem, "madeToOrder" | "category" | "showcase">
 ): boolean {
-  return item.madeToOrder === true && item.category === "instrument" && item.showcase !== true;
+  return item.madeToOrder === true && canBeMadeToOrder(item.category) && item.showcase !== true;
 }
 
 /** Label for a price that is context for the visitor, not an offer to buy. */

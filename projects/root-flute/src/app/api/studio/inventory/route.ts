@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getInventory, createInventoryItem } from "@/lib/inventoryStore";
-import type { InventoryCategory, InventoryItemInput } from "@/lib/inventory";
+import { canBeMadeToOrder, type InventoryCategory, type InventoryItemInput } from "@/lib/inventory";
 
 const CATEGORIES: InventoryCategory[] = ["flute", "instrument", "jewelry"];
 
@@ -26,8 +26,8 @@ export async function POST(req: NextRequest) {
   if (!featuredImage || typeof featuredImage.url !== "string" || featuredImage.url.trim().length === 0) {
     return NextResponse.json({ error: "A featured image is required." }, { status: 400 });
   }
-  if (body.madeToOrder === true && category !== "instrument") {
-    return NextResponse.json({ error: "Only Instruments can be made-to-order designs." }, { status: 400 });
+  if (body.madeToOrder === true && !canBeMadeToOrder(category)) {
+    return NextResponse.json({ error: "Only Instruments and Flutes can be made-to-order designs." }, { status: 400 });
   }
   if (body.madeToOrder === true && body.showcase === true) {
     return NextResponse.json({ error: "A piece can't be both a made-to-order design and a showcase example." }, { status: 400 });

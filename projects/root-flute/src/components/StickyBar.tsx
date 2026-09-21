@@ -2,15 +2,9 @@
 
 import { useEffect, useState } from "react";
 import { usePathname } from "next/navigation";
-import { subscribeCurrentFluteRef, type CurrentFluteRef } from "@/lib/currentFluteRef";
-import { startCheckout } from "@/lib/checkoutClient";
-import FluteInquiryModal from "@/components/sections/flutes/FluteInquiryModal";
 
 export default function StickyBar() {
   const [visible, setVisible] = useState(false);
-  const [inquiryOpen, setInquiryOpen] = useState(false);
-  const [currentFlute, setCurrentFlute] = useState<CurrentFluteRef>(null);
-  const [checkoutStatus, setCheckoutStatus] = useState<"idle" | "redirecting" | "error">("idle");
   const pathname = usePathname();
   const isFlutes = pathname === "/flutes";
   const isHome = pathname === "/";
@@ -25,47 +19,13 @@ export default function StickyBar() {
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
 
-  useEffect(() => subscribeCurrentFluteRef(setCurrentFlute), []);
-
-  // Resets a stuck "Redirecting…" button when the customer returns via
-  // browser Back and the page is restored from bfcache (no fresh mount).
-  useEffect(() => {
-    function handlePageShow(event: PageTransitionEvent) {
-      if (event.persisted) setCheckoutStatus("idle");
-    }
-    window.addEventListener("pageshow", handlePageShow);
-    return () => window.removeEventListener("pageshow", handlePageShow);
-  }, []);
-
-  // Showcase / made-to-order example: no checkout, ever — open the existing
-  // flute inquiry, prefilled as a NEW made-to-order piece.
-  const showcase = currentFlute?.showcase === true;
-
-  async function handleClaimClick() {
-    if (showcase) {
-      setInquiryOpen(true);
-      return;
-    }
-    if (!currentFlute || !currentFlute.eligible) {
-      document.getElementById("acquire")?.scrollIntoView({ behavior: "smooth" });
-      return;
-    }
-    if (checkoutStatus === "redirecting") return;
-    setCheckoutStatus("redirecting");
-    const url = await startCheckout(currentFlute.id);
-    if (url) {
-      window.location.href = url;
-    } else {
-      setCheckoutStatus("error");
-    }
-  }
-
-  // No sticky bar on homepage, jewelry, or instruments — those pages have per-item CTAs.
+  // No sticky bar on homepage, jewelry, instruments or flutes — those pages have
+  // per-item CTAs (the Flutes page renders its own sticky bar from its server-
+  // provided item, so its copy is correct on the very first server render).
   // RootFlute Studio (/studio) is a separate private app and never shows the public CTA bar.
-  if (isHome || isJewelry || isInstruments || pathname.startsWith("/studio")) return null;
+  if (isHome || isJewelry || isInstruments || isFlutes || pathname.startsWith("/studio")) return null;
 
   return (
-    <>
     <div
       aria-hidden={!visible}
       className={`fixed bottom-0 inset-x-0 z-50 transition-transform duration-300 ${
@@ -75,37 +35,8 @@ export default function StickyBar() {
       <div className="bg-brand-surface border-t border-brand-border shadow-2xl">
         <div className="max-w-6xl mx-auto px-6 py-3 flex items-center justify-between gap-4">
 
-          {isFlutes ? (
-            <>
-              <p className="text-brand-muted text-sm hidden sm:block">
-                {showcase ? "Individually made to order." : "One instrument available now."}{" "}
-                <span className="text-brand-gold font-semibold">
-                  {showcase
-                    ? "Ancient materials. Each one shaped for its player."
-                    : "Ancient materials. Impossible to replicate."}
-                </span>
-              </p>
-              <p className="text-brand-gold font-semibold text-sm sm:hidden">
-                {showcase ? "Individually made to order." : "One instrument available now."}
-              </p>
-              <button
-                type="button"
-                onClick={handleClaimClick}
-                disabled={checkoutStatus === "redirecting"}
-                className="inline-flex items-center justify-center px-5 py-2.5 text-sm font-bold bg-brand-gold text-brand-dark hover:bg-brand-gold-light disabled:opacity-40 disabled:cursor-not-allowed transition-colors duration-200 flex-shrink-0"
-              >
-                {showcase
-                  ? "Request a Made-to-Order Flute →"
-                  : checkoutStatus === "redirecting"
-                  ? "Redirecting…"
-                  : checkoutStatus === "error"
-                  ? "Try Again →"
-                  : "Claim This Instrument →"}
-              </button>
-            </>
-          ) : (
-            // /society and any other route
-            <>
+          {/* /society and any other route */}
+          <>
               <p className="text-brand-muted text-sm hidden sm:block">
                 Founding seats are limited.{" "}
                 <span className="text-brand-gold font-semibold">
@@ -123,23 +54,10 @@ export default function StickyBar() {
               >
                 Claim Your Seat →
               </a>
-            </>
-          )}
+          </>
 
         </div>
       </div>
     </div>
-
-    {/* Rendered outside the bar on purpose: the bar is CSS-transformed, and a
-        `fixed` modal inside a transformed ancestor is positioned against that
-        ancestor instead of the viewport. */}
-    {isFlutes && showcase && (
-      <FluteInquiryModal
-        isOpen={inquiryOpen}
-        defaultItem={currentFlute?.inquiryItem ?? ""}
-        onClose={() => setInquiryOpen(false)}
-      />
-    )}
-    </>
   );
 }

@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getInventoryItem, updateInventoryItem, deleteInventoryItem } from "@/lib/inventoryStore";
-import type { InventoryItemInput } from "@/lib/inventory";
+import { canBeMadeToOrder, type InventoryItemInput } from "@/lib/inventory";
 
 const PATCHABLE_KEYS: (keyof InventoryItemInput)[] = [
   "category",
@@ -56,14 +56,14 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
   }
   if (typeof patch.name === "string") patch.name = patch.name.trim();
 
-  // A permanent made-to-order design must be an Instrument and can't also be a
+  // A permanent made-to-order design must be an Instrument or Flute and can't also be a
   // (non-purchasable) showcase example. Validated against the record AS IT
   // WOULD BE after this patch, so a partial patch can't create a bad combo.
   const current = await getInventoryItem(id);
   if (!current) return NextResponse.json({ error: "Not found." }, { status: 404 });
   const merged = { ...current, ...patch };
-  if (merged.madeToOrder === true && merged.category !== "instrument") {
-    return NextResponse.json({ error: "Only Instruments can be made-to-order designs." }, { status: 400 });
+  if (merged.madeToOrder === true && !canBeMadeToOrder(merged.category)) {
+    return NextResponse.json({ error: "Only Instruments and Flutes can be made-to-order designs." }, { status: 400 });
   }
   if (merged.madeToOrder === true && merged.showcase === true) {
     return NextResponse.json({ error: "A piece can't be both a made-to-order design and a showcase example." }, { status: 400 });

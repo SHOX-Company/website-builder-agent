@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { X } from "lucide-react";
 import type { InventoryCategory, InventoryImage, InventoryItem, InventoryItemInput } from "@/lib/inventory";
-import { CATEGORY_LABELS, isMadeToOrder } from "@/lib/inventory";
+import { CATEGORY_LABELS, canBeMadeToOrder, isMadeToOrder } from "@/lib/inventory";
 import Input from "@/components/studio/ui/Input";
 import Textarea from "@/components/studio/ui/Textarea";
 import Switch from "@/components/studio/ui/Switch";
@@ -43,7 +43,7 @@ type AvailabilityMode = "finite" | "madeToOrder" | "showcase";
 
 // The three kinds of listing. Exactly one applies at a time (stored as the
 // `madeToOrder` / `showcase` booleans, mutually exclusive).
-const AVAILABILITY_OPTIONS: { value: AvailabilityMode; label: string; description: string; instrumentsOnly?: boolean }[] = [
+const AVAILABILITY_OPTIONS: { value: AvailabilityMode; label: string; description: string; madeToOrderOnly?: boolean }[] = [
   {
     value: "finite",
     label: "One-of-one inventory",
@@ -53,7 +53,7 @@ const AVAILABILITY_OPTIONS: { value: AvailabilityMode; label: string; descriptio
   {
     value: "madeToOrder",
     label: "Made-to-order design",
-    instrumentsOnly: true,
+    madeToOrderOnly: true,
     description:
       "A permanent design you build for each order. It stays live after every purchase and can be ordered again — never marked Sold. To retire it, use Soft Delete.",
   },
@@ -404,8 +404,8 @@ export default function InventoryItemDrawer({
                       // to the end of the new one rather than carrying over a
                       // position number that belonged to the old category.
                       order: activePeerCount(allItems, cat, item?.id) + 1,
-                      // Made-to-order designs are Instruments-only.
-                      madeToOrder: cat === "instrument" ? prev.madeToOrder : false,
+                      // Made-to-order designs are Instruments / Flutes only.
+                      madeToOrder: canBeMadeToOrder(cat) ? prev.madeToOrder : false,
                     }))
                   }
                   className={`px-3 py-2.5 rounded-md text-sm font-sans border transition-colors duration-150 ${
@@ -484,7 +484,7 @@ export default function InventoryItemDrawer({
               its consequence out. */}
           <div className="flex flex-col gap-2" role="radiogroup" aria-label="Availability type">
             <span className="text-xs uppercase tracking-widest text-brand-muted font-sans">Availability Type</span>
-            {AVAILABILITY_OPTIONS.filter((o) => !o.instrumentsOnly || form.category === "instrument").map((opt) => {
+            {AVAILABILITY_OPTIONS.filter((o) => !o.madeToOrderOnly || canBeMadeToOrder(form.category)).map((opt) => {
               const selected = availabilityMode === opt.value;
               return (
                 <button

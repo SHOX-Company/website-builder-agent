@@ -5,7 +5,13 @@ import Button from "@/components/ui/Button";
 
 // `showcase`: the current flute is a made-to-order example, not available
 // inventory — the availability micro-copy below must not claim otherwise.
-export default function HeroFlutes({ showcase = false }: { showcase?: boolean }) {
+export default function HeroFlutes({
+  showcase = false,
+  madeToOrder = false,
+}: {
+  showcase?: boolean;
+  madeToOrder?: boolean;
+}) {
   const videoRef = useRef<HTMLVideoElement>(null);
 
   useEffect(() => {
@@ -87,7 +93,11 @@ export default function HeroFlutes({ showcase = false }: { showcase?: boolean })
             No forest. No farm. No factory.
           </p>
           <p className="text-brand-gold/60 text-xs font-sans uppercase tracking-widest">
-            {showcase ? "Individually made to order." : "One instrument available now."}
+            {madeToOrder
+              ? "Made to order. Each individually handcrafted."
+              : showcase
+              ? "Individually made to order."
+              : "One instrument available now."}
           </p>
         </div>
 
