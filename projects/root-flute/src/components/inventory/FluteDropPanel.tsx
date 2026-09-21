@@ -157,13 +157,6 @@ export default function FluteDropPanel({
               </div>
             )}
             <PriceDisplay price={item.price} label={showcase ? REFERENCE_PRICE_LABEL : undefined} />
-            {madeToOrder && (
-              <p className="text-brand-muted/70 text-xs font-sans leading-relaxed">
-                Made to order. The flute pictured is an example of Daniel&rsquo;s work. Each new flute
-                is individually handcrafted for its player, and its natural materials and details may
-                vary. This design remains available to order.
-              </p>
-            )}
             {madeToOrder && eligible && (
               <p className="text-brand-muted/70 text-xs font-sans leading-relaxed">{MADE_TO_ORDER_PAYMENT_TERMS}</p>
             )}
