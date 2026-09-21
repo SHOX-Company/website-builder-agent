@@ -4,9 +4,11 @@ import { useEffect, useState } from "react";
 import { usePathname } from "next/navigation";
 import { subscribeCurrentFluteRef, type CurrentFluteRef } from "@/lib/currentFluteRef";
 import { startCheckout } from "@/lib/checkoutClient";
+import FluteInquiryModal from "@/components/sections/flutes/FluteInquiryModal";
 
 export default function StickyBar() {
   const [visible, setVisible] = useState(false);
+  const [inquiryOpen, setInquiryOpen] = useState(false);
   const [currentFlute, setCurrentFlute] = useState<CurrentFluteRef>(null);
   const [checkoutStatus, setCheckoutStatus] = useState<"idle" | "redirecting" | "error">("idle");
   const pathname = usePathname();
@@ -35,7 +37,15 @@ export default function StickyBar() {
     return () => window.removeEventListener("pageshow", handlePageShow);
   }, []);
 
+  // Showcase / made-to-order example: no checkout, ever — open the existing
+  // flute inquiry, prefilled as a NEW made-to-order piece.
+  const showcase = currentFlute?.showcase === true;
+
   async function handleClaimClick() {
+    if (showcase) {
+      setInquiryOpen(true);
+      return;
+    }
     if (!currentFlute || !currentFlute.eligible) {
       document.getElementById("acquire")?.scrollIntoView({ behavior: "smooth" });
       return;
@@ -55,6 +65,7 @@ export default function StickyBar() {
   if (isHome || isJewelry || isInstruments || pathname.startsWith("/studio")) return null;
 
   return (
+    <>
     <div
       aria-hidden={!visible}
       className={`fixed bottom-0 inset-x-0 z-50 transition-transform duration-300 ${
@@ -67,13 +78,15 @@ export default function StickyBar() {
           {isFlutes ? (
             <>
               <p className="text-brand-muted text-sm hidden sm:block">
-                One instrument available now.{" "}
+                {showcase ? "Individually made to order." : "One instrument available now."}{" "}
                 <span className="text-brand-gold font-semibold">
-                  Ancient materials. Impossible to replicate.
+                  {showcase
+                    ? "Ancient materials. Each one shaped for its player."
+                    : "Ancient materials. Impossible to replicate."}
                 </span>
               </p>
               <p className="text-brand-gold font-semibold text-sm sm:hidden">
-                One instrument available now.
+                {showcase ? "Individually made to order." : "One instrument available now."}
               </p>
               <button
                 type="button"
@@ -81,7 +94,9 @@ export default function StickyBar() {
                 disabled={checkoutStatus === "redirecting"}
                 className="inline-flex items-center justify-center px-5 py-2.5 text-sm font-bold bg-brand-gold text-brand-dark hover:bg-brand-gold-light disabled:opacity-40 disabled:cursor-not-allowed transition-colors duration-200 flex-shrink-0"
               >
-                {checkoutStatus === "redirecting"
+                {showcase
+                  ? "Request a Made-to-Order Flute →"
+                  : checkoutStatus === "redirecting"
                   ? "Redirecting…"
                   : checkoutStatus === "error"
                   ? "Try Again →"
@@ -114,5 +129,17 @@ export default function StickyBar() {
         </div>
       </div>
     </div>
+
+    {/* Rendered outside the bar on purpose: the bar is CSS-transformed, and a
+        `fixed` modal inside a transformed ancestor is positioned against that
+        ancestor instead of the viewport. */}
+    {isFlutes && showcase && (
+      <FluteInquiryModal
+        isOpen={inquiryOpen}
+        defaultItem={currentFlute?.inquiryItem ?? ""}
+        onClose={() => setInquiryOpen(false)}
+      />
+    )}
+    </>
   );
 }

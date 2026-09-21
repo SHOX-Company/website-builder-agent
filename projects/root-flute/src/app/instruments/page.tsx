@@ -6,18 +6,20 @@ import InstrumentsCollection from "@/components/sections/instruments/Instruments
 import FinalCTAInstruments from "@/components/sections/instruments/FinalCTAInstruments";
 import Footer from "@/components/sections/Footer";
 import { getPublicInventory } from "@/lib/inventoryStore";
+import { isMadeToOrder } from "@/lib/inventory";
 
 export const metadata = buildPageMetadata("instruments");
 export const dynamic = "force-dynamic";
 
 export default async function InstrumentsPage() {
   const items = await getPublicInventory("instrument");
+  const madeToOrder = items.some((item) => isMadeToOrder(item));
 
   return (
     <main>
-      <HeroInstruments />
+      <HeroInstruments madeToOrder={madeToOrder} />
       <InstrumentsCollection items={items} />
-      <FinalCTAInstruments />
+      <FinalCTAInstruments madeToOrder={madeToOrder} />
       <Footer />
     </main>
   );

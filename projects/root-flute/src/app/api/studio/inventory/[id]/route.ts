@@ -7,6 +7,8 @@ const PATCHABLE_KEYS: (keyof InventoryItemInput)[] = [
   "name",
   "price",
   "published",
+  "showcase",
+  "madeToOrder",
   "featured",
   "shortDescription",
   "story",
@@ -39,6 +41,12 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
   if (body.order !== undefined && (!Number.isInteger(body.order) || body.order < 1)) {
     return NextResponse.json({ error: "Display order must be a positive whole number." }, { status: 400 });
   }
+  if (body.showcase !== undefined && typeof body.showcase !== "boolean") {
+    return NextResponse.json({ error: "Showcase must be true or false." }, { status: 400 });
+  }
+  if (body.madeToOrder !== undefined && typeof body.madeToOrder !== "boolean") {
+    return NextResponse.json({ error: "Made to order must be true or false." }, { status: 400 });
+  }
 
   const patch: Partial<InventoryItemInput> = {};
   for (const key of PATCHABLE_KEYS) {
@@ -47,6 +55,19 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
     }
   }
   if (typeof patch.name === "string") patch.name = patch.name.trim();
+
+  // A permanent made-to-order design must be an Instrument and can't also be a
+  // (non-purchasable) showcase example. Validated against the record AS IT
+  // WOULD BE after this patch, so a partial patch can't create a bad combo.
+  const current = await getInventoryItem(id);
+  if (!current) return NextResponse.json({ error: "Not found." }, { status: 404 });
+  const merged = { ...current, ...patch };
+  if (merged.madeToOrder === true && merged.category !== "instrument") {
+    return NextResponse.json({ error: "Only Instruments can be made-to-order designs." }, { status: 400 });
+  }
+  if (merged.madeToOrder === true && merged.showcase === true) {
+    return NextResponse.json({ error: "A piece can't be both a made-to-order design and a showcase example." }, { status: 400 });
+  }
 
   const item = await updateInventoryItem(id, patch);
   if (!item) return NextResponse.json({ error: "Not found." }, { status: 404 });

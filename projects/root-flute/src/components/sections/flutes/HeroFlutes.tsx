@@ -3,7 +3,9 @@
 import { useRef, useEffect } from "react";
 import Button from "@/components/ui/Button";
 
-export default function HeroFlutes() {
+// `showcase`: the current flute is a made-to-order example, not available
+// inventory — the availability micro-copy below must not claim otherwise.
+export default function HeroFlutes({ showcase = false }: { showcase?: boolean }) {
   const videoRef = useRef<HTMLVideoElement>(null);
 
   useEffect(() => {
@@ -76,7 +78,7 @@ export default function HeroFlutes() {
           size="lg"
           className="hover:scale-105 hover:brightness-110 active:scale-100 transition-all duration-200 ease-out"
         >
-          View Current Offering →
+          Explore the Flutes →
         </Button>
 
         {/* Micro-copy accent */}
@@ -85,7 +87,7 @@ export default function HeroFlutes() {
             No forest. No farm. No factory.
           </p>
           <p className="text-brand-gold/60 text-xs font-sans uppercase tracking-widest">
-            One instrument available now.
+            {showcase ? "Individually made to order." : "One instrument available now."}
           </p>
         </div>
 

@@ -4,12 +4,19 @@ import { useState } from "react";
 import SectionWrapper from "@/components/ui/SectionWrapper";
 import ItemBlock from "@/components/inventory/ItemBlock";
 import InstrumentsInquiryModal from "./InstrumentsInquiryModal";
-import type { InventoryItem } from "@/lib/inventory";
+import { inquiryContext, isMadeToOrder, isShowcase, type InventoryItem } from "@/lib/inventory";
 import { slugify } from "@/lib/slug";
 
 export default function InstrumentsCollection({ items }: { items: InventoryItem[] }) {
   const [modalOpen, setModalOpen] = useState(false);
   const [selectedItem, setSelectedItem] = useState<InventoryItem | null>(null);
+  // At least one instrument is a made-to-order example: the page copy must not
+  // claim that the instruments shown are available to be acquired.
+  const hasShowcase = items.some((item) => isShowcase(item));
+  // At least one instrument is a permanent made-to-order design: it can be
+  // ordered again after every purchase, so "made once / no reordering / gone
+  // when it finds its player" would be false and is dropped.
+  const hasMadeToOrder = items.some((item) => isMadeToOrder(item));
 
   // Only reached for inquiry-only items — checkout-eligible items redirect
   // straight to Stripe from within ItemBlock and never call this.
@@ -32,11 +39,14 @@ export default function InstrumentsCollection({ items }: { items: InventoryItem[
               ? `${items.length} instrument${items.length === 1 ? "" : "s"}. ${items.length === 1 ? "One intention" : "Many intentions"}.`
               : "The next instrument is being shaped."}
           </h2>
-          <p className="text-brand-muted text-base leading-relaxed max-w-2xl mx-auto">
-            Each instrument is made once. There is no restocking, no reordering, no
-            reproduction. When it finds its player, it is gone.
-          </p>
-          <p className="text-brand-muted text-base leading-relaxed max-w-2xl mx-auto mt-4">
+          {!hasMadeToOrder && (
+            <p className="text-brand-muted text-base leading-relaxed max-w-2xl mx-auto">
+              {hasShowcase
+                ? "Each instrument is made once. There is no restocking, no reordering, and no reproduction of the exact instrument."
+                : "Each instrument is made once. There is no restocking, no reordering, no reproduction. When it finds its player, it is gone."}
+            </p>
+          )}
+          <p className={`text-brand-muted text-base leading-relaxed max-w-2xl mx-auto${hasMadeToOrder ? "" : " mt-4"}`}>
             The instruments shown here are made to order. Each is individually
             handcrafted for its player, carrying its own natural character,
             materials, and voice.
@@ -67,13 +77,18 @@ export default function InstrumentsCollection({ items }: { items: InventoryItem[
         )}
 
         <p className="text-center text-brand-muted text-sm max-w-lg mx-auto leading-relaxed mt-10">
-          Past instruments are not available. Each is worked once — and never again.
+          {hasMadeToOrder
+            ? "These are standing RootFlute designs. Each new instrument is made to order."
+            : hasShowcase
+            ? "The instruments shown are examples of past work. Each is worked once — and a new instrument can be made to order."
+            : "Past instruments are not available. Each is worked once — and never again."}
         </p>
       </SectionWrapper>
 
       <InstrumentsInquiryModal
         isOpen={modalOpen}
-        defaultItem={selectedItem?.name ?? ""}
+        defaultItem={selectedItem ? inquiryContext(selectedItem) : ""}
+        madeToOrder={hasMadeToOrder}
         onClose={() => setModalOpen(false)}
       />
     </>

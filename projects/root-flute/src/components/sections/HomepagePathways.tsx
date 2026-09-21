@@ -42,7 +42,7 @@ const PATHWAYS = [
     name: "Handcrafted Flutes",
     description:
       "Handcrafted, purpose-built flutes created to carry emotion, stillness, and the living spirit of sound.",
-    cta: "View Current Offering",
+    cta: "Explore the Flutes",
     accent: "Rare materials · One of one · Handcarved",
     imageSrc: "/images/homepage-flutes.jpg",
     imageAlt: "Daniel on dock holding rare antler flute — mountains and lake backdrop",
@@ -57,9 +57,9 @@ const PATHWAYS = [
     description:
       "Immersive handcrafted instruments designed for deep listening, movement, meditation, and sonic exploration.",
     cta: "View the Instruments",
-    accent: "Six pieces · Handcrafted · One of one",
+    accent: "Handcrafted · Made to order",
     imageSrc: "/images/instruments/instruments-hero.png",
-    imageAlt: "RootFlute handcrafted instruments — rare one-of-one collection",
+    imageAlt: "RootFlute handcrafted instruments — made-to-order collection",
     variant: "neutral" as const,
     watermarkLine: "Sound • Ritual • Presence",
     imageObjectPosition: "center",

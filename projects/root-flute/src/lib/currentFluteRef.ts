@@ -2,7 +2,12 @@
 // current checkout-eligible drop, without threading inventory data through
 // layout.tsx. subscribe() always replays the latest known value immediately,
 // so it works regardless of which component's effect runs first.
-export type CurrentFluteRef = { id: string; eligible: boolean } | null;
+// `showcase` items are made-to-order examples: never checkout-eligible, and
+// the sticky bar opens the flute inquiry modal (prefilled with `inquiryItem`)
+// instead of starting checkout.
+export type CurrentFluteRef =
+  | { id: string; eligible: boolean; showcase?: boolean; inquiryItem?: string }
+  | null;
 
 let current: CurrentFluteRef = null;
 const listeners = new Set<(value: CurrentFluteRef) => void>();

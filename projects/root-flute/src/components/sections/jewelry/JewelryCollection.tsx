@@ -4,11 +4,14 @@ import { useState } from "react";
 import SectionWrapper from "@/components/ui/SectionWrapper";
 import ItemBlock from "@/components/inventory/ItemBlock";
 import JewelryInquiryModal from "./JewelryInquiryModal";
-import type { InventoryItem } from "@/lib/inventory";
+import { inquiryContext, isShowcase, type InventoryItem } from "@/lib/inventory";
 
 export default function JewelryCollection({ items }: { items: InventoryItem[] }) {
   const [modalOpen, setModalOpen] = useState(false);
   const [selectedItem, setSelectedItem] = useState<InventoryItem | null>(null);
+  // At least one piece is a made-to-order example: the page copy must not
+  // claim that the pieces shown are available to be acquired.
+  const hasShowcase = items.some((item) => isShowcase(item));
 
   // Only reached for inquiry-only items — checkout-eligible items redirect
   // straight to Stripe from within ItemBlock and never call this.
@@ -32,9 +35,17 @@ export default function JewelryCollection({ items }: { items: InventoryItem[] })
               : "The next piece is being shaped."}
           </h2>
           <p className="text-brand-muted text-base leading-relaxed max-w-2xl mx-auto">
-            Each piece is made once. There is no restocking, no reordering, no reproduction.
-            When it finds its owner, it is gone.
+            {hasShowcase
+              ? "Each piece is made once. There is no restocking, no reordering, and no reproduction of the exact piece."
+              : "Each piece is made once. There is no restocking, no reordering, no reproduction. When it finds its owner, it is gone."}
           </p>
+          {hasShowcase && (
+            <p className="text-brand-muted text-base leading-relaxed max-w-2xl mx-auto mt-4">
+              The pieces shown here are one-of-one works from the RootFlute workshop. New pieces are
+              created to order, individually shaped by their materials and the person they are made
+              for.
+            </p>
+          )}
         </div>
 
         {items.length > 0 ? (
@@ -60,13 +71,15 @@ export default function JewelryCollection({ items }: { items: InventoryItem[] })
         )}
 
         <p className="text-center text-brand-muted text-sm max-w-lg mx-auto leading-relaxed mt-10">
-          These pieces are not available in a storefront. Each one finds its owner — and then it is gone.
+          {hasShowcase
+            ? "These pieces are not available in a storefront. Each is made once — new pieces are created to order."
+            : "These pieces are not available in a storefront. Each one finds its owner — and then it is gone."}
         </p>
       </SectionWrapper>
 
       <JewelryInquiryModal
         isOpen={modalOpen}
-        defaultPiece={selectedItem?.name ?? ""}
+        defaultPiece={selectedItem ? inquiryContext(selectedItem) : ""}
         onClose={() => setModalOpen(false)}
       />
     </>

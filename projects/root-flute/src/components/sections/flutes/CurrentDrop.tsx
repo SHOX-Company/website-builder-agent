@@ -4,11 +4,12 @@ import { useState } from "react";
 import SectionWrapper from "@/components/ui/SectionWrapper";
 import FluteDropPanel from "@/components/inventory/FluteDropPanel";
 import FluteInquiryModal from "./FluteInquiryModal";
-import type { InventoryItem } from "@/lib/inventory";
+import { inquiryContext, isShowcase, type InventoryItem } from "@/lib/inventory";
 
 export default function CurrentDrop({ items }: { items: InventoryItem[] }) {
   const [modalOpen, setModalOpen] = useState(false);
   const current = items[0] ?? null;
+  const showcase = current ? isShowcase(current) : false;
 
   // Only reached for inquiry-only items — checkout-eligible items redirect
   // straight to Stripe from within FluteDropPanel and never call this.
@@ -23,7 +24,7 @@ export default function CurrentDrop({ items }: { items: InventoryItem[] }) {
 
         <div className="text-center mb-14">
           <p className="text-brand-gold text-xs uppercase tracking-[0.3em] font-sans mb-4">
-            Current Offering
+            {showcase ? "Made to Order" : "Current Offering"}
           </p>
           <h2 className="font-display text-4xl sm:text-5xl font-light text-brand-text mb-6">
             Born from 10,000 years of time.
@@ -33,6 +34,13 @@ export default function CurrentDrop({ items }: { items: InventoryItem[] }) {
             permafrost for millennia. Released one at a time. Each one is the only one that will
             ever exist.
           </p>
+          {showcase && (
+            <p className="text-brand-muted text-base leading-relaxed max-w-2xl mx-auto mt-4">
+              Mammoth Tusk flutes are individually made to order. Each is created for its player,
+              shaped by the character of the material and Daniel&rsquo;s hand, so no two will ever
+              be exactly alike.
+            </p>
+          )}
         </div>
 
         {current ? (
@@ -51,7 +59,7 @@ export default function CurrentDrop({ items }: { items: InventoryItem[] }) {
 
       <FluteInquiryModal
         isOpen={modalOpen}
-        defaultItem={current?.name ?? ""}
+        defaultItem={current ? inquiryContext(current) : ""}
         onClose={() => setModalOpen(false)}
       />
     </>

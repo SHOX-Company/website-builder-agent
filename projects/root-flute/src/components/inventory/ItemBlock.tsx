@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { isCheckoutEligible, type InventoryItem } from "@/lib/inventory";
+import { isCheckoutEligible, isMadeToOrder, isShowcase, REFERENCE_PRICE_LABEL, type InventoryItem } from "@/lib/inventory";
 import { startCheckout } from "@/lib/checkoutClient";
 import PriceDisplay from "./PriceDisplay";
 import ItemLightbox from "./ItemLightbox";
@@ -32,10 +32,17 @@ export default function ItemBlock({ item, noun, layout, isLast = false, priority
   const [checkoutStatus, setCheckoutStatus] = useState<"idle" | "redirecting" | "error">("idle");
   const isRight = layout === "right";
   const eligible = isCheckoutEligible(item);
+  // Showcase / made-to-order example: never reaches Stripe — inquiry only.
+  const showcase = isShowcase(item);
+  // Permanent made-to-order design: a standing RootFlute design that stays
+  // live and orderable after every purchase (never one-of-one inventory).
+  const madeToOrder = isMadeToOrder(item);
+  const showcaseCta =
+    item.category === "jewelry" ? "Inquire About a Made-to-Order Piece →" : `Request a Made-to-Order ${noun} →`;
   const gallery = item.featuredImage ? [item.featuredImage, ...item.additionalImages] : item.additionalImages;
 
   async function handleAcquireClick() {
-    if (!eligible) {
+    if (showcase || !eligible) {
       onAcquire(item);
       return;
     }
@@ -161,12 +168,25 @@ export default function ItemBlock({ item, noun, layout, isLast = false, priority
                 </p>
               </div>
             )}
-            <PriceDisplay price={item.price} />
+            <PriceDisplay price={item.price} label={showcase ? REFERENCE_PRICE_LABEL : undefined} />
+            {madeToOrder && (
+              <p className="text-brand-muted/70 text-xs font-sans leading-relaxed">
+                Made to order. The instrument pictured is an example of Daniel&rsquo;s work. Each new
+                instrument is individually handcrafted, and its natural materials and details may
+                vary. This design remains available to order.
+              </p>
+            )}
           </div>
 
           <div className="flex flex-col gap-4">
             <span className="inline-block border border-brand-border text-brand-muted text-xs uppercase tracking-widest px-4 py-2 self-start">
-              Available Now &nbsp;·&nbsp; One of One
+              {showcase ? (
+                <>One of One &nbsp;·&nbsp; From the Workshop</>
+              ) : madeToOrder ? (
+                <>Made to Order &nbsp;·&nbsp; Individually Handcrafted</>
+              ) : (
+                <>Available Now &nbsp;·&nbsp; One of One</>
+              )}
             </span>
             <button
               type="button"
@@ -174,7 +194,15 @@ export default function ItemBlock({ item, noun, layout, isLast = false, priority
               disabled={checkoutStatus === "redirecting"}
               className="inline-flex items-center justify-center font-semibold transition-colors duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-gold bg-brand-gold text-brand-dark hover:bg-brand-gold-light disabled:opacity-40 disabled:cursor-not-allowed px-8 py-4 text-lg self-start"
             >
-              {checkoutStatus === "redirecting" ? "Redirecting…" : `Acquire This ${noun} →`}
+              {showcase
+                ? showcaseCta
+                : checkoutStatus === "redirecting"
+                ? "Redirecting…"
+                : madeToOrder
+                ? eligible
+                  ? `Order This ${noun} →`
+                  : `Request a Made-to-Order ${noun} →`
+                : `Acquire This ${noun} →`}
             </button>
             {checkoutStatus === "error" && (
               <p className="text-red-400/90 text-xs font-sans">
@@ -182,7 +210,9 @@ export default function ItemBlock({ item, noun, layout, isLast = false, priority
               </p>
             )}
             <p className="text-brand-muted/60 text-xs font-sans">
-              {eligible
+              {showcase || (madeToOrder && !eligible)
+                ? <>Private inquiry &nbsp;·&nbsp; Handled personally by Daniel</>
+                : eligible
                 ? "Secure checkout via Stripe"
                 : <>Private acquisition inquiry &nbsp;·&nbsp; Handled personally by Daniel</>}
             </p>

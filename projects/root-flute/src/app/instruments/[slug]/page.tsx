@@ -6,7 +6,7 @@ import { slugify } from "@/lib/slug";
 import Footer from "@/components/sections/Footer";
 import InstrumentDetail from "@/components/sections/instruments/InstrumentDetail";
 import { getPublicInventory } from "@/lib/inventoryStore";
-import type { InventoryItem } from "@/lib/inventory";
+import { isMadeToOrder, type InventoryItem } from "@/lib/inventory";
 
 // Instruments are one-of-one inventory pieces (sold once, never restocked),
 // so — unlike the Custom Flute styles — there's no fixed slug list to
@@ -30,7 +30,10 @@ export async function generateMetadata({
 
   const title = `${item.name} | RootFlute Instruments`;
   const description =
-    item.shortDescription || "A one-of-one handcrafted instrument by RootFlute.";
+    item.shortDescription ||
+    (isMadeToOrder(item)
+      ? "A made-to-order handcrafted instrument by RootFlute."
+      : "A one-of-one handcrafted instrument by RootFlute.");
   const canonicalUrl = `${SITE_URL}/instruments/${slug}`;
   const ogImage = item.featuredImage?.url ?? `${SITE_URL}/api/og?page=instruments`;
 

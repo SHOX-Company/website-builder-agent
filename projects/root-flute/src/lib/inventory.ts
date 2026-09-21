@@ -16,6 +16,27 @@ export interface InventoryItem {
   price: number | null;
   status: InventoryStatus;
   published: boolean;
+  /**
+   * Showcase / Made-to-Order Example. `true` = the piece stays publicly
+   * visible as an example of RootFlute work, its price renders as a
+   * "Reference price", and it can NEVER be purchased — the only CTA is a
+   * made-to-order inquiry. This is deliberately NOT `status: "sold"`: sold
+   * pieces are hidden from the public site; showcase pieces are not.
+   * Optional so every record written before this field existed keeps behaving
+   * exactly as it did (absent === false).
+   */
+  showcase?: boolean;
+  /**
+   * Permanent Made-to-Order design (Instruments only). `true` = this listing
+   * is a standing RootFlute design, NOT a finite physical piece: a purchase
+   * creates an order and Daniel builds that customer's instrument, but the
+   * listing stays live, is never marked Sold, and can be ordered again.
+   * Mutually exclusive with `showcase` (which is non-purchasable) — see
+   * `isMadeToOrder`, which is the only thing the rest of the code consults.
+   * Optional so every record written before this field existed keeps
+   * behaving exactly as it did (absent === false === finite inventory).
+   */
+  madeToOrder?: boolean;
   featured: boolean;
   shortDescription: string;
   story: string;
@@ -50,12 +71,45 @@ export function formatPrice(price: number | null): string {
   return `$${price.toLocaleString("en-US")}`;
 }
 
+export function isShowcase(item: Pick<InventoryItem, "showcase">): boolean {
+  return item.showcase === true;
+}
+
+/**
+ * The single definition of "permanent made-to-order design". Deliberately
+ * fail-safe: it is only true for an Instrument that is explicitly flagged AND
+ * is not a showcase example. A stray flag on a Flute or Talisman, or a record
+ * flagged as both, falls back to ordinary finite / showcase behavior — so the
+ * one-of-one commerce rules for those can never be relaxed by accident.
+ */
+export function isMadeToOrder(
+  item: Pick<InventoryItem, "madeToOrder" | "category" | "showcase">
+): boolean {
+  return item.madeToOrder === true && item.category === "instrument" && item.showcase !== true;
+}
+
+/** Label for a price that is context for the visitor, not an offer to buy. */
+export const REFERENCE_PRICE_LABEL = "Reference price";
+
+// What the inquiry form is told the visitor is asking about. A showcase piece
+// is not for sale, so the inquiry must read as a request for a NEW
+// made-to-order piece — never as a request to buy the photographed one. A
+// made-to-order design IS the thing being ordered, so it is named directly.
+export function inquiryContext(
+  item: Pick<InventoryItem, "name" | "showcase" | "madeToOrder" | "category">
+): string {
+  if (isShowcase(item)) return `Made to order — inspired by ${item.name}`;
+  if (isMadeToOrder(item)) return `Made to order — ${item.name}`;
+  return item.name;
+}
+
 // Stripe Checkout Task S1: pure eligibility predicate. Items with no set
 // price ("Pricing on inquiry") are never checkout-eligible — they only ever
-// go through the inquiry flow. No Checkout Session exists yet, so nothing
-// currently branches on `true`; later Stripe tasks wire that in.
+// go through the inquiry flow. Showcase items are never eligible either,
+// regardless of price: this is the single choke point every client CTA and
+// /api/checkout-session consults.
 export function isCheckoutEligible(item: InventoryItem): boolean {
-  return item.price !== null;
+  return item.price !== null && !isShowcase(item);
 }
 
 // `order` is optional on input: omit it to auto-append at the end of its

@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getInventoryItem } from "@/lib/inventoryStore";
-import { isCheckoutEligible, type InventoryCategory } from "@/lib/inventory";
+import { isCheckoutEligible, isMadeToOrder, type InventoryCategory } from "@/lib/inventory";
 import { getStripeClient } from "@/lib/stripe";
 import { SITE_URL } from "@/lib/siteMetadata";
 
@@ -33,7 +33,13 @@ export async function POST(req: NextRequest) {
   if (
     !item ||
     !item.published ||
-    item.status !== "available" ||
+    // A finite piece must still be on the shelf. A permanent made-to-order
+    // design is orderable whatever its `status` says (it is never "consumed").
+    (item.status !== "available" && !isMadeToOrder(item)) ||
+    // Showcase / made-to-order examples do not physically exist as available
+    // inventory — never create a Checkout Session for one, whatever the
+    // client claims. (Also covered by isCheckoutEligible; explicit on purpose.)
+    item.showcase === true ||
     item.price === null ||
     !isCheckoutEligible(item)
   ) {
@@ -64,7 +70,7 @@ export async function POST(req: NextRequest) {
           },
         },
       ],
-      metadata: { inventoryItemId: item.id },
+      metadata: { inventoryItemId: item.id, ...(isMadeToOrder(item) ? { madeToOrder: "true" } : {}) },
       success_url: `${SITE_URL}/checkout/success`,
       cancel_url: `${SITE_URL}${CATEGORY_PATH[item.category]}`,
     });

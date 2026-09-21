@@ -219,6 +219,12 @@ export interface PurchaseConfirmationPayload {
   shippingSummary: string | null;
   /** Stable idempotency key (per Stripe session) passed through to Resend. */
   idempotencyKey: string;
+  /**
+   * A permanent made-to-order design was ordered (not a finite one-of-one
+   * piece). Switches the wording only — the finite email is left exactly as
+   * it always was. Absent/false === finite.
+   */
+  madeToOrder?: boolean;
 }
 
 const SUPPORT_URL = `${SITE_URL}/acquisition-support`;
@@ -230,8 +236,9 @@ const PURCHASE_REPLY_TO_EMAIL = "RootFlute@gmail.com";
 
 function buildPurchaseConfirmationHtml(p: PurchaseConfirmationPayload): string {
   const greeting = p.customerName ? `${esc(p.customerName)},` : "Thank you.";
+  const mto = p.madeToOrder === true;
   const rows: [string, string][] = [
-    ["Piece", `${esc(p.itemName)}`],
+    [mto ? "Instrument" : "Piece", `${esc(p.itemName)}`],
     ["Category", esc(p.itemCategoryLabel)],
     ["Amount", esc(p.amountFormatted)],
     ["Order Reference", esc(p.orderReference)],
@@ -258,17 +265,23 @@ function buildPurchaseConfirmationHtml(p: PurchaseConfirmationPayload): string {
         <tr><td style="height:2px;background:linear-gradient(90deg,transparent,#c8a45a,transparent);font-size:0;">&nbsp;</td></tr>
         <tr>
           <td style="padding:36px 32px 20px;">
-            <p style="margin:0 0 12px;color:#c8a45a;font-size:10px;text-transform:uppercase;letter-spacing:0.3em;font-family:Arial,sans-serif;">Acquisition Confirmed</p>
-            <p style="margin:0 0 6px;color:#e8e0d0;font-size:24px;font-weight:300;font-family:Georgia,serif;">Your piece has been claimed.</p>
+            <p style="margin:0 0 12px;color:#c8a45a;font-size:10px;text-transform:uppercase;letter-spacing:0.3em;font-family:Arial,sans-serif;">${mto ? "Order Confirmed" : "Acquisition Confirmed"}</p>
+            <p style="margin:0 0 6px;color:#e8e0d0;font-size:24px;font-weight:300;font-family:Georgia,serif;">${mto ? "Your instrument has been ordered." : "Your piece has been claimed."}</p>
             <p style="margin:0;color:#8a8170;font-size:13px;font-family:Georgia,serif;">${greeting}</p>
           </td>
         </tr>
         <tr>
           <td style="padding:8px 32px 20px;">
             <p style="margin:0;color:#b8ae98;font-size:14px;line-height:1.7;font-family:Georgia,serif;">
-              Your checkout completed and this one-of-one piece is now reserved to you. Daniel
+              ${
+                mto
+                  ? `Your checkout completed and your made-to-order instrument has been ordered. Daniel
+              will personally follow up regarding the creation of your instrument and the next
+              steps &mdash; please watch the inbox for the email address you used at checkout.`
+                  : `Your checkout completed and this one-of-one piece is now reserved to you. Daniel
               will personally follow up regarding your acquisition and the next steps &mdash;
-              please watch the inbox for the email address you used at checkout.
+              please watch the inbox for the email address you used at checkout.`
+              }
             </p>
           </td>
         </tr>
@@ -282,8 +295,8 @@ function buildPurchaseConfirmationHtml(p: PurchaseConfirmationPayload): string {
         </tr>
         <tr>
           <td style="padding:8px 32px 32px;border-top:1px solid #2a2820;">
-            <p style="margin:16px 0 12px;color:#9a8a6a;font-size:12px;font-family:Arial,sans-serif;">Need help with your acquisition?</p>
-            <a href="${SUPPORT_URL}" style="display:inline-block;padding:12px 22px;background:#c8a45a;color:#141410;font-size:13px;font-weight:bold;text-decoration:none;font-family:Arial,sans-serif;letter-spacing:0.04em;">Request support or a return &rarr;</a>
+            <p style="margin:16px 0 12px;color:#9a8a6a;font-size:12px;font-family:Arial,sans-serif;">${mto ? "Need help with your order?" : "Need help with your acquisition?"}</p>
+            <a href="${SUPPORT_URL}" style="display:inline-block;padding:12px 22px;background:#c8a45a;color:#141410;font-size:13px;font-weight:bold;text-decoration:none;font-family:Arial,sans-serif;letter-spacing:0.04em;">${mto ? "Request support" : "Request support or a return"} &rarr;</a>
             <p style="margin:14px 0 0;color:#6b6356;font-size:11px;line-height:1.6;font-family:Arial,sans-serif;">
               Daniel personally reviews each request and follows up with you directly.
             </p>
@@ -305,16 +318,28 @@ function buildPurchaseConfirmationHtml(p: PurchaseConfirmationPayload): string {
 }
 
 function buildPurchaseConfirmationText(p: PurchaseConfirmationPayload): string {
+  const mto = p.madeToOrder === true;
   const lines = [
-    `ACQUISITION CONFIRMED — Your piece has been claimed.`,
+    mto
+      ? `ORDER CONFIRMED — Your instrument has been ordered.`
+      : `ACQUISITION CONFIRMED — Your piece has been claimed.`,
     ``,
     p.customerName ? `${p.customerName},` : `Thank you.`,
     ``,
-    `Your checkout completed and this one-of-one piece is now reserved to you.`,
-    `Daniel will personally follow up regarding your acquisition and the next`,
-    `steps — please watch the inbox for the email address you used at checkout.`,
+    ...(mto
+      ? [
+          `Your checkout completed and your made-to-order instrument has been ordered.`,
+          `Daniel will personally follow up regarding the creation of your instrument`,
+          `and the next steps — please watch the inbox for the email address you used`,
+          `at checkout.`,
+        ]
+      : [
+          `Your checkout completed and this one-of-one piece is now reserved to you.`,
+          `Daniel will personally follow up regarding your acquisition and the next`,
+          `steps — please watch the inbox for the email address you used at checkout.`,
+        ]),
     ``,
-    `Piece:            ${p.itemName}`,
+    `${mto ? "Instrument:       " : "Piece:            "}${p.itemName}`,
     `Category:         ${p.itemCategoryLabel}`,
     `Amount:           ${p.amountFormatted}`,
     `Order Reference:  ${p.orderReference}`,
@@ -322,7 +347,7 @@ function buildPurchaseConfirmationText(p: PurchaseConfirmationPayload): string {
   if (p.shippingSummary) lines.push(`Ship To:          ${p.shippingSummary}`);
   lines.push(
     ``,
-    `Need help with your acquisition? Request support or a return:`,
+    mto ? `Need help with your order? Request support:` : `Need help with your acquisition? Request support or a return:`,
     SUPPORT_URL,
     ``,
     `Daniel personally reviews each request and follows up with you directly.`,
@@ -367,7 +392,7 @@ export async function sendPurchaseConfirmationEmail(
       from,
       to: payload.to,
       replyTo: PURCHASE_REPLY_TO_EMAIL,
-      subject: `Your RootFlute acquisition — ${payload.itemName}`,
+      subject: `Your RootFlute ${payload.madeToOrder === true ? "order" : "acquisition"} — ${payload.itemName}`,
       html: buildPurchaseConfirmationHtml(payload),
       text: buildPurchaseConfirmationText(payload),
     },
@@ -426,6 +451,8 @@ export interface InternalSaleNotificationPayload {
   shippingAddress: string | null;
   /** Stable idempotency key (per Stripe session) passed through to Resend. */
   idempotencyKey: string;
+  /** A permanent made-to-order design was ordered (the design stays live). */
+  madeToOrder?: boolean;
 }
 
 const EMAIL_ADDRESS_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -497,7 +524,7 @@ function buildInternalSaleNotificationHtml(p: InternalSaleNotificationPayload): 
           <td style="padding:32px 32px 20px;">
             <p style="margin:0 0 10px;color:#c8a45a;font-size:10px;text-transform:uppercase;letter-spacing:0.3em;font-family:Arial,sans-serif;">Internal &middot; Sale Notification</p>
             <p style="margin:0;color:#e8e0d0;font-size:22px;font-weight:300;font-family:Georgia,serif;">SALE CONFIRMED</p>
-            <p style="margin:6px 0 0;color:#8a8170;font-size:13px;font-family:Georgia,serif;">A Root Flute piece has been acquired.</p>
+            <p style="margin:6px 0 0;color:#8a8170;font-size:13px;font-family:Georgia,serif;">${p.madeToOrder === true ? "A made-to-order Root Flute instrument has been ordered. The design remains live for future orders." : "A Root Flute piece has been acquired."}</p>
           </td>
         </tr>
         <tr>
@@ -523,7 +550,9 @@ function buildInternalSaleNotificationHtml(p: InternalSaleNotificationPayload): 
 
 function buildInternalSaleNotificationText(p: InternalSaleNotificationPayload): string {
   const lines = [
-    `SALE CONFIRMED — A Root Flute piece has been acquired.`,
+    p.madeToOrder === true
+      ? `SALE CONFIRMED — A made-to-order Root Flute instrument has been ordered. The design remains live for future orders.`
+      : `SALE CONFIRMED — A Root Flute piece has been acquired.`,
     ``,
     `Piece:              ${p.itemName}`,
     `Category:           ${p.itemCategoryLabel}`,

@@ -99,7 +99,7 @@ export default function SoundDemo() {
         </p>
 
         <Button href="#current-drop" variant="primary" size="lg">
-          View Current Offering →
+          Explore the Flutes →
         </Button>
 
       </div>

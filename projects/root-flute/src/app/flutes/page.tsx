@@ -9,6 +9,7 @@ import FluteFAQ from "@/components/sections/flutes/FluteFAQ";
 import FinalCTAFlutes from "@/components/sections/flutes/FinalCTAFlutes";
 import Footer from "@/components/sections/Footer";
 import { getPublicInventory } from "@/lib/inventoryStore";
+import { isShowcase } from "@/lib/inventory";
 
 export const metadata = buildPageMetadata("flutes");
 export const dynamic = "force-dynamic";
@@ -18,7 +19,7 @@ export default async function FlutesPage() {
 
   return (
     <main>
-      <HeroFlutes />
+      <HeroFlutes showcase={items[0] ? isShowcase(items[0]) : false} />
       <CurrentDrop items={items} />
       <CraftsmanAuthority />
       <SoundDemo />

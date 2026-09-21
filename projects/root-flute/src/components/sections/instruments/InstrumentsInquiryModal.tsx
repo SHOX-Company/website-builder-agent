@@ -15,6 +15,8 @@ interface FormData {
 interface Props {
   isOpen: boolean;
   defaultItem?: string;
+  /** Permanent made-to-order design(s): the finite "made once / one owner" success wording would be false. */
+  madeToOrder?: boolean;
   onClose: () => void;
 }
 
@@ -24,6 +26,7 @@ const FIELD_BASE =
 export default function InstrumentsInquiryModal({
   isOpen,
   defaultItem = "Handcrafted Instrument",
+  madeToOrder = false,
   onClose,
 }: Props) {
   const [status, setStatus] = useState<"idle" | "submitting" | "success">("idle");
@@ -122,12 +125,13 @@ export default function InstrumentsInquiryModal({
                 Your acquisition inquiry<br />has been received.
               </h3>
               <p className="text-brand-muted text-sm leading-relaxed max-w-[300px]">
-                Daniel personally reviews each request. Each instrument is made once —
-                availability is confirmed individually. You will hear back directly.
+                {madeToOrder
+                  ? "Daniel personally reviews each request. You will hear back directly."
+                  : "Daniel personally reviews each request. Each instrument is made once — availability is confirmed individually. You will hear back directly."}
               </p>
               <div className="w-16 h-px bg-brand-gold/20" aria-hidden="true" />
               <p className="font-display text-xl italic text-brand-text/40">
-                One instrument. One owner.
+                {madeToOrder ? "Individually handcrafted." : "One instrument. One owner."}
               </p>
               <button
                 onClick={onClose}

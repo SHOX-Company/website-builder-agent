@@ -7,7 +7,10 @@ import Image from "next/image";
 //   lower readability vignette deepens the canvas below the headline.
 // ─────────────────────────────────────────────────────────────────────────────
 
-export default function HeroInstruments() {
+// `madeToOrder`: the instruments are permanent made-to-order designs, so the
+// count-and-"made once" micro-copy below (which implies finite one-of-one
+// pieces) is replaced. Omitted/false keeps the original line exactly.
+export default function HeroInstruments({ madeToOrder = false }: { madeToOrder?: boolean }) {
   return (
     <section className="relative min-h-[100svh] lg:min-h-[88vh] flex flex-col items-center justify-center overflow-hidden bg-[#07060B]">
 
@@ -131,7 +134,7 @@ export default function HeroInstruments() {
 
         {/* Micro-copy */}
         <p className="text-white/18 text-[10px] font-sans uppercase tracking-[0.38em]">
-          Six instruments. Each made once.
+          {madeToOrder ? "Made to order. Each individually handcrafted." : "Six instruments. Each made once."}
         </p>
 
       </div>

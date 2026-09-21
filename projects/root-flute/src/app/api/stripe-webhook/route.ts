@@ -2,8 +2,8 @@ import { NextRequest, NextResponse } from "next/server";
 import type Stripe from "stripe";
 import { getStripeClient } from "@/lib/stripe";
 import { getInventoryItem, markInventoryItemSold } from "@/lib/inventoryStore";
-import { CATEGORY_LABELS, formatPrice, type InventoryItem } from "@/lib/inventory";
-import { ensureOrder, markOrderNotificationsSent } from "@/lib/orderStore";
+import { CATEGORY_LABELS, formatPrice, isMadeToOrder, type InventoryItem } from "@/lib/inventory";
+import { ensureOrder, getOrderBySession, markOrderNotificationsSent } from "@/lib/orderStore";
 import { sendPurchaseConfirmationEmail, sendInternalSaleNotificationEmail } from "@/lib/email";
 
 function formatStripeAddress(address: Stripe.Address | null | undefined): string | null {
@@ -28,11 +28,19 @@ function formatStripeAddress(address: Stripe.Address | null | undefined): string
 // unmark inventory, affect capture, or turn a completed transaction into a
 // non-2xx webhook response — every step here is individually wrapped so one
 // failing can never prevent the other from being attempted.
+//
+// Returns whether the order record is durably persisted. Finite pieces ignore
+// this (their sale is authoritative via the Sold flag, so the order record is
+// best-effort). For a made-to-order design the order record IS the sale
+// record — nothing is marked Sold — so that path passes `verifyPersisted` and
+// answers Stripe non-2xx when the record can't be confirmed, making Stripe
+// retry (safe: capture and order creation are both idempotent).
 async function recordOrderAndNotify(
   session: Stripe.Checkout.Session,
   item: InventoryItem,
-  soldAt: string
-): Promise<void> {
+  soldAt: string,
+  opts: { verifyPersisted?: boolean } = {}
+): Promise<boolean> {
   let order;
   try {
     const shipping = session.collected_information?.shipping_details ?? null;
@@ -62,7 +70,20 @@ async function recordOrderAndNotify(
       `[webhook] post-sale order persistence failed for ${session?.id} — the sale itself is unaffected:`,
       err
     );
-    return;
+    return false;
+  }
+
+  // The store is a read-modify-write over versioned blobs, so two orders
+  // landing at the same moment could in theory overwrite each other. Re-read
+  // to confirm THIS session's order really is in the list before relying on it.
+  if (opts.verifyPersisted) {
+    const confirmed = await getOrderBySession(session.id).catch(() => null);
+    if (!confirmed) {
+      console.error(
+        `[webhook] order for ${session.id} could not be confirmed after write — asking Stripe to retry.`
+      );
+      return false;
+    }
   }
 
   const amountFormatted =
@@ -99,6 +120,7 @@ async function recordOrderAndNotify(
           orderReference,
           shippingSummary,
           idempotencyKey: `rf-purchase-confirmation-${session.id}`,
+          madeToOrder: isMadeToOrder(item),
         });
 
         if (result.ok) {
@@ -137,6 +159,7 @@ async function recordOrderAndNotify(
         shippingName: order.shippingName,
         shippingAddress: order.shippingAddress,
         idempotencyKey: `rf-internal-sale-notification-${session.id}`,
+        madeToOrder: isMadeToOrder(item),
       });
 
       if (result.ok) {
@@ -171,6 +194,8 @@ async function recordOrderAndNotify(
       );
     }
   }
+
+  return true;
 }
 
 // Stripe Checkout Task S4 — winner/loser transaction logic for the
@@ -216,6 +241,52 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ received: true });
   }
 
+  // Permanent made-to-order design (an Instrument): a purchase is an ORDER,
+  // not the consumption of a finite piece. Capture, record the order, notify —
+  // and leave the design exactly as it was (never Sold, never unpublished), so
+  // it stays live and another customer can order it later. Concurrent orders
+  // for the same design are all valid (no winner/loser); each Checkout Session
+  // is its own idempotent unit, keyed by its session id. Every step is safe to
+  // repeat: capture is idempotency-keyed and skipped once succeeded, the order
+  // is create-or-fetch by session id, and each email has its own sent-flag plus
+  // a per-session Resend idempotency key. A retried or replayed event (even
+  // for a session whose order already exists) therefore changes nothing.
+  if (isMadeToOrder(item)) {
+    let paymentIntent;
+    try {
+      paymentIntent = await stripe.paymentIntents.retrieve(paymentIntentId);
+    } catch {
+      return NextResponse.json({ error: "Could not retrieve payment." }, { status: 500 });
+    }
+
+    if (paymentIntent.status === "requires_capture") {
+      try {
+        paymentIntent = await stripe.paymentIntents.capture(
+          paymentIntentId,
+          {},
+          { idempotencyKey: `capture_${session.id}` }
+        );
+      } catch {
+        return NextResponse.json({ error: "Capture failed." }, { status: 500 });
+      }
+    }
+
+    if (paymentIntent.status !== "succeeded") {
+      // Not actually captured (canceled / unexpected state) — no order.
+      return NextResponse.json({ received: true });
+    }
+
+    const persisted = await recordOrderAndNotify(session, item, new Date().toISOString(), {
+      verifyPersisted: true,
+    });
+    if (!persisted) {
+      // Payment is captured but the order record isn't confirmed — non-2xx
+      // makes Stripe retry, which skips straight back to this write.
+      return NextResponse.json({ error: "Could not record order." }, { status: 500 });
+    }
+    return NextResponse.json({ received: true });
+  }
+
   if (item.status === "sold") {
     if (item.stripeCheckoutSessionId === session.id) {
       // Same-session retry — already won and captured. The sale is done;
@@ -227,6 +298,25 @@ export async function POST(req: NextRequest) {
 
     // Losing session: item sold under a different session (or manually).
     // Release this authorization; never capture it, never touch the winner.
+    try {
+      await stripe.paymentIntents.cancel(paymentIntentId);
+    } catch {
+      // Already canceled/finalized elsewhere — nothing further to do.
+    }
+    return NextResponse.json({ received: true });
+  }
+
+  // Showcase / made-to-order example: this piece does not exist as available
+  // inventory, so no sale may complete for it — even from a Checkout Session
+  // that was opened before it became showcase (sessions stay payable for up
+  // to ~24h). Release the authorization; never capture, never mark sold, never
+  // send a customer confirmation. Placed AFTER the sold branch on purpose: a
+  // sale that already completed and was captured under this exact session is
+  // still finalized by that branch above, untouched by a later flag change.
+  if (item.showcase === true) {
+    console.error(
+      `[webhook] showcase item ${item.id} received checkout session ${session.id} — authorization released, nothing captured.`
+    );
     try {
       await stripe.paymentIntents.cancel(paymentIntentId);
     } catch {

@@ -17,15 +17,16 @@ interface NavItem {
 
 // The nine custom flute designs, each already a standalone, directly
 // shareable page at /custom-flutes/<slug> (see the STYLES map in
-// src/app/custom-flutes/[style]/page.tsx). Order and labels match that
-// route verbatim — no new pages, just navigation into the existing ones.
+// src/app/custom-flutes/[style]/page.tsx). Order matches that route; the
+// three "Mayan …" designs are shown here WITHOUT the word "Mayan" (menu
+// display labels only — their URLs, page titles and content are unchanged).
 const CUSTOM_FLUTE_DESIGNS: NavChild[] = [
   { label: "Bell Flutes", href: "/custom-flutes/bell-flutes" },
   { label: "Point Flutes", href: "/custom-flutes/point-flutes" },
   { label: "Drone Flutes", href: "/custom-flutes/drone-flutes" },
-  { label: "Mayan Harmony Flutes", href: "/custom-flutes/mayan-harmony-flutes" },
-  { label: "Triple Mayan Chord Flutes", href: "/custom-flutes/triple-mayan-chord-flutes" },
-  { label: "Four Chamber Mayan Chord Flutes", href: "/custom-flutes/four-chamber-mayan-chord-flutes" },
+  { label: "Harmony Flutes", href: "/custom-flutes/mayan-harmony-flutes" },
+  { label: "Triple Chord Flutes", href: "/custom-flutes/triple-mayan-chord-flutes" },
+  { label: "Four Chamber Chord Flutes", href: "/custom-flutes/four-chamber-mayan-chord-flutes" },
   { label: "Rack Flutes", href: "/custom-flutes/rack-flutes" },
   { label: "Snake Flutes", href: "/custom-flutes/snake-flutes" },
   { label: "Mammoth Tusk Flute", href: "/custom-flutes/mammoth-tusk-flutes" },
@@ -38,7 +39,7 @@ const NAV_ITEMS: NavItem[] = [
     label: "Flutes",
     href: "/flutes",
     children: [
-      { label: "Available Now", href: "/flutes" },
+      { label: "Explore the Flutes", href: "/flutes" },
       { label: "Custom Flute Styles", href: "/custom-flutes", children: CUSTOM_FLUTE_DESIGNS },
     ],
   },
@@ -91,11 +92,45 @@ export default function Navbar() {
   // one instance per surface (desktop flyout / mobile accordion).
   const [flutesDesignsOpen, setFlutesDesignsOpen] = useState(false);
   const [mobileFlutesDesignsOpen, setMobileFlutesDesignsOpen] = useState(false);
+  // Instruments dropdown — same hover-dropdown mechanism as Flutes (own
+  // state/ref/timer; the "Instruments" label also stays a working link). Its
+  // entries are the live public instrument designs, fetched once from
+  // /api/instruments-nav (see `instrumentLinks` below).
+  const [instrumentsOpen, setInstrumentsOpen] = useState(false);
+  const [mobileInstrumentsOpen, setMobileInstrumentsOpen] = useState(false);
+  const [instrumentLinks, setInstrumentLinks] = useState<NavChild[]>([]);
   const videosRef = useRef<HTMLLIElement>(null);
   const flutesRef = useRef<HTMLLIElement>(null);
+  const instrumentsRef = useRef<HTMLLIElement>(null);
   const closeTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const flutesCloseTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const instrumentsCloseTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const lockedScrollY = useRef(0);
+
+  // One small fetch for the Instruments submenu. Skipped inside Studio (which
+  // renders no public nav). On any failure the submenu simply shows "All
+  // Instruments" — it never blocks or breaks the rest of the navigation.
+  useEffect(() => {
+    if (pathname.startsWith("/studio")) return;
+    let cancelled = false;
+    fetch("/api/instruments-nav")
+      .then((res) => (res.ok ? res.json() : null))
+      .then((data: { items?: { name: string; slug: string }[] } | null) => {
+        if (cancelled || !data?.items) return;
+        setInstrumentLinks(data.items.map((i) => ({ label: i.name, href: `/instruments/${i.slug}` })));
+      })
+      .catch(() => {});
+    return () => {
+      cancelled = true;
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  const navItems: NavItem[] = NAV_ITEMS.map((item) =>
+    item.label === "Instruments"
+      ? { ...item, children: [{ label: "All Instruments", href: "/instruments" }, ...instrumentLinks] }
+      : item
+  );
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 24);
@@ -128,6 +163,15 @@ export default function Navbar() {
       setFlutesOpen(false);
       setFlutesDesignsOpen(false);
     }, 120);
+  }
+
+  function openInstrumentsNow() {
+    if (instrumentsCloseTimer.current) clearTimeout(instrumentsCloseTimer.current);
+    setInstrumentsOpen(true);
+  }
+
+  function closeInstrumentsDelayed() {
+    instrumentsCloseTimer.current = setTimeout(() => setInstrumentsOpen(false), 120);
   }
 
   // Body scroll lock, applied/removed synchronously and imperatively (never
@@ -189,6 +233,7 @@ export default function Navbar() {
     setMobileVideosOpen(false);
     setMobileFlutesOpen(false);
     setMobileFlutesDesignsOpen(false);
+    setMobileInstrumentsOpen(false);
   }, [unlockBody]);
 
   // Belt-and-braces reset for anything outside a normal tap: Escape, and the
@@ -197,6 +242,7 @@ export default function Navbar() {
     setVideosOpen(false);
     setFlutesOpen(false);
     setFlutesDesignsOpen(false);
+    setInstrumentsOpen(false);
     closeMobileMenu();
   }, [closeMobileMenu]);
 
@@ -209,6 +255,9 @@ export default function Navbar() {
       if (flutesRef.current && !flutesRef.current.contains(e.target as Node)) {
         setFlutesOpen(false);
         setFlutesDesignsOpen(false);
+      }
+      if (instrumentsRef.current && !instrumentsRef.current.contains(e.target as Node)) {
+        setInstrumentsOpen(false);
       }
     }
     function handleKey(e: KeyboardEvent) {
@@ -301,7 +350,7 @@ export default function Navbar() {
 
         {/* Desktop nav */}
         <ul className="hidden lg:flex items-center gap-7">
-          {NAV_ITEMS.map((item) => {
+          {navItems.map((item) => {
             if (item.label === "Flutes" && item.children) {
               const open = flutesOpen;
               return (
@@ -404,6 +453,67 @@ export default function Navbar() {
                           </a>
                         )
                       )}
+                    </div>
+                  </div>
+                </li>
+              );
+            }
+
+            if (item.label === "Instruments" && item.children) {
+              const open = instrumentsOpen;
+              return (
+                <li
+                  key={item.label}
+                  ref={instrumentsRef}
+                  className="relative"
+                  onMouseEnter={openInstrumentsNow}
+                  onMouseLeave={closeInstrumentsDelayed}
+                  onFocus={openInstrumentsNow}
+                  onBlur={(e) => {
+                    if (!e.currentTarget.contains(e.relatedTarget as Node | null)) closeInstrumentsDelayed();
+                  }}
+                >
+                  <a
+                    href={`${promoterPrefix}${item.href}`}
+                    aria-haspopup="true"
+                    aria-expanded={open}
+                    className={`flex items-center gap-1.5 text-xs uppercase tracking-widest font-sans transition-colors duration-200 [text-shadow:0_1px_6px_rgba(0,0,0,0.6)] ${
+                      isActive(item.href) ? "text-brand-gold" : "text-brand-text/85 hover:text-brand-gold"
+                    }`}
+                  >
+                    {item.label}
+                    <svg
+                      viewBox="0 0 10 6"
+                      aria-hidden="true"
+                      className={`w-2.5 h-2.5 transition-transform duration-200 ${open ? "rotate-180" : ""}`}
+                      fill="none"
+                    >
+                      <path d="M1 1l4 4 4-4" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round" />
+                    </svg>
+                  </a>
+
+                  <div
+                    role="menu"
+                    className={`absolute top-full right-0 pt-4 transition-all duration-200 ${
+                      open ? "opacity-100 translate-y-0 pointer-events-auto" : "opacity-0 -translate-y-1 pointer-events-none"
+                    }`}
+                  >
+                    <div className="min-w-[220px] bg-brand-surface/95 backdrop-blur-md border border-brand-border shadow-2xl py-2">
+                      {item.children.map((child) => (
+                        <a
+                          key={child.href}
+                          href={`${promoterPrefix}${child.href}`}
+                          role="menuitem"
+                          onClick={() => setInstrumentsOpen(false)}
+                          className={`block whitespace-nowrap px-5 py-3 text-sm font-sans text-brand-gold transition-colors duration-150 hover:bg-brand-dark/40 ${
+                            (child.href === "/instruments" ? logicalPathname === "/instruments" : isActive(child.href))
+                              ? "bg-brand-dark/40"
+                              : ""
+                          }`}
+                        >
+                          {child.label}
+                        </a>
+                      ))}
                     </div>
                   </div>
                 </li>
@@ -520,7 +630,7 @@ export default function Navbar() {
         }`}
       >
         <ul className="flex flex-col px-6 py-8 gap-1">
-          {NAV_ITEMS.map((item) => {
+          {navItems.map((item) => {
             if (item.label === "Flutes" && item.children) {
               return (
                 <li key={item.label} className="border-b border-brand-border/50">
@@ -603,6 +713,55 @@ export default function Navbar() {
                                 </div>
                               </>
                             )}
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                  </div>
+                </li>
+              );
+            }
+
+            if (item.label === "Instruments" && item.children) {
+              return (
+                <li key={item.label} className="border-b border-brand-border/50">
+                  {/* Same accordion interaction as the Flutes row above: the row
+                      is one toggle target; /instruments itself is reached via
+                      "All Instruments" inside the submenu it opens. */}
+                  <button
+                    type="button"
+                    aria-expanded={mobileInstrumentsOpen}
+                    onClick={() => setMobileInstrumentsOpen((v) => !v)}
+                    className={`w-full flex items-center justify-between py-4 text-base uppercase tracking-widest font-sans transition-colors duration-200 ${
+                      isActive(item.href) ? "text-brand-gold" : "text-brand-text"
+                    }`}
+                  >
+                    {item.label}
+                    <svg
+                      viewBox="0 0 10 6"
+                      aria-hidden="true"
+                      className={`w-3 h-3 transition-transform duration-200 ${mobileInstrumentsOpen ? "rotate-180" : ""}`}
+                      fill="none"
+                    >
+                      <path d="M1 1l4 4 4-4" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round" />
+                    </svg>
+                  </button>
+                  <div
+                    className={`grid transition-all duration-300 ease-out ${
+                      mobileInstrumentsOpen ? "grid-rows-[1fr] opacity-100" : "grid-rows-[0fr] opacity-0"
+                    }`}
+                  >
+                    <div className="overflow-hidden">
+                      <ul className="flex flex-col pb-3 pl-4">
+                        {item.children.map((child) => (
+                          <li key={child.href}>
+                            <a
+                              href={`${promoterPrefix}${child.href}`}
+                              onClick={closeMobileMenu}
+                              className="block py-3 text-sm font-sans text-brand-gold transition-colors duration-150"
+                            >
+                              {child.label}
+                            </a>
                           </li>
                         ))}
                       </ul>

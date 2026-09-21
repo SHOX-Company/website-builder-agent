@@ -26,6 +26,12 @@ export async function POST(req: NextRequest) {
   if (!featuredImage || typeof featuredImage.url !== "string" || featuredImage.url.trim().length === 0) {
     return NextResponse.json({ error: "A featured image is required." }, { status: 400 });
   }
+  if (body.madeToOrder === true && category !== "instrument") {
+    return NextResponse.json({ error: "Only Instruments can be made-to-order designs." }, { status: 400 });
+  }
+  if (body.madeToOrder === true && body.showcase === true) {
+    return NextResponse.json({ error: "A piece can't be both a made-to-order design and a showcase example." }, { status: 400 });
+  }
   if (body.order !== undefined && (!Number.isInteger(body.order) || body.order < 1)) {
     return NextResponse.json({ error: "Display order must be a positive whole number." }, { status: 400 });
   }
@@ -35,6 +41,8 @@ export async function POST(req: NextRequest) {
     name: typeof name === "string" ? name.trim() : "",
     price: price ?? null,
     published: body.published !== false,
+    showcase: body.showcase === true,
+    madeToOrder: body.madeToOrder === true,
     featured: Boolean(body.featured),
     shortDescription: typeof shortDescription === "string" ? shortDescription.trim() : "",
     story: typeof story === "string" ? story.trim() : "",

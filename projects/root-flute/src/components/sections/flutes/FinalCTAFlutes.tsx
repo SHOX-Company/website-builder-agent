@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import FluteInquiryModal from "./FluteInquiryModal";
-import { isCheckoutEligible, type InventoryItem } from "@/lib/inventory";
+import { inquiryContext, isCheckoutEligible, isShowcase, type InventoryItem } from "@/lib/inventory";
 import { startCheckout } from "@/lib/checkoutClient";
 import { setCurrentFluteRef } from "@/lib/currentFluteRef";
 
@@ -11,6 +11,9 @@ export default function FinalCTAFlutes({ items }: { items: InventoryItem[] }) {
   const [checkoutStatus, setCheckoutStatus] = useState<"idle" | "redirecting" | "error">("idle");
   const current = items[0] ?? null;
   const eligible = current ? isCheckoutEligible(current) : false;
+  // Showcase / made-to-order example: never reaches Stripe — inquiry only.
+  const showcase = current ? isShowcase(current) : false;
+  const inquiryItem = current ? inquiryContext(current) : "";
 
   // Resets a stuck "Redirecting…" button when the customer returns via
   // browser Back and the page is restored from bfcache (no fresh mount).
@@ -25,12 +28,12 @@ export default function FinalCTAFlutes({ items }: { items: InventoryItem[] }) {
   // Publishes the current drop's item/eligibility so the sticky bar can
   // initiate the same direct Stripe checkout without its own inventory fetch.
   useEffect(() => {
-    setCurrentFluteRef(current ? { id: current.id, eligible } : null);
+    setCurrentFluteRef(current ? { id: current.id, eligible, showcase, inquiryItem } : null);
     return () => setCurrentFluteRef(null);
-  }, [current, eligible]);
+  }, [current, eligible, showcase, inquiryItem]);
 
   async function handleAcquireClick() {
-    if (!current || !eligible) {
+    if (!current || showcase || !eligible) {
       setModalOpen(true);
       return;
     }
@@ -67,7 +70,7 @@ export default function FinalCTAFlutes({ items }: { items: InventoryItem[] }) {
         <div className="relative z-10 w-full max-w-3xl mx-auto px-6 text-center flex flex-col items-center gap-8 sm:gap-10">
 
           <p className="text-brand-gold text-xs uppercase tracking-[0.3em] font-sans">
-            One Available Now
+            {showcase ? "Made to Order" : "One Available Now"}
           </p>
 
           {/* h2 — clamp scales 32px→48px across 360–565px, then sm:text-6xl takes over */}
@@ -96,7 +99,9 @@ export default function FinalCTAFlutes({ items }: { items: InventoryItem[] }) {
               disabled={checkoutStatus === "redirecting"}
               className="inline-flex items-center justify-center font-semibold transition-colors duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-gold bg-brand-gold text-brand-dark hover:bg-brand-gold-light disabled:opacity-40 disabled:cursor-not-allowed px-8 py-4 text-base sm:text-lg"
             >
-              {checkoutStatus === "redirecting"
+              {showcase
+                ? "Request a Made-to-Order Flute →"
+                : checkoutStatus === "redirecting"
                 ? "Redirecting…"
                 : eligible
                 ? "Claim This Instrument →"
@@ -117,7 +122,9 @@ export default function FinalCTAFlutes({ items }: { items: InventoryItem[] }) {
           )}
 
           <p className="text-brand-muted/50 text-xs">
-            {eligible
+            {showcase
+              ? "Private inquiry · Handled personally by Daniel"
+              : eligible
               ? "Secure checkout via Stripe."
               : "Only 25 Woolly Mammoth tusks remain. Each acquisition is handled personally by Daniel."}
           </p>
@@ -127,7 +134,7 @@ export default function FinalCTAFlutes({ items }: { items: InventoryItem[] }) {
 
       <FluteInquiryModal
         isOpen={modalOpen}
-        defaultItem={current?.name ?? ""}
+        defaultItem={inquiryItem}
         onClose={() => setModalOpen(false)}
       />
     </>

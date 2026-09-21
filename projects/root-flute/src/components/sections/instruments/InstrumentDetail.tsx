@@ -4,7 +4,7 @@ import { useState } from "react";
 import SectionWrapper from "@/components/ui/SectionWrapper";
 import ItemBlock from "@/components/inventory/ItemBlock";
 import InstrumentsInquiryModal from "./InstrumentsInquiryModal";
-import type { InventoryItem } from "@/lib/inventory";
+import { inquiryContext, isMadeToOrder, type InventoryItem } from "@/lib/inventory";
 
 // Single-item counterpart to InstrumentsCollection — same ItemBlock card and
 // the same inquiry modal, just rendering one instrument instead of the list.
@@ -26,7 +26,8 @@ export default function InstrumentDetail({ item }: { item: InventoryItem }) {
 
       <InstrumentsInquiryModal
         isOpen={modalOpen}
-        defaultItem={item.name}
+        defaultItem={inquiryContext(item)}
+        madeToOrder={isMadeToOrder(item)}
         onClose={() => setModalOpen(false)}
       />
     </>

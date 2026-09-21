@@ -4,7 +4,7 @@ import { useState } from "react";
 import SectionWrapper from "@/components/ui/SectionWrapper";
 import ItemBlock from "@/components/inventory/ItemBlock";
 import JewelryInquiryModal from "./JewelryInquiryModal";
-import type { InventoryItem } from "@/lib/inventory";
+import { inquiryContext, type InventoryItem } from "@/lib/inventory";
 
 // Single-item counterpart to JewelryCollection — same ItemBlock card and the
 // same inquiry modal, just rendering one piece instead of the list. Modeled
@@ -27,7 +27,7 @@ export default function JewelryDetail({ item }: { item: InventoryItem }) {
 
       <JewelryInquiryModal
         isOpen={modalOpen}
-        defaultPiece={item.name}
+        defaultPiece={inquiryContext(item)}
         onClose={() => setModalOpen(false)}
       />
     </>

@@ -19,15 +19,17 @@
 // Server-only — never import this from a "use client" component.
 
 import { put, list, del } from "@vercel/blob";
+import { isMadeToOrder } from "@/lib/inventory";
 import type { InventoryCategory, InventoryItem, InventoryItemInput } from "@/lib/inventory";
 
 const INVENTORY_PREFIX = "data/inventory/";
 const VERSIONS_TO_KEEP = 2;
 
 // An item only occupies a slot in its category's Display Order sequence
-// while it's actually visible on the public site.
+// while it's actually visible on the public site. A permanent made-to-order
+// design is visible whenever it is published — its `status` never removes it.
 function isActive(item: InventoryItem): boolean {
-  return item.status === "available" && item.published !== false;
+  return item.published !== false && (item.status === "available" || isMadeToOrder(item));
 }
 
 // Guarantees every active item has a valid, gapless, 1-based Display Order
@@ -193,6 +195,15 @@ export async function updateInventoryItem(
   const current = items[index];
   const { order: requestedOrder, ...restPatch } = patch;
   const updatedTarget: InventoryItem = { ...current, ...restPatch, updatedAt: new Date().toISOString() };
+  // Converting a finite piece that was already marked Sold (e.g. an instrument
+  // that sold under the old one-of-one rules) into a permanent made-to-order
+  // design puts it back on the shelf: `status` no longer describes a design
+  // that is never consumed. The historical sale is NOT touched — it lives on
+  // the order record (and `stripeCheckoutSessionId` is left as a pointer).
+  if (isMadeToOrder(updatedTarget) && updatedTarget.status === "sold") {
+    updatedTarget.status = "available";
+    updatedTarget.soldAt = null;
+  }
   const itemsWithTarget = items.map((item, i) => (i === index ? updatedTarget : item));
 
   const wasActive = isActive(current);
@@ -227,6 +238,10 @@ export async function markInventoryItemSold(
   const index = items.findIndex((item) => item.id === id);
   if (index === -1) return null;
 
+  // A permanent made-to-order design is never consumed by a sale — refuse to
+  // mark it Sold (returns the record unchanged, writes nothing).
+  if (isMadeToOrder(items[index])) return items[index];
+
   const now = new Date().toISOString();
   const updated: InventoryItem = {
     ...items[index],
@@ -247,6 +262,11 @@ export async function markInventoryItemSold(
  * touching anything else (images, video, story, metadata all untouched), so
  * it immediately reappears on the public site with zero recreation. It
  * re-enters its category's Display Order sequence at the end.
+ *
+ * `showcase` is deliberately left exactly as it was (the spread below
+ * preserves it): relisting must never silently turn a made-to-order example
+ * into something that can be bought. Restoring purchase eligibility is a
+ * separate, explicit act — switching the Showcase toggle off in Studio.
  */
 export async function relistInventoryItem(id: string): Promise<InventoryItem | null> {
   const items = await readAll();

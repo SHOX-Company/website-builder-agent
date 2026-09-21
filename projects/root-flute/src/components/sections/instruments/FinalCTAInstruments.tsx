@@ -3,7 +3,9 @@
 import { useState } from "react";
 import InstrumentsInquiryModal from "./InstrumentsInquiryModal";
 
-export default function FinalCTAInstruments() {
+// `madeToOrder`: permanent made-to-order designs — "when one finds its owner,
+// it will never be made again" would be false, so that sentence is dropped.
+export default function FinalCTAInstruments({ madeToOrder = false }: { madeToOrder?: boolean }) {
   const [modalOpen, setModalOpen] = useState(false);
 
   return (
@@ -34,8 +36,8 @@ export default function FinalCTAInstruments() {
 
           <p className="text-brand-muted text-base sm:text-lg leading-relaxed max-w-xl">
             These are not instruments built for a market. They are built for a single person —
-            the one who was always meant to play them. When one finds its owner, it will
-            never be made again.
+            the one who was always meant to play them.
+            {madeToOrder ? "" : " When one finds its owner, it will never be made again."}
           </p>
 
           <p className="font-display text-3xl sm:text-4xl font-light italic text-brand-gold/75">
@@ -68,6 +70,7 @@ export default function FinalCTAInstruments() {
       <InstrumentsInquiryModal
         isOpen={modalOpen}
         defaultItem="General Inquiry"
+        madeToOrder={madeToOrder}
         onClose={() => setModalOpen(false)}
       />
     </>

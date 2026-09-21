@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { X } from "lucide-react";
 import type { InventoryCategory, InventoryImage, InventoryItem, InventoryItemInput } from "@/lib/inventory";
-import { CATEGORY_LABELS } from "@/lib/inventory";
+import { CATEGORY_LABELS, isMadeToOrder } from "@/lib/inventory";
 import Input from "@/components/studio/ui/Input";
 import Textarea from "@/components/studio/ui/Textarea";
 import Switch from "@/components/studio/ui/Switch";
@@ -23,6 +23,10 @@ interface FormState {
   priceOnInquiry: boolean;
   price: string;
   published: boolean;
+  /** Showcase / Made-to-Order Example — public, reference-priced, never purchasable. */
+  showcase: boolean;
+  /** Permanent made-to-order design (Instruments only) — stays live after every purchase. */
+  madeToOrder: boolean;
   featured: boolean;
   shortDescription: string;
   story: string;
@@ -35,12 +39,44 @@ interface FormState {
   order: number;
 }
 
+type AvailabilityMode = "finite" | "madeToOrder" | "showcase";
+
+// The three kinds of listing. Exactly one applies at a time (stored as the
+// `madeToOrder` / `showcase` booleans, mutually exclusive).
+const AVAILABILITY_OPTIONS: { value: AvailabilityMode; label: string; description: string; instrumentsOnly?: boolean }[] = [
+  {
+    value: "finite",
+    label: "One-of-one inventory",
+    description:
+      "A single physical piece. Buyable at checkout (if it has a price) until it sells — a purchase marks it Sold and removes it from the site.",
+  },
+  {
+    value: "madeToOrder",
+    label: "Made-to-order design",
+    instrumentsOnly: true,
+    description:
+      "A permanent design you build for each order. It stays live after every purchase and can be ordered again — never marked Sold. To retire it, use Soft Delete.",
+  },
+  {
+    value: "showcase",
+    label: "Showcase example (not for sale)",
+    description:
+      "A public example of your work. Price shows as “Reference price”, checkout is impossible, and visitors inquire instead. Not the same as Sold.",
+  },
+];
+
+// Visible on the public site: published, and either still on the shelf or a
+// permanent made-to-order design (which a sale never removes).
+function isActiveItem(item: InventoryItem): boolean {
+  return item.published !== false && (item.status === "available" || isMadeToOrder(item));
+}
+
 // How many active (available + published) items in `category` this item
 // would be competing for a position among — used both to size the Display
 // Order dropdown and to default new/incoming items to "append at the end."
 function activePeerCount(allItems: InventoryItem[], category: InventoryCategory, excludeId?: string): number {
   return allItems.filter(
-    (item) => item.category === category && item.status === "available" && item.published !== false && item.id !== excludeId
+    (item) => item.category === category && isActiveItem(item) && item.id !== excludeId
   ).length;
 }
 
@@ -51,6 +87,8 @@ function emptyForm(defaultCategory: InventoryCategory = "flute", order = 1): For
     priceOnInquiry: false,
     price: "",
     published: true,
+    showcase: false,
+    madeToOrder: false,
     featured: false,
     shortDescription: "",
     story: "",
@@ -70,6 +108,8 @@ function formFromItem(item: InventoryItem, order: number): FormState {
     priceOnInquiry: item.price === null,
     price: item.price === null ? "" : String(item.price),
     published: item.published,
+    showcase: item.showcase === true,
+    madeToOrder: item.madeToOrder === true,
     featured: item.featured,
     shortDescription: item.shortDescription,
     story: item.story,
@@ -117,7 +157,7 @@ export default function InventoryItemDrawer({
     // An already-active item keeps its current position by default;
     // anything else (new, or currently sold/unpublished) defaults to the end.
     const order =
-      item && item.status === "available" && item.published !== false
+      item && isActiveItem(item)
         ? item.order
         : activePeerCount(allItems, category, item?.id) + 1;
     return item ? formFromItem(item, order) : emptyForm(category, order);
@@ -138,7 +178,7 @@ export default function InventoryItemDrawer({
     if (open) {
       const category = item ? item.category : defaultCategory ?? "flute";
       const order =
-        item && item.status === "available" && item.published !== false
+        item && isActiveItem(item)
           ? item.order
           : activePeerCount(allItems, category, item?.id) + 1;
       setForm(item ? formFromItem(item, order) : emptyForm(category, order));
@@ -147,6 +187,14 @@ export default function InventoryItemDrawer({
   }
 
   const maxOrder = activePeerCount(allItems, form.category, item?.id) + 1;
+
+  const availabilityMode: AvailabilityMode = form.madeToOrder ? "madeToOrder" : form.showcase ? "showcase" : "finite";
+  function setAvailability(mode: AvailabilityMode) {
+    setForm((prev) => ({ ...prev, madeToOrder: mode === "madeToOrder", showcase: mode === "showcase" }));
+  }
+  // Based on the SAVED record (not unsaved form edits): what the live site is
+  // doing right now, and therefore whether "Mark as Sold" makes sense.
+  const savedMadeToOrder = item ? isMadeToOrder(item) : false;
 
   useEffect(() => {
     if (!open) return;
@@ -175,6 +223,8 @@ export default function InventoryItemDrawer({
       name: form.name.trim(),
       price: form.priceOnInquiry || form.price.trim().length === 0 ? null : Number(form.price),
       published: form.published,
+      showcase: form.showcase,
+      madeToOrder: form.madeToOrder,
       featured: form.featured,
       shortDescription: form.shortDescription.trim(),
       story: form.story.trim(),
@@ -306,6 +356,16 @@ export default function InventoryItemDrawer({
 
         {/* Body */}
         <div className="flex-1 overflow-y-auto px-6 py-6 flex flex-col gap-8">
+          {mode === "edit" && item && savedMadeToOrder && (
+            <div className="flex items-center gap-2 px-3 py-2 rounded-md bg-brand-gold/5 border border-brand-gold/40">
+              <span className="w-1.5 h-1.5 rounded-full bg-brand-gold flex-shrink-0" />
+              <p className="text-xs font-sans text-brand-muted">
+                This is a permanent <span className="text-brand-text font-medium">made-to-order design</span> — it
+                stays live after every purchase and can be ordered again.
+              </p>
+            </div>
+          )}
+
           {mode === "edit" && item && (item.status === "sold" || !item.published) && (
             <div className="flex flex-col gap-2">
               {item.status === "sold" && (
@@ -344,6 +404,8 @@ export default function InventoryItemDrawer({
                       // to the end of the new one rather than carrying over a
                       // position number that belonged to the old category.
                       order: activePeerCount(allItems, cat, item?.id) + 1,
+                      // Made-to-order designs are Instruments-only.
+                      madeToOrder: cat === "instrument" ? prev.madeToOrder : false,
                     }))
                   }
                   className={`px-3 py-2.5 rounded-md text-sm font-sans border transition-colors duration-150 ${
@@ -414,6 +476,40 @@ export default function InventoryItemDrawer({
               />
               Price on inquiry (no set price shown)
             </label>
+          </div>
+
+          {/* Availability type — ONE control (no overlapping toggles) for what
+              kind of listing this is. It decides whether the piece can be
+              bought and what happens after a purchase, so each option spells
+              its consequence out. */}
+          <div className="flex flex-col gap-2" role="radiogroup" aria-label="Availability type">
+            <span className="text-xs uppercase tracking-widest text-brand-muted font-sans">Availability Type</span>
+            {AVAILABILITY_OPTIONS.filter((o) => !o.instrumentsOnly || form.category === "instrument").map((opt) => {
+              const selected = availabilityMode === opt.value;
+              return (
+                <button
+                  key={opt.value}
+                  type="button"
+                  role="radio"
+                  aria-checked={selected}
+                  onClick={() => setAvailability(opt.value)}
+                  className={`flex flex-col gap-1 text-left rounded-md border p-4 transition-colors duration-150 ${
+                    selected ? "border-brand-gold bg-brand-gold/5" : "border-brand-border hover:border-brand-gold/40"
+                  }`}
+                >
+                  <span className={`text-sm font-sans ${selected ? "text-brand-gold" : "text-brand-text"}`}>
+                    {opt.label}
+                  </span>
+                  <span className="text-xs text-brand-muted leading-relaxed">{opt.description}</span>
+                </button>
+              );
+            })}
+            {availabilityMode === "madeToOrder" && item?.status === "sold" && (
+              <p className="text-xs text-brand-gold/90 leading-relaxed">
+                This piece is currently marked Sold. Saving it as a made-to-order design puts it back on the site; the
+                earlier sale and its order record are not touched.
+              </p>
+            )}
           </div>
 
           <Switch
@@ -492,7 +588,7 @@ export default function InventoryItemDrawer({
               <StudioButton
                 variant="secondary"
                 onClick={handleMarkSold}
-                disabled={actionPending !== null || item.status === "sold"}
+                disabled={actionPending !== null || item.status === "sold" || savedMadeToOrder}
                 className="w-full"
               >
                 {actionPending === "sold" ? "Marking Sold…" : "Mark as Sold"}

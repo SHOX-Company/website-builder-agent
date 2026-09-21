@@ -2,7 +2,7 @@
 
 import { useState, useRef, useEffect } from "react";
 import Image from "next/image";
-import { isCheckoutEligible, type InventoryItem } from "@/lib/inventory";
+import { isCheckoutEligible, isShowcase, REFERENCE_PRICE_LABEL, type InventoryItem } from "@/lib/inventory";
 import { startCheckout } from "@/lib/checkoutClient";
 import PriceDisplay from "./PriceDisplay";
 import ItemLightbox from "./ItemLightbox";
@@ -25,10 +25,12 @@ export default function FluteDropPanel({
   const [checkoutStatus, setCheckoutStatus] = useState<"idle" | "redirecting" | "error">("idle");
   const videoRef = useRef<HTMLVideoElement>(null);
   const eligible = isCheckoutEligible(item);
+  // Showcase / made-to-order example: never reaches Stripe — inquiry only.
+  const showcase = isShowcase(item);
   const gallery = item.featuredImage ? [item.featuredImage, ...item.additionalImages] : item.additionalImages;
 
   async function handleAcquireClick() {
-    if (!eligible) {
+    if (showcase || !eligible) {
       onAcquire(item);
       return;
     }
@@ -128,7 +130,7 @@ export default function FluteDropPanel({
         {/* Right: product panel */}
         <div className="bg-brand-surface p-5 sm:p-10 lg:p-14 flex flex-col justify-between gap-8 sm:gap-10">
           <div className="flex flex-col gap-4">
-            <p className="text-brand-gold text-xs uppercase tracking-widest font-sans">Current Drop</p>
+            <p className="text-brand-gold text-xs uppercase tracking-widest font-sans">{showcase ? "From the Workshop" : "Current Drop"}</p>
             {item.name && (
               <h3 className="font-display text-3xl sm:text-5xl font-light text-brand-text leading-tight">
                 {item.name}
@@ -150,12 +152,16 @@ export default function FluteDropPanel({
                 </p>
               </div>
             )}
-            <PriceDisplay price={item.price} />
+            <PriceDisplay price={item.price} label={showcase ? REFERENCE_PRICE_LABEL : undefined} />
           </div>
 
           <div className="flex flex-col gap-4">
             <span className="inline-block border border-brand-border text-brand-muted text-xs uppercase tracking-widest px-4 py-2 text-center sm:text-left sm:self-start">
-              Extremely Limited &nbsp;·&nbsp; One Available Now
+              {showcase ? (
+                <>Made to Order &nbsp;·&nbsp; Each Individually Made</>
+              ) : (
+                <>Extremely Limited &nbsp;·&nbsp; One Available Now</>
+              )}
             </span>
             <button
               type="button"
@@ -163,7 +169,11 @@ export default function FluteDropPanel({
               disabled={checkoutStatus === "redirecting"}
               className="inline-flex items-center justify-center font-semibold transition-colors duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-gold bg-brand-gold text-brand-dark hover:bg-brand-gold-light disabled:opacity-40 disabled:cursor-not-allowed px-8 py-4 text-base sm:text-lg w-full sm:self-start sm:w-auto"
             >
-              {checkoutStatus === "redirecting" ? "Redirecting…" : "Claim This Instrument →"}
+              {showcase
+                ? "Request a Made-to-Order Flute →"
+                : checkoutStatus === "redirecting"
+                ? "Redirecting…"
+                : "Claim This Instrument →"}
             </button>
             {checkoutStatus === "error" && (
               <p className="text-red-400/90 text-xs font-sans text-center sm:text-left">
@@ -171,7 +181,9 @@ export default function FluteDropPanel({
               </p>
             )}
             <p className="text-brand-muted/60 text-xs font-sans text-center sm:text-left">
-              {eligible
+              {showcase
+                ? <>Private inquiry &nbsp;·&nbsp; Handled personally by Daniel</>
+                : eligible
                 ? "Secure checkout via Stripe"
                 : <>Private acquisition inquiry &nbsp;·&nbsp; Handled personally by Daniel</>}
             </p>
@@ -206,7 +218,9 @@ export default function FluteDropPanel({
       )}
 
       <p className="text-center text-brand-muted text-sm max-w-lg mx-auto leading-relaxed">
-        Past instruments are not available. Each tusk is worked once — and never again.
+        {showcase
+          ? "The exact instrument shown is not reproduced. Each tusk is worked once — and a new flute can be made to order."
+          : "Past instruments are not available. Each tusk is worked once — and never again."}
       </p>
 
       {lightbox !== null && (
