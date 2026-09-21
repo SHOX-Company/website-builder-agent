@@ -47,6 +47,13 @@ export default function FinalCTAFlutes({ items }: { items: InventoryItem[] }) {
       setModalOpen(true);
       return;
     }
+    // A made-to-order flute is paid Full or as a 50% Deposit — the customer
+    // chooses in the purchase area, so these CTAs take them there rather than
+    // opening a Checkout Session with a choice they haven't made.
+    if (madeToOrder) {
+      document.getElementById("order-options")?.scrollIntoView({ behavior: "smooth", block: "center" });
+      return;
+    }
     if (checkoutStatus === "redirecting") return;
     setCheckoutStatus("redirecting");
     const url = await startCheckout(current.id);

@@ -6,6 +6,7 @@ import ItemBlock from "@/components/inventory/ItemBlock";
 import InstrumentsInquiryModal from "./InstrumentsInquiryModal";
 import { inquiryContext, isMadeToOrder, isShowcase, type InventoryItem } from "@/lib/inventory";
 import { slugify } from "@/lib/slug";
+import { MADE_TO_ORDER_PAYMENT_TERMS } from "@/lib/checkoutSelection";
 
 export default function InstrumentsCollection({ items }: { items: InventoryItem[] }) {
   const [modalOpen, setModalOpen] = useState(false);
@@ -51,6 +52,11 @@ export default function InstrumentsCollection({ items }: { items: InventoryItem[
             handcrafted for its player, carrying its own natural character,
             materials, and voice.
           </p>
+          {hasMadeToOrder && (
+            <p className="text-brand-muted/80 text-sm leading-relaxed max-w-2xl mx-auto mt-4">
+              {MADE_TO_ORDER_PAYMENT_TERMS}
+            </p>
+          )}
         </div>
 
         {items.length > 0 ? (

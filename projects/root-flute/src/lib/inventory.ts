@@ -8,6 +8,28 @@ export interface InventoryImage {
   alt: string;
 }
 
+/**
+ * A purchasable size / configuration of a made-to-order design (e.g. the
+ * Triton Shell Harp's "Large" and "Medium"). The server prices a checkout from
+ * THIS record, never from anything the browser submits. Only honoured for a
+ * permanent made-to-order design (see `getConfigurations`).
+ */
+export interface InventoryConfiguration {
+  /** Stable machine id, e.g. "large". Lowercase letters, digits, hyphens. */
+  id: string;
+  /** Customer-facing label, e.g. "Large". */
+  label: string;
+  /** Full price of this configuration, whole dollars. */
+  price: number;
+}
+
+/** A playable product video (self-hosted MP4) shown on the piece's detail page. */
+export interface InventoryVideo {
+  url: string;
+  title: string;
+  poster?: string;
+}
+
 export interface InventoryItem {
   id: string;
   category: InventoryCategory;
@@ -37,6 +59,21 @@ export interface InventoryItem {
    * behaving exactly as it did (absent === false === finite inventory).
    */
   madeToOrder?: boolean;
+  /**
+   * Sizes / configurations of a made-to-order design, each with its own full
+   * price. Absent or empty === a single-price piece (`price`). When present,
+   * a checkout must name exactly one of them. `price` is kept as the default
+   * (first) configuration's price so listings/orders that only know `price`
+   * keep working.
+   */
+  configurations?: InventoryConfiguration[];
+  /**
+   * An exact, customer-facing "what comes with it" sentence, rendered verbatim
+   * (never restyled, recased or rewritten) near the price. Optional.
+   */
+  inclusions?: string;
+  /** Additional playable product videos for the detail page (`video` is the autoplay hero clip). */
+  videos?: InventoryVideo[];
   featured: boolean;
   shortDescription: string;
   story: string;

@@ -5,8 +5,10 @@ import Image from "next/image";
 import Link from "next/link";
 import { isCheckoutEligible, isMadeToOrder, isShowcase, REFERENCE_PRICE_LABEL, type InventoryItem } from "@/lib/inventory";
 import { startCheckout } from "@/lib/checkoutClient";
+import { getConfigurations } from "@/lib/checkoutSelection";
 import PriceDisplay from "./PriceDisplay";
 import ItemLightbox from "./ItemLightbox";
+import MadeToOrderPurchase from "./MadeToOrderPurchase";
 
 interface ItemBlockProps {
   item: InventoryItem;
@@ -168,7 +170,11 @@ export default function ItemBlock({ item, noun, layout, isLast = false, priority
                 </p>
               </div>
             )}
-            <PriceDisplay price={item.price} label={showcase ? REFERENCE_PRICE_LABEL : undefined} />
+            {/* A design with several sizes shows each size's own price in the
+                purchase area below instead of one headline price. */}
+            {!(madeToOrder && getConfigurations(item).length > 1) && (
+              <PriceDisplay price={item.price} label={showcase ? REFERENCE_PRICE_LABEL : undefined} />
+            )}
             {madeToOrder && (
               <p className="text-brand-muted/70 text-xs font-sans leading-relaxed">
                 Made to order. The instrument pictured is an example of Daniel&rsquo;s work. Each new
@@ -188,6 +194,10 @@ export default function ItemBlock({ item, noun, layout, isLast = false, priority
                 <>Available Now &nbsp;·&nbsp; One of One</>
               )}
             </span>
+            {madeToOrder && eligible ? (
+              <MadeToOrderPurchase item={item} noun={noun} />
+            ) : (
+              <>
             <button
               type="button"
               onClick={handleAcquireClick}
@@ -216,6 +226,8 @@ export default function ItemBlock({ item, noun, layout, isLast = false, priority
                 ? "Secure checkout via Stripe"
                 : <>Private acquisition inquiry &nbsp;·&nbsp; Handled personally by Daniel</>}
             </p>
+              </>
+            )}
             {detailHref && (
               <Link
                 href={detailHref}

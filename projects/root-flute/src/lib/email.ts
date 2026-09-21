@@ -225,9 +225,28 @@ export interface PurchaseConfirmationPayload {
    * it always was. Absent/false === finite.
    */
   madeToOrder?: boolean;
+  /**
+   * Present ONLY for a made-to-order order paid as a 50% deposit. Switches the
+   * wording to deposit terms; absent === the certified full-payment email,
+   * unchanged. Amounts are pre-formatted by the caller from the durable order
+   * record. Shipping is never given an amount — it is simply still due.
+   */
+  deposit?: DepositSummary;
+}
+
+/** Pre-formatted amounts for a made-to-order 50% deposit order. */
+export interface DepositSummary {
+  fullPriceFormatted: string;
+  paidFormatted: string;
+  balanceFormatted: string;
 }
 
 const SUPPORT_URL = `${SITE_URL}/acquisition-support`;
+
+// Deposit wording. Never calls the deposit full payment, never gives a
+// shipping amount, delivery date or completion date.
+const DEPOSIT_BODY =
+  "Your 50% deposit has been received and your made-to-order order is in. This is a deposit, not full payment: the remaining 50% balance, plus shipping, is due before your instrument ships. Daniel will personally follow up regarding the creation of your instrument and the next steps — please watch the inbox for the email address you used at checkout.";
 
 // The branded sender (RESEND_FROM_EMAIL, e.g. acquisitions@rootflute.com) is
 // not an operational mailbox — Daniel's actual inbox is RootFlute@gmail.com.
@@ -237,10 +256,18 @@ const PURCHASE_REPLY_TO_EMAIL = "RootFlute@gmail.com";
 function buildPurchaseConfirmationHtml(p: PurchaseConfirmationPayload): string {
   const greeting = p.customerName ? `${esc(p.customerName)},` : "Thank you.";
   const mto = p.madeToOrder === true;
+  const dep = mto ? p.deposit : undefined;
   const rows: [string, string][] = [
     [mto ? "Instrument" : "Piece", `${esc(p.itemName)}`],
     ["Category", esc(p.itemCategoryLabel)],
-    ["Amount", esc(p.amountFormatted)],
+    ...(dep
+      ? ([
+          ["Full Price", esc(dep.fullPriceFormatted)],
+          ["Deposit Paid (50%)", esc(dep.paidFormatted)],
+          ["Remaining Balance (50%)", esc(dep.balanceFormatted)],
+          ["Shipping", "Additional &mdash; due before shipment"],
+        ] as [string, string][])
+      : ([["Amount", esc(p.amountFormatted)]] as [string, string][])),
     ["Order Reference", esc(p.orderReference)],
     ...(p.shippingSummary ? ([["Ship To", esc(p.shippingSummary)]] as [string, string][]) : []),
   ];
@@ -265,8 +292,8 @@ function buildPurchaseConfirmationHtml(p: PurchaseConfirmationPayload): string {
         <tr><td style="height:2px;background:linear-gradient(90deg,transparent,#c8a45a,transparent);font-size:0;">&nbsp;</td></tr>
         <tr>
           <td style="padding:36px 32px 20px;">
-            <p style="margin:0 0 12px;color:#c8a45a;font-size:10px;text-transform:uppercase;letter-spacing:0.3em;font-family:Arial,sans-serif;">${mto ? "Order Confirmed" : "Acquisition Confirmed"}</p>
-            <p style="margin:0 0 6px;color:#e8e0d0;font-size:24px;font-weight:300;font-family:Georgia,serif;">${mto ? "Your instrument has been ordered." : "Your piece has been claimed."}</p>
+            <p style="margin:0 0 12px;color:#c8a45a;font-size:10px;text-transform:uppercase;letter-spacing:0.3em;font-family:Arial,sans-serif;">${dep ? "Deposit Received" : mto ? "Order Confirmed" : "Acquisition Confirmed"}</p>
+            <p style="margin:0 0 6px;color:#e8e0d0;font-size:24px;font-weight:300;font-family:Georgia,serif;">${dep ? "Your instrument order has been received." : mto ? "Your instrument has been ordered." : "Your piece has been claimed."}</p>
             <p style="margin:0;color:#8a8170;font-size:13px;font-family:Georgia,serif;">${greeting}</p>
           </td>
         </tr>
@@ -274,7 +301,9 @@ function buildPurchaseConfirmationHtml(p: PurchaseConfirmationPayload): string {
           <td style="padding:8px 32px 20px;">
             <p style="margin:0;color:#b8ae98;font-size:14px;line-height:1.7;font-family:Georgia,serif;">
               ${
-                mto
+                dep
+                  ? DEPOSIT_BODY
+                  : mto
                   ? `Your checkout completed and your made-to-order instrument has been ordered. Daniel
               will personally follow up regarding the creation of your instrument and the next
               steps &mdash; please watch the inbox for the email address you used at checkout.`
@@ -319,14 +348,19 @@ function buildPurchaseConfirmationHtml(p: PurchaseConfirmationPayload): string {
 
 function buildPurchaseConfirmationText(p: PurchaseConfirmationPayload): string {
   const mto = p.madeToOrder === true;
+  const dep = mto ? p.deposit : undefined;
   const lines = [
-    mto
+    dep
+      ? `DEPOSIT RECEIVED — Your instrument order has been received.`
+      : mto
       ? `ORDER CONFIRMED — Your instrument has been ordered.`
       : `ACQUISITION CONFIRMED — Your piece has been claimed.`,
     ``,
     p.customerName ? `${p.customerName},` : `Thank you.`,
     ``,
-    ...(mto
+    ...(dep
+      ? [DEPOSIT_BODY]
+      : mto
       ? [
           `Your checkout completed and your made-to-order instrument has been ordered.`,
           `Daniel will personally follow up regarding the creation of your instrument`,
@@ -341,7 +375,14 @@ function buildPurchaseConfirmationText(p: PurchaseConfirmationPayload): string {
     ``,
     `${mto ? "Instrument:       " : "Piece:            "}${p.itemName}`,
     `Category:         ${p.itemCategoryLabel}`,
-    `Amount:           ${p.amountFormatted}`,
+    ...(dep
+      ? [
+          `Full Price:       ${dep.fullPriceFormatted}`,
+          `Deposit Paid:     ${dep.paidFormatted} (50%)`,
+          `Remaining:        ${dep.balanceFormatted} (50%)`,
+          `Shipping:         Additional — due before shipment`,
+        ]
+      : [`Amount:           ${p.amountFormatted}`]),
     `Order Reference:  ${p.orderReference}`,
   ];
   if (p.shippingSummary) lines.push(`Ship To:          ${p.shippingSummary}`);
@@ -392,7 +433,9 @@ export async function sendPurchaseConfirmationEmail(
       from,
       to: payload.to,
       replyTo: PURCHASE_REPLY_TO_EMAIL,
-      subject: `Your RootFlute ${payload.madeToOrder === true ? "order" : "acquisition"} — ${payload.itemName}`,
+      subject: `Your RootFlute ${
+        payload.madeToOrder === true ? (payload.deposit ? "order (50% deposit)" : "order") : "acquisition"
+      } — ${payload.itemName}`,
       html: buildPurchaseConfirmationHtml(payload),
       text: buildPurchaseConfirmationText(payload),
     },
@@ -453,6 +496,8 @@ export interface InternalSaleNotificationPayload {
   idempotencyKey: string;
   /** A permanent made-to-order design was ordered (the design stays live). */
   madeToOrder?: boolean;
+  /** Present ONLY for a made-to-order 50% deposit order (see PurchaseConfirmationPayload.deposit). */
+  deposit?: DepositSummary;
 }
 
 const EMAIL_ADDRESS_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -488,10 +533,19 @@ function formatOrderTimestamp(iso: string): string {
 }
 
 function buildInternalSaleNotificationHtml(p: InternalSaleNotificationPayload): string {
+  const dep = p.madeToOrder === true ? p.deposit : undefined;
   const rows: [string, string][] = [
     ["Piece", esc(p.itemName)],
     ["Category", esc(p.itemCategoryLabel)],
-    ["Amount Paid", esc(p.amountFormatted)],
+    ...(dep
+      ? ([
+          ["Payment", "MADE-TO-ORDER DEPOSIT (50%)"],
+          ["Full Price", esc(dep.fullPriceFormatted)],
+          ["Deposit Paid", esc(dep.paidFormatted)],
+          ["Remaining Balance", esc(dep.balanceFormatted)],
+          ["Shipping", "Still due before shipment (not charged)"],
+        ] as [string, string][])
+      : ([["Amount Paid", esc(p.amountFormatted)]] as [string, string][])),
     ["Customer Name", esc(p.customerName || "—")],
     ["Customer Email", esc(p.customerEmail || "—")],
     ["Customer Phone", esc(p.customerPhone || "—")],
@@ -523,8 +577,8 @@ function buildInternalSaleNotificationHtml(p: InternalSaleNotificationPayload): 
         <tr>
           <td style="padding:32px 32px 20px;">
             <p style="margin:0 0 10px;color:#c8a45a;font-size:10px;text-transform:uppercase;letter-spacing:0.3em;font-family:Arial,sans-serif;">Internal &middot; Sale Notification</p>
-            <p style="margin:0;color:#e8e0d0;font-size:22px;font-weight:300;font-family:Georgia,serif;">SALE CONFIRMED</p>
-            <p style="margin:6px 0 0;color:#8a8170;font-size:13px;font-family:Georgia,serif;">${p.madeToOrder === true ? "A made-to-order Root Flute instrument has been ordered. The design remains live for future orders." : "A Root Flute piece has been acquired."}</p>
+            <p style="margin:0;color:#e8e0d0;font-size:22px;font-weight:300;font-family:Georgia,serif;">${dep ? "MADE-TO-ORDER DEPOSIT" : "SALE CONFIRMED"}</p>
+            <p style="margin:6px 0 0;color:#8a8170;font-size:13px;font-family:Georgia,serif;">${dep ? "A 50% deposit was paid on a made-to-order piece. The remaining balance and shipping must be collected before it ships. The design remains live for future orders." : p.madeToOrder === true ? "A made-to-order Root Flute instrument has been ordered. The design remains live for future orders." : "A Root Flute piece has been acquired."}</p>
           </td>
         </tr>
         <tr>
@@ -549,14 +603,25 @@ function buildInternalSaleNotificationHtml(p: InternalSaleNotificationPayload): 
 }
 
 function buildInternalSaleNotificationText(p: InternalSaleNotificationPayload): string {
+  const dep = p.madeToOrder === true ? p.deposit : undefined;
   const lines = [
-    p.madeToOrder === true
+    dep
+      ? `MADE-TO-ORDER DEPOSIT — A 50% deposit was paid on a made-to-order piece. The remaining balance and shipping must be collected before it ships. The design remains live for future orders.`
+      : p.madeToOrder === true
       ? `SALE CONFIRMED — A made-to-order Root Flute instrument has been ordered. The design remains live for future orders.`
       : `SALE CONFIRMED — A Root Flute piece has been acquired.`,
     ``,
     `Piece:              ${p.itemName}`,
     `Category:           ${p.itemCategoryLabel}`,
-    `Amount Paid:        ${p.amountFormatted}`,
+    ...(dep
+      ? [
+          `Payment:            MADE-TO-ORDER DEPOSIT (50%)`,
+          `Full Price:         ${dep.fullPriceFormatted}`,
+          `Deposit Paid:       ${dep.paidFormatted}`,
+          `Remaining Balance:  ${dep.balanceFormatted}`,
+          `Shipping:           Still due before shipment (not charged)`,
+        ]
+      : [`Amount Paid:        ${p.amountFormatted}`]),
     `Customer Name:      ${p.customerName || "—"}`,
     `Customer Email:     ${p.customerEmail || "—"}`,
     `Customer Phone:     ${p.customerPhone || "—"}`,
@@ -608,7 +673,10 @@ export async function sendInternalSaleNotificationEmail(
     {
       from,
       to: recipients,
-      subject: `Root Flute Sale — ${payload.itemName} — ${payload.amountFormatted}`,
+      subject:
+        payload.madeToOrder === true && payload.deposit
+          ? `Root Flute MADE-TO-ORDER DEPOSIT — ${payload.itemName} — ${payload.deposit.paidFormatted} of ${payload.deposit.fullPriceFormatted}`
+          : `Root Flute Sale — ${payload.itemName} — ${payload.amountFormatted}`,
       html: buildInternalSaleNotificationHtml(payload),
       text: buildInternalSaleNotificationText(payload),
     },

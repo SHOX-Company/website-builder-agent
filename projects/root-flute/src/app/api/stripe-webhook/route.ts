@@ -19,6 +19,82 @@ function formatStripeAddress(address: Stripe.Address | null | undefined): string
   return parts.length > 0 ? parts.join(", ") : null;
 }
 
+// What a made-to-order Checkout Session was for, re-derived from the
+// server-set session metadata and cross-checked before anything is captured.
+interface MadeToOrderPayment {
+  mode: "full" | "deposit";
+  configurationId: string | null;
+  configurationLabel: string | null;
+  /** Exactly what was ordered, e.g. "Triton Shell Harp - Large". */
+  displayName: string;
+  fullPriceCents: number;
+  chargeCents: number;
+  balanceCents: number;
+}
+
+function money(cents: number): string {
+  return `$${(cents / 100).toLocaleString("en-US", { minimumFractionDigits: 2 })}`;
+}
+
+// Sessions created before deposits existed carry no amount metadata: they are
+// full payments of whatever Stripe says was charged. Sessions created since
+// carry paymentMode / fullPriceCents / chargeCents; those must be internally
+// consistent (a deposit is EXACTLY half the full price, and Stripe's own
+// amount_total must equal the charge) or nothing may be captured.
+function deriveMadeToOrderPayment(
+  session: Stripe.Checkout.Session,
+  item: InventoryItem
+): { ok: true; payment: MadeToOrderPayment } | { ok: false; reason: string } {
+  const md = session.metadata ?? {};
+  const mode: "full" | "deposit" = md.paymentMode === "deposit" ? "deposit" : "full";
+  const configurationId = md.configurationId ?? null;
+  const configurationLabel = md.configurationLabel ?? null;
+  const displayName = configurationLabel ? `${item.name} - ${configurationLabel}` : item.name;
+
+  if (md.fullPriceCents === undefined && md.chargeCents === undefined) {
+    if (mode === "deposit" || typeof session.amount_total !== "number" || session.amount_total <= 0) {
+      return { ok: false, reason: "deposit/amount metadata missing" };
+    }
+    return {
+      ok: true,
+      payment: {
+        mode: "full",
+        configurationId,
+        configurationLabel,
+        displayName,
+        fullPriceCents: session.amount_total,
+        chargeCents: session.amount_total,
+        balanceCents: 0,
+      },
+    };
+  }
+
+  const fullPriceCents = Number(md.fullPriceCents);
+  const chargeCents = Number(md.chargeCents);
+  const expectedCharge = mode === "deposit" ? fullPriceCents / 2 : fullPriceCents;
+  if (
+    !Number.isInteger(fullPriceCents) ||
+    fullPriceCents <= 0 ||
+    !Number.isInteger(chargeCents) ||
+    chargeCents !== expectedCharge ||
+    session.amount_total !== chargeCents
+  ) {
+    return { ok: false, reason: "charge does not match the recorded full price / payment mode" };
+  }
+  return {
+    ok: true,
+    payment: {
+      mode,
+      configurationId,
+      configurationLabel,
+      displayName,
+      fullPriceCents,
+      chargeCents,
+      balanceCents: fullPriceCents - chargeCents,
+    },
+  };
+}
+
 // Post-sale communication. Runs ONLY after the sale is already authoritative
 // (inventory marked Sold). Two independent best-effort notifications live
 // here — the customer acquisition confirmation and the internal merchant
@@ -39,8 +115,9 @@ async function recordOrderAndNotify(
   session: Stripe.Checkout.Session,
   item: InventoryItem,
   soldAt: string,
-  opts: { verifyPersisted?: boolean } = {}
+  opts: { verifyPersisted?: boolean; payment?: MadeToOrderPayment } = {}
 ): Promise<boolean> {
+  const payment = opts.payment;
   let order;
   try {
     const shipping = session.collected_information?.shipping_details ?? null;
@@ -53,9 +130,9 @@ async function recordOrderAndNotify(
       stripeCheckoutSessionId: session.id,
       stripePaymentIntentId: paymentIntentId,
       inventoryItemId: item.id,
-      itemName: item.name,
+      itemName: payment?.displayName ?? item.name,
       itemCategory: item.category,
-      itemPrice: item.price,
+      itemPrice: payment ? payment.fullPriceCents / 100 : item.price,
       amountTotal: session.amount_total,
       currency: session.currency,
       customerEmail: session.customer_details?.email ?? null,
@@ -64,6 +141,16 @@ async function recordOrderAndNotify(
       shippingName: shipping?.name ?? null,
       shippingAddress: formatStripeAddress(shipping?.address),
       soldAt,
+      ...(payment
+        ? {
+            configurationId: payment.configurationId,
+            configurationLabel: payment.configurationLabel,
+            paymentMode: payment.mode,
+            fullPriceCents: payment.fullPriceCents,
+            balanceDueCents: payment.balanceCents,
+            shippingDueBeforeShipment: payment.mode === "deposit",
+          }
+        : {}),
     });
   } catch (err) {
     console.error(
@@ -91,6 +178,20 @@ async function recordOrderAndNotify(
       ? `$${(order.amountTotal / 100).toLocaleString("en-US", { minimumFractionDigits: 2 })}`
       : formatPrice(order.itemPrice);
   const orderReference = `RF-${session.id.slice(-8).toUpperCase()}`;
+  // Deposit wording is driven by the DURABLE order record (not the live
+  // session), so a retried delivery describes the order exactly as it was
+  // first recorded. Undefined for full payments → the certified emails.
+  const depositSummary =
+    order.paymentMode === "deposit" &&
+    typeof order.fullPriceCents === "number" &&
+    typeof order.balanceDueCents === "number" &&
+    order.amountTotal != null
+      ? {
+          fullPriceFormatted: money(order.fullPriceCents),
+          paidFormatted: money(order.amountTotal),
+          balanceFormatted: money(order.balanceDueCents),
+        }
+      : undefined;
   const shippingSummary =
     order.shippingName && order.shippingAddress
       ? `${order.shippingName}, ${order.shippingAddress}`
@@ -121,6 +222,7 @@ async function recordOrderAndNotify(
           shippingSummary,
           idempotencyKey: `rf-purchase-confirmation-${session.id}`,
           madeToOrder: isMadeToOrder(item),
+          deposit: depositSummary,
         });
 
         if (result.ok) {
@@ -160,6 +262,7 @@ async function recordOrderAndNotify(
         shippingAddress: order.shippingAddress,
         idempotencyKey: `rf-internal-sale-notification-${session.id}`,
         madeToOrder: isMadeToOrder(item),
+        deposit: depositSummary,
       });
 
       if (result.ok) {
@@ -252,6 +355,23 @@ export async function POST(req: NextRequest) {
   // a per-session Resend idempotency key. A retried or replayed event (even
   // for a session whose order already exists) therefore changes nothing.
   if (isMadeToOrder(item)) {
+    // Cross-check the server-set amounts before anything is captured. A
+    // session whose charge doesn't match its recorded full price / payment
+    // mode (a deposit that isn't exactly half, an amount Stripe didn't charge)
+    // is never captured: the authorization is released and nothing is ordered.
+    const derived = deriveMadeToOrderPayment(session, item);
+    if (!derived.ok) {
+      console.error(
+        `[webhook] made-to-order session ${session.id} rejected (${derived.reason}) — authorization released, nothing captured.`
+      );
+      try {
+        await stripe.paymentIntents.cancel(paymentIntentId);
+      } catch {
+        // Already canceled/finalized elsewhere — nothing further to do.
+      }
+      return NextResponse.json({ received: true });
+    }
+
     let paymentIntent;
     try {
       paymentIntent = await stripe.paymentIntents.retrieve(paymentIntentId);
@@ -278,11 +398,28 @@ export async function POST(req: NextRequest) {
 
     const persisted = await recordOrderAndNotify(session, item, new Date().toISOString(), {
       verifyPersisted: true,
+      payment: derived.payment,
     });
     if (!persisted) {
       // Payment is captured but the order record isn't confirmed — non-2xx
       // makes Stripe retry, which skips straight back to this write.
       return NextResponse.json({ error: "Could not record order." }, { status: 500 });
+    }
+    return NextResponse.json({ received: true });
+  }
+
+  // A deposit is only ever valid for a permanent made-to-order design. If the
+  // item stopped being one while this session was open (converted to finite,
+  // showcase, unpublished-and-reclassified…), a deposit must never flow into
+  // the finite path — that would capture half the price and mark it Sold.
+  if (session.metadata?.paymentMode === "deposit") {
+    console.error(
+      `[webhook] deposit session ${session.id} for ${item.id}, which is no longer a made-to-order design — authorization released, nothing captured.`
+    );
+    try {
+      await stripe.paymentIntents.cancel(paymentIntentId);
+    } catch {
+      // Already canceled/finalized elsewhere — nothing further to do.
     }
     return NextResponse.json({ received: true });
   }

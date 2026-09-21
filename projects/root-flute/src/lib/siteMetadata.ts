@@ -55,7 +55,7 @@ const PAGE_META = {
   },
   instruments: {
     title: "RootFlute Instruments | Sound · Ritual · Presence",
-    description: "One-of-one intentional instruments handcrafted for resonance and ritual.",
+    description: "Handcrafted, made-to-order instruments shaped for resonance and ritual.",
     ogImage: `${SITE_URL}/api/og?page=instruments`,
     ogImageAlt: "RootFlute Instruments — Sound · Ritual · Presence",
     path: "/instruments",

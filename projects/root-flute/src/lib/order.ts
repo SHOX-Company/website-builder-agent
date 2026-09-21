@@ -47,6 +47,19 @@ export interface Order {
    */
   internalNotificationSent: boolean;
   internalNotificationSentAt: string | null;
+  // Made-to-order payment context. All optional so every historical order
+  // (written before these existed) stays valid and reads as a full payment.
+  /** Selected size / configuration id and label (e.g. "large" / "Large"), if the design has sizes. */
+  configurationId?: string | null;
+  configurationLabel?: string | null;
+  /** "full" (default when absent) or "deposit" (50% upfront). */
+  paymentMode?: "full" | "deposit";
+  /** Authoritative full price of the ordered product/configuration, in cents. */
+  fullPriceCents?: number;
+  /** Remaining product balance still owed, in cents (0 for a full payment). Shipping is additional and not included. */
+  balanceDueCents?: number;
+  /** True when shipping is still owed before shipment (deposit orders). Never carries an amount. */
+  shippingDueBeforeShipment?: boolean;
 }
 
 export type OrderInput = Omit<

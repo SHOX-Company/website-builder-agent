@@ -6,6 +6,8 @@ import { isCheckoutEligible, isMadeToOrder, isShowcase, REFERENCE_PRICE_LABEL, t
 import { startCheckout } from "@/lib/checkoutClient";
 import PriceDisplay from "./PriceDisplay";
 import ItemLightbox from "./ItemLightbox";
+import MadeToOrderPurchase from "./MadeToOrderPurchase";
+import { MADE_TO_ORDER_PAYMENT_TERMS } from "@/lib/checkoutSelection";
 
 // The Flutes page shows exactly one instrument at a time ("released one at a
 // time") rather than a multi-item grid — this panel is that single-item
@@ -162,6 +164,9 @@ export default function FluteDropPanel({
                 vary. This design remains available to order.
               </p>
             )}
+            {madeToOrder && eligible && (
+              <p className="text-brand-muted/70 text-xs font-sans leading-relaxed">{MADE_TO_ORDER_PAYMENT_TERMS}</p>
+            )}
           </div>
 
           <div className="flex flex-col gap-4">
@@ -172,6 +177,10 @@ export default function FluteDropPanel({
                 <>Extremely Limited &nbsp;·&nbsp; One Available Now</>
               )}
             </span>
+            {madeToOrder && eligible ? (
+              <MadeToOrderPurchase item={item} noun="Flute" id="order-options" />
+            ) : (
+              <>
             <button
               type="button"
               onClick={handleAcquireClick}
@@ -200,6 +209,8 @@ export default function FluteDropPanel({
                 ? "Secure checkout via Stripe"
                 : <>Private acquisition inquiry &nbsp;·&nbsp; Handled personally by Daniel</>}
             </p>
+              </>
+            )}
           </div>
         </div>
       </div>
