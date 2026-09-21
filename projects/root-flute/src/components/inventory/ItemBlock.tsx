@@ -7,7 +7,7 @@ import { isCheckoutEligible, isMadeToOrder, isShowcase, REFERENCE_PRICE_LABEL, t
 import { startCheckout } from "@/lib/checkoutClient";
 import { getConfigurations } from "@/lib/checkoutSelection";
 import PriceDisplay from "./PriceDisplay";
-import ItemLightbox from "./ItemLightbox";
+import ItemLightbox, { isVideoMedia, type GalleryMedia } from "./ItemLightbox";
 import MadeToOrderPurchase from "./MadeToOrderPurchase";
 
 interface ItemBlockProps {
@@ -41,7 +41,17 @@ export default function ItemBlock({ item, noun, layout, isLast = false, priority
   const madeToOrder = isMadeToOrder(item);
   const showcaseCta =
     item.category === "jewelry" ? "Inquire About a Made-to-Order Piece →" : `Request a Made-to-Order ${noun} →`;
-  const gallery = item.featuredImage ? [item.featuredImage, ...item.additionalImages] : item.additionalImages;
+  const images = item.featuredImage ? [item.featuredImage, ...item.additionalImages] : item.additionalImages;
+  // One mixed-media gallery: any product videos come FIRST (in stored order),
+  // then the images. Each video appears here and nowhere else on the page.
+  const videos = (item.videos ?? []).filter((v) => v && typeof v.url === "string" && v.url.length > 0);
+  const gallery: GalleryMedia[] = [
+    ...videos.map((v) => ({ type: "video" as const, url: v.url, alt: v.title, poster: v.poster })),
+    ...images,
+  ];
+  const first = gallery[0];
+  // What the panel shows: a video's poster frame, or the first image itself.
+  const cover = first ? (isVideoMedia(first) ? (first.poster ? { url: first.poster, alt: first.alt } : null) : first) : null;
 
   async function handleAcquireClick() {
     if (showcase || !eligible) {
@@ -82,7 +92,13 @@ export default function ItemBlock({ item, noun, layout, isLast = false, priority
           }`}
           onClick={() => setLightbox(0)}
           role="button"
-          aria-label={item.name ? `View full image of ${item.name}` : "View full image"}
+          aria-label={
+            first && isVideoMedia(first)
+              ? `Open gallery: ${first.alt}`
+              : item.name
+              ? `View full image of ${item.name}`
+              : "View full image"
+          }
           tabIndex={0}
           onKeyDown={(e) => e.key === "Enter" && setLightbox(0)}
           style={{
@@ -94,10 +110,10 @@ export default function ItemBlock({ item, noun, layout, isLast = false, priority
             className="absolute inset-[4px] overflow-hidden bg-brand-dark"
             style={{ boxShadow: "inset 0 0 0 1px rgba(196,151,58,0.22), inset 0 0 32px rgba(0,0,0,0.5)" }}
           >
-            {gallery[0] && (
+            {cover && (
               <>
                 <Image
-                  src={gallery[0].url}
+                  src={cover.url}
                   alt=""
                   aria-hidden="true"
                   fill
@@ -116,8 +132,8 @@ export default function ItemBlock({ item, noun, layout, isLast = false, priority
                   }}
                 >
                   <Image
-                    src={gallery[0].url}
-                    alt={gallery[0].alt}
+                    src={cover.url}
+                    alt={cover.alt}
                     fill
                     unoptimized
                     priority={priority}
@@ -131,6 +147,13 @@ export default function ItemBlock({ item, noun, layout, isLast = false, priority
               aria-hidden="true"
               className="absolute inset-0 z-20 bg-gradient-to-t from-brand-dark/60 via-transparent to-transparent pointer-events-none"
             />
+            {first && isVideoMedia(first) && (
+              <div aria-hidden="true" className="absolute inset-0 z-30 flex items-center justify-center pointer-events-none">
+                <span className="flex items-center justify-center w-16 h-16 rounded-full border border-brand-gold/70 bg-black/45 text-brand-gold text-2xl pl-1 backdrop-blur-sm">
+                  ▶
+                </span>
+              </div>
+            )}
             {gallery.length > 1 && (
               <div className="absolute bottom-5 right-5 z-30 transition-opacity duration-300 opacity-35 group-hover:opacity-90">
                 <span className="text-white text-[10px] font-sans uppercase tracking-[0.35em]">View Gallery</span>

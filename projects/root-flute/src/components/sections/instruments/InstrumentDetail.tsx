@@ -3,7 +3,6 @@
 import { useState } from "react";
 import SectionWrapper from "@/components/ui/SectionWrapper";
 import ItemBlock from "@/components/inventory/ItemBlock";
-import ProductVideos from "@/components/inventory/ProductVideos";
 import InstrumentsInquiryModal from "./InstrumentsInquiryModal";
 import { inquiryContext, isMadeToOrder, type InventoryItem } from "@/lib/inventory";
 
@@ -23,7 +22,6 @@ export default function InstrumentDetail({ item }: { item: InventoryItem }) {
           priority
           onAcquire={() => setModalOpen(true)}
         />
-        {item.videos && item.videos.length > 0 && <ProductVideos videos={item.videos} />}
       </SectionWrapper>
 
       <InstrumentsInquiryModal
