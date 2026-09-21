@@ -32,8 +32,8 @@ export default function CurrentDrop({ items }: { items: InventoryItem[] }) {
           </h2>
           <p className="text-brand-muted text-base leading-relaxed max-w-2xl mx-auto">
             Each instrument is carved from ancient Woolly Mammoth tusk — preserved beneath Arctic
-            permafrost for millennia.{madeToOrder ? "" : " Released one at a time."} Each one is the
-            only one that will ever exist.
+            permafrost for millennia.
+            {madeToOrder ? "" : " Released one at a time. Each one is the only one that will ever exist."}
           </p>
           {(showcase || madeToOrder) && (
             <p className="text-brand-muted text-base leading-relaxed max-w-2xl mx-auto mt-4">

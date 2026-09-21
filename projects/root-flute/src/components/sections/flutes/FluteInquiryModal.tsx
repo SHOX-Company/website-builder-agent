@@ -161,7 +161,7 @@ export default function FluteInquiryModal({
                   {form.item}
                 </h3>
                 <p className="text-brand-muted/50 text-xs font-sans mt-2">
-                  One-of-one ancient instrument &nbsp;·&nbsp; Handled personally by Daniel
+                  Individually handcrafted ancient instrument &nbsp;·&nbsp; Handled personally by Daniel
                 </p>
               </div>
 

@@ -3,7 +3,7 @@ import SectionWrapper from "@/components/ui/SectionWrapper";
 const faqs = [
   {
     q: "Why are these instruments priced so high?",
-    a: "The materials alone are extraordinarily rare — Woolly Mammoth tusk has not been naturally replenished for 10,000 years. Combined with 20+ years of craft, weeks of hand-tuning per instrument, and the one-of-one nature of each piece, these flutes are priced in the same category as fine art. They are not purchased. They are acquired.",
+    a: "The materials alone are extraordinarily rare — Woolly Mammoth tusk has not been naturally replenished for 10,000 years. Combined with 20+ years of craft, weeks of hand-tuning per instrument, and the unique nature of each individually handcrafted piece, these flutes are priced in the same category as fine art. They are not purchased. They are acquired.",
   },
   {
     q: "What materials are used?",
