@@ -12,6 +12,7 @@ const PATCHABLE_KEYS: (keyof InventoryItemInput)[] = [
   "configurations",
   "inclusions",
   "videos",
+  "primaryMedia",
   "featured",
   "shortDescription",
   "story",
@@ -90,6 +91,9 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
   }
   if (body.inclusions !== undefined && (typeof body.inclusions !== "string" || body.inclusions.length > 300)) {
     return NextResponse.json({ error: "Inclusions must be text of at most 300 characters." }, { status: 400 });
+  }
+  if (body.primaryMedia !== undefined && body.primaryMedia !== "image" && body.primaryMedia !== "video") {
+    return NextResponse.json({ error: "Primary media must be 'image' or 'video'." }, { status: 400 });
   }
 
   const patch: Partial<InventoryItemInput> = {};

@@ -42,13 +42,15 @@ export default function ItemBlock({ item, noun, layout, isLast = false, priority
   const showcaseCta =
     item.category === "jewelry" ? "Inquire About a Made-to-Order Piece →" : `Request a Made-to-Order ${noun} →`;
   const images = item.featuredImage ? [item.featuredImage, ...item.additionalImages] : item.additionalImages;
-  // One mixed-media gallery: any product videos come FIRST (in stored order),
-  // then the images. Each video appears here and nowhere else on the page.
-  const videos = (item.videos ?? []).filter((v) => v && typeof v.url === "string" && v.url.length > 0);
-  const gallery: GalleryMedia[] = [
-    ...videos.map((v) => ({ type: "video" as const, url: v.url, alt: v.title, poster: v.poster })),
-    ...images,
-  ];
+  // One mixed-media gallery. Which group leads is explicit per item
+  // (`primaryMedia`) rather than a single hardcoded rule — absent/"video"
+  // keeps every existing videos-first record (e.g. the Shell Harp) exactly as
+  // it is; "image" leads with the photo(s) instead. Each video appears here
+  // and nowhere else on the page.
+  const videos = (item.videos ?? [])
+    .filter((v) => v && typeof v.url === "string" && v.url.length > 0)
+    .map((v) => ({ type: "video" as const, url: v.url, alt: v.title, poster: v.poster }));
+  const gallery: GalleryMedia[] = item.primaryMedia === "image" ? [...images, ...videos] : [...videos, ...images];
   const first = gallery[0];
   // What the panel shows: a video's poster frame, or the first image itself.
   const cover = first ? (isVideoMedia(first) ? (first.poster ? { url: first.poster, alt: first.alt } : null) : first) : null;

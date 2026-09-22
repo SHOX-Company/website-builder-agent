@@ -19,7 +19,7 @@ export default async function JewelryPage() {
       <HeroJewelry />
       <JewelryCollection items={items} />
       <JewelryPhilosophy />
-      <FinalCTAJewelry />
+      <FinalCTAJewelry items={items} />
       <Footer />
     </main>
   );

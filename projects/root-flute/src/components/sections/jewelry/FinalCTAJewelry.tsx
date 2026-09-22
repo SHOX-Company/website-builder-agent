@@ -2,9 +2,19 @@
 
 import { useState } from "react";
 import JewelryInquiryModal from "./JewelryInquiryModal";
+import { isCheckoutEligible, isMadeToOrder, type InventoryItem } from "@/lib/inventory";
 
-export default function FinalCTAJewelry() {
+// Whether at least one public piece physically exists and can be bought right
+// now (finite, priced, not showcase, not made-to-order). Driven purely by
+// inventory state — never by a name or id — so the closing copy below is
+// truthful today and automatically reverts once that piece sells.
+function hasDirectPurchase(items: InventoryItem[]): boolean {
+  return items.some((item) => isCheckoutEligible(item) && !isMadeToOrder(item));
+}
+
+export default function FinalCTAJewelry({ items = [] }: { items?: InventoryItem[] }) {
   const [modalOpen, setModalOpen] = useState(false);
+  const directPurchase = hasDirectPurchase(items);
 
   return (
     <>
@@ -35,7 +45,7 @@ export default function FinalCTAJewelry() {
         <div className="relative z-10 max-w-3xl mx-auto px-6 text-center flex flex-col items-center gap-10">
 
           <p className="text-brand-gold text-xs uppercase tracking-[0.3em] font-sans">
-            Three Pieces. Three Owners.
+            {directPurchase ? "One-of-One. Available Now." : "Three Pieces. Three Owners."}
           </p>
 
           <h2 className="font-display text-5xl sm:text-6xl md:text-7xl font-light text-brand-text leading-tight">
@@ -45,8 +55,9 @@ export default function FinalCTAJewelry() {
           </h2>
 
           <p className="text-brand-muted text-base sm:text-lg leading-relaxed max-w-xl">
-            There is no storefront, no cart, no checkout flow. If something here moves you,
-            begin an acquisition inquiry. Daniel reviews every request personally.
+            {directPurchase
+              ? "Available work may be acquired directly, above. Private commissions remain available through inquiry — Daniel reviews every request personally."
+              : "There is no storefront, no cart, no checkout flow. If something here moves you, begin an acquisition inquiry. Daniel reviews every request personally."}
           </p>
 
           <p className="font-display text-2xl sm:text-3xl font-light italic text-brand-gold/70">

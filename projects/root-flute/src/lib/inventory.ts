@@ -74,6 +74,15 @@ export interface InventoryItem {
   inclusions?: string;
   /** Additional playable product videos for the detail page (`video` is the autoplay hero clip). */
   videos?: InventoryVideo[];
+  /**
+   * Which media type leads the gallery (the card thumbnail and the first
+   * lightbox item) when a piece has both `videos` and images. Absent/"video"
+   * === videos first, then images (the Shell Harp pattern: every existing
+   * record with videos keeps behaving exactly as it does today). "image" ===
+   * images first, then videos — for a piece whose primary photo is a static
+   * shot rather than a video frame.
+   */
+  primaryMedia?: "image" | "video";
   featured: boolean;
   shortDescription: string;
   story: string;
