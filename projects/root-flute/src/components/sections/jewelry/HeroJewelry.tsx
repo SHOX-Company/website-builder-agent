@@ -84,7 +84,7 @@ export default function HeroJewelry() {
       {/* ═══════════════════════════════════════════════════════════
           TYPOGRAPHY
           Centered. Headline sits directly over the pendant array.
-          Body + CTA sit in the dark zone cleared by the feathers.
+          Body sits in the dark zone cleared by the feathers.
           ═══════════════════════════════════════════════════════ */}
       <div className="relative z-10 max-w-[15rem] sm:max-w-[17rem] mx-auto px-4 text-center flex flex-col items-center gap-5 sm:gap-6">
 
@@ -124,21 +124,6 @@ export default function HeroJewelry() {
           style={{ textShadow: "0 2px 20px rgba(0,0,0,1)" }}
         >
           Handcrafted, intentional adornment for those who carry the practice into their body.
-        </p>
-
-        {/* CTA — luxury text link */}
-        <a
-          href="#collection"
-          className="group mt-1 inline-block text-brand-gold/60 text-[10px] sm:text-[11px] uppercase tracking-[0.52em] font-sans transition-colors duration-300 hover:text-brand-gold/88"
-        >
-          <span className="border-b border-brand-gold/18 pb-[2px] transition-colors duration-300 group-hover:border-brand-gold/45">
-            View the Collection
-          </span>
-        </a>
-
-        {/* Micro-copy */}
-        <p className="text-white/18 text-[10px] font-sans uppercase tracking-[0.38em]">
-          Three pieces. Each made once.
         </p>
 
       </div>
