@@ -172,13 +172,43 @@ async function backupLead(payload: InquiryPayload, emailDelivered: boolean): Pro
   }
 }
 
-export async function sendInquiryEmail(payload: InquiryPayload): Promise<{ ok: boolean; reason?: string }> {
-  const timestamp = formatTimestamp();
+// Same human-readable style as the "Submitted" timestamp on a fresh inquiry
+// (see formatTimestamp, used internally below), but for an arbitrary date —
+// e.g. an existing lead's original createdAt — rather than "now". Exported so
+// a redelivery of an existing lead's notification (see
+// sendInternalInquiryNotification) can render the ORIGINAL submission time
+// instead of implying the inquiry just arrived.
+export function formatInquiryTimestamp(iso: string): string {
+  const date = new Date(iso);
+  if (Number.isNaN(date.getTime())) return iso;
+  return date.toLocaleString("en-US", {
+    timeZone: "America/New_York",
+    dateStyle: "full",
+    timeStyle: "short",
+  });
+}
+
+// ------------------------------------------------------------
+// The internal RootFlute inquiry notification — send-only, no persistence.
+//
+// This is the email half of what sendInquiryEmail (below) used to do as one
+// inseparable operation. Splitting it out means an EXISTING lead's
+// notification can be (re)delivered — e.g. after a routing fix, or if the
+// original send failed — without ever touching lead storage: no new lead, no
+// lead mutation. sendInquiryEmail composes this with backupLead for every
+// live website form, so normal submissions are completely unaffected by this
+// split. See src/app/api/studio/leads/[id]/resend-notification/route.ts for
+// the one place this is invoked independently — a Studio-authenticated
+// (never public) recovery mechanism, not a new lead-creating pathway.
+// ------------------------------------------------------------
+export async function sendInternalInquiryNotification(
+  payload: InquiryPayload,
+  options: { timestamp?: string } = {}
+): Promise<{ ok: boolean; reason?: string; id?: string }> {
+  const timestamp = options.timestamp ?? formatTimestamp();
 
   if (!process.env.RESEND_API_KEY) {
     console.error(`[inquiry] RESEND_API_KEY is not set — email NOT sent. Add it to Vercel env vars.`);
-    console.info(`[inquiry] Captured payload:`, JSON.stringify({ ...payload, timestamp }));
-    await backupLead(payload, false);
     return { ok: false, reason: "no_api_key" };
   }
 
@@ -186,15 +216,12 @@ export async function sendInquiryEmail(payload: InquiryPayload): Promise<{ ok: b
   // two internal/customer sends in this file and for the same reason: the
   // shared onboarding@resend.dev sandbox sender can only deliver to the
   // Resend account owner's own address, so it would silently drop one of the
-  // two required internal recipients rather than failing loudly. This lead is
-  // still backed up (see backupLead below) even when the email can't send.
+  // two required internal recipients rather than failing loudly.
   const from = process.env.RESEND_FROM_EMAIL;
   if (!from) {
     console.error(
       `[inquiry] RESEND_FROM_EMAIL is not set — refusing to send from the shared sandbox sender, which cannot reliably reach both required internal recipients. Configure a verified Resend domain.`
     );
-    console.info(`[inquiry] Captured payload:`, JSON.stringify({ ...payload, timestamp }));
-    await backupLead(payload, false);
     return { ok: false, reason: "no_verified_sender" };
   }
 
@@ -214,14 +241,26 @@ export async function sendInquiryEmail(payload: InquiryPayload): Promise<{ ok: b
 
   if (error) {
     console.error(`[inquiry] Resend rejected the send:`, JSON.stringify(error));
-    console.info(`[inquiry] Payload that failed:`, JSON.stringify({ ...payload, timestamp }));
-    await backupLead(payload, false);
     return { ok: false, reason: "resend_error" };
   }
 
   console.info(`[inquiry] Email sent successfully. Resend id: ${data?.id}`);
-  await backupLead(payload, true);
-  return { ok: true };
+  return { ok: true, id: data?.id };
+}
+
+// The entry point every live website form calls: persistence + notification,
+// composed. Behavior is byte-for-byte what this function did before the
+// split above — a lead is always backed up (even on send failure), exactly
+// once, using the SAME timestamp the (attempted) email rendered with.
+export async function sendInquiryEmail(payload: InquiryPayload): Promise<{ ok: boolean; reason?: string }> {
+  const timestamp = formatTimestamp();
+  const result = await sendInternalInquiryNotification(payload, { timestamp });
+
+  if (!result.ok) {
+    console.info(`[inquiry] Captured payload:`, JSON.stringify({ ...payload, timestamp }));
+  }
+  await backupLead(payload, result.ok);
+  return { ok: result.ok, reason: result.reason };
 }
 
 // ============================================================
