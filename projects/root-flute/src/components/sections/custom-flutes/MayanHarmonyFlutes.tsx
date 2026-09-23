@@ -17,12 +17,27 @@ import SectionWrapper from "@/components/ui/SectionWrapper";
 // rendered customer-facing text changed, and the existing shared URL
 // (/custom-flutes/mayan-harmony-flutes) keeps working.
 //
-// Video 1 (mayan-harmony-flutes-video-1.mp4) replaces the prior YouTube
-// embed with the approved supplied clip, self-hosted from /public the same
-// way as every other native <video> in this section (Drone Flutes, Snake
-// Flutes, Four Chamber Mayan Chord) — no Blob involved for this static
-// marketing section. Poster frame extracted directly from the video via
-// ffmpeg (no AI-generated media).
+// Video 2 (mayan-harmony-flutes-video-1.mp4, "double1") replaced the prior
+// YouTube embed with the first approved supplied clip, self-hosted from
+// /public the same way as every other native <video> in this section
+// (Drone Flutes, Snake Flutes, Four Chamber Mayan Chord) — no Blob involved
+// for this static marketing section. It is UNCHANGED and UNMOVED-IN-STORAGE
+// by the addition below; it only moved to the second position on the page.
+//
+// Video 1 (mayan-harmony-flutes-video-2.mp4, "double2", 2026-09-23) is a
+// NEW, ADDITIONAL clip placed FIRST per operator instruction — this is not
+// a replacement. The operator-supplied source
+// (~/Downloads/double2.mp4, 3840x2160, H.264/AAC already, but a
+// ~1.9GB/52.5Mbps camera-master export unsuitable for direct web delivery)
+// was transcoded to a web-appropriate 1920x1080 derivative at the same
+// H.264 High-profile/AAC/CRF23/faststart settings used for the Triple Chord
+// derivative, for consistency and file-size sanity — not for codec
+// compatibility (the source was already H.264/AAC). Duration, aspect ratio,
+// orientation, audio sync and visual content are unchanged; only
+// resolution/bitrate were reduced. The original source file in Downloads is
+// untouched. Poster frame extracted directly from the source video via
+// ffmpeg (no AI-generated media), downscaled to match the derivative's
+// resolution.
 const images = [
   "/images/custom-flutes/mayan-harmony-flutes/mayan-harmony-flute-1.jpg",
   "/images/custom-flutes/mayan-harmony-flutes/mayan-harmony-flute-2.jpg",
@@ -47,20 +62,36 @@ export default function MayanHarmonyFlutes() {
           <p className="text-brand-muted text-sm">MADE TO ORDER</p>
         </div>
 
-        {/* Video */}
-        <div className="aspect-video w-full max-w-2xl mx-auto mb-16 border border-brand-border overflow-hidden bg-black">
-          <video
-            controls
-            preload="metadata"
-            poster="/videos/custom-flutes/mayan-harmony-flutes/mayan-harmony-flutes-video-1-poster.jpg"
-            aria-label="Double Harmony flute, by RootFlute"
-            className="w-full h-full object-contain"
-          >
-            <source
-              src="/videos/custom-flutes/mayan-harmony-flutes/mayan-harmony-flutes-video-1.mp4"
-              type="video/mp4"
-            />
-          </video>
+        {/* Videos */}
+        <div className="grid sm:grid-cols-2 gap-6 max-w-3xl mx-auto mb-16">
+          <div className="aspect-video w-full border border-brand-border overflow-hidden bg-black">
+            <video
+              controls
+              preload="metadata"
+              poster="/videos/custom-flutes/mayan-harmony-flutes/mayan-harmony-flutes-video-2-poster.jpg"
+              aria-label="Double Harmony flute, by RootFlute"
+              className="w-full h-full object-contain"
+            >
+              <source
+                src="/videos/custom-flutes/mayan-harmony-flutes/mayan-harmony-flutes-video-2.mp4"
+                type="video/mp4"
+              />
+            </video>
+          </div>
+          <div className="aspect-video w-full border border-brand-border overflow-hidden bg-black">
+            <video
+              controls
+              preload="metadata"
+              poster="/videos/custom-flutes/mayan-harmony-flutes/mayan-harmony-flutes-video-1-poster.jpg"
+              aria-label="Double Harmony flute, by RootFlute"
+              className="w-full h-full object-contain"
+            >
+              <source
+                src="/videos/custom-flutes/mayan-harmony-flutes/mayan-harmony-flutes-video-1.mp4"
+                type="video/mp4"
+              />
+            </video>
+          </div>
         </div>
 
         {/* Photographs */}
