@@ -1,18 +1,35 @@
 import Image from "next/image";
 import SectionWrapper from "@/components/ui/SectionWrapper";
-import CustomFluteInquiryCTA from "./CustomFluteInquiryCTA";
+import { getPublicInventory } from "@/lib/inventoryStore";
+import { isCheckoutEligible } from "@/lib/inventory";
+import MadeToOrderPurchase from "@/components/inventory/MadeToOrderPurchase";
 
 // Content migrated verbatim from the old RootFlute site
-// (https://www.rootflute.com/4-chamber-mayan-chord) — price note and
-// "MADE TO ORDER" label are Daniel's original words, not rewritten. The
-// standalone RootFlute logo graphic present on the old page was
-// intentionally not migrated (site chrome, not Four-Chamber-Mayan-Chord
-// content — same rule established for every prior Custom Flutes section).
-// Video 1 was a self-hosted Squarespace native video; recovered from its
-// publicly-served HLS stream and stored locally as mp4 (same method as
-// Drone Flutes, see CF-3.1). Video 2 is a direct YouTube embed. The source
-// images had no legitimate individual captions (just raw filenames/empty
-// alt text), so none were invented.
+// (https://www.rootflute.com/4-chamber-mayan-chord) — "MADE TO ORDER" label
+// is Daniel's original words, not rewritten. The standalone RootFlute logo
+// graphic present on the old page was intentionally not migrated (site
+// chrome, not Four-Chamber-Mayan-Chord content — same rule established for
+// every prior Custom Flutes section). Video 1 was a self-hosted Squarespace
+// native video; recovered from its publicly-served HLS stream and stored
+// locally as mp4 (same method as Drone Flutes, see CF-3.1). Video 2 is a
+// direct YouTube embed. The source images had no legitimate individual
+// captions (just raw filenames/empty alt text), so none were invented.
+//
+// Customer-facing name completed from "Four Chamber Mayan Chord Flutes" to
+// "Four Chamber Chord Flutes" ("Mayan" removed), matching the PUBLIC NAMING
+// list in the 2026-09-23 Operation Bulletproof pricing conversion and the
+// Navbar's existing "Four Chamber Chord Flutes" label (previously a
+// display-only nav shorthand — this brings the page heading into line with
+// it, completing the same "Mayan" removal already done for Double Harmony
+// and Triple Chord in the prior task). The internal file/directory naming
+// ("four-chamber-mayan-chord") and the route slug are unchanged — only the
+// rendered customer-facing text changed, so the existing shared URL keeps
+// working. Price converted from "starting at $4,200" to Daniel's final
+// approved FIRM price of $4,500, with real made-to-order Full/50% Deposit
+// commerce enabled, reusing the EXACT same certified architecture as
+// Mammoth and Triple Chord — no new backend code. See TripleMayanChord.tsx
+// for the full explanation of the lookup-by-name /
+// `getPublicInventory("flute")[0]` safety pattern this also relies on.
 const images = [
   "/images/custom-flutes/four-chamber-mayan-chord/four-chamber-mayan-chord-1.jpg",
   "/images/custom-flutes/four-chamber-mayan-chord/four-chamber-mayan-chord-2.jpg",
@@ -24,7 +41,13 @@ const images = [
   "/images/custom-flutes/four-chamber-mayan-chord/four-chamber-mayan-chord-8.jpg",
 ];
 
-export default function FourChamberMayanChord() {
+const FOUR_CHAMBER_ITEM_NAME = "Four Chamber Chord Flutes";
+
+export default async function FourChamberMayanChord() {
+  const flutes = await getPublicInventory("flute");
+  const item = flutes.find((i) => i.name === FOUR_CHAMBER_ITEM_NAME) ?? null;
+  const eligible = item ? isCheckoutEligible(item) : false;
+
   return (
     <SectionWrapper className="bg-brand-surface-2">
       <div className="max-w-5xl mx-auto">
@@ -33,19 +56,17 @@ export default function FourChamberMayanChord() {
             Custom Flute Style
           </p>
           <h2 className="font-display text-4xl sm:text-5xl font-light text-brand-text mb-4">
-            Four Chamber Mayan Chord Flutes
+            Four Chamber Chord Flutes
           </h2>
-          <p className="text-brand-muted text-sm">starting at 4200$</p>
+          <p className="text-brand-muted text-sm">$4,500</p>
           <p className="text-brand-muted text-sm">MADE TO ORDER</p>
         </div>
 
-        {/* Acquisition inquiry (2026-09-23) — "starting at" is not yet an authorized firm
-            checkout price (no shipping/deposit terms have been published for this design),
-            so this is the existing certified inquiry pathway, not a Stripe checkout. See
-            CustomFluteInquiryCTA.tsx for the full reasoning. */}
-        <div className="flex justify-center mb-16">
-          <CustomFluteInquiryCTA design="Four Chamber Mayan Chord Flutes" />
-        </div>
+        {item && eligible && (
+          <div className="max-w-md mx-auto mb-16 border border-brand-border bg-brand-surface p-6 sm:p-8">
+            <MadeToOrderPurchase item={item} noun="Flute" id="four-chamber-order" />
+          </div>
+        )}
 
         {/* Videos */}
         <div className="grid sm:grid-cols-2 gap-6 max-w-3xl mx-auto mb-16">
@@ -79,7 +100,7 @@ export default function FourChamberMayanChord() {
             <div key={src} className="relative aspect-square border border-brand-border overflow-hidden">
               <Image
                 src={src}
-                alt="Four Chamber Mayan Chord Flute"
+                alt="Four Chamber Chord Flute"
                 fill
                 className="object-cover object-center"
                 sizes="(max-width: 640px) 50vw, 25vw"

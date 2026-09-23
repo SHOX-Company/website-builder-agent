@@ -64,11 +64,12 @@ export default function SnakeFlutes() {
           <h2 className="font-display text-4xl sm:text-5xl font-light text-brand-text mb-4">
             Snake Flutes
           </h2>
-          <p className="text-brand-muted text-sm">starting at $2,400</p>
+          <p className="text-brand-muted text-sm">Starting at $2,800</p>
           <p className="text-brand-muted text-sm">MADE TO ORDER</p>
         </div>
 
-        {/* Acquisition inquiry (2026-09-23) — "starting at" is not yet an authorized firm
+        {/* Acquisition inquiry (2026-09-23, price updated 2026-09-23 per Operation
+            Bulletproof pricing conversion) — "starting at" is not yet an authorized firm
             checkout price (no shipping/deposit terms have been published for this design),
             so this is the existing certified inquiry pathway, not a Stripe checkout. This
             LONG page (16 photographs) carries this CTA both here (upper) and again after

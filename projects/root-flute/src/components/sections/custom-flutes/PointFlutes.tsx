@@ -28,11 +28,12 @@ export default function PointFlutes() {
             Point Flutes
           </h2>
           <p className="text-brand-muted text-sm">
-            from $1,400 - price based on labor and materials used
+            Starting at $1,800 - price based on labor and materials used
           </p>
         </div>
 
-        {/* Acquisition inquiry (2026-09-23) — no firm/fixed checkout price exists for this
+        {/* Acquisition inquiry (2026-09-23, price updated 2026-09-23 per Operation
+            Bulletproof pricing conversion) — no firm/fixed checkout price exists for this
             design (price varies with labor and materials, per the copy above), so this is
             the existing certified inquiry pathway, not a Stripe checkout. See
             CustomFluteInquiryCTA.tsx for the full reasoning. */}

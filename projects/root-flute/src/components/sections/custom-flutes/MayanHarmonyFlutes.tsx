@@ -1,6 +1,8 @@
 import Image from "next/image";
 import SectionWrapper from "@/components/ui/SectionWrapper";
-import CustomFluteInquiryCTA from "./CustomFluteInquiryCTA";
+import { getPublicInventory } from "@/lib/inventoryStore";
+import { isCheckoutEligible } from "@/lib/inventory";
+import MadeToOrderPurchase from "@/components/inventory/MadeToOrderPurchase";
 
 // Content migrated verbatim from the old RootFlute site
 // (https://www.rootflute.com/mayan-harmony-flutes) — "MADE TO ORDER" label is
@@ -48,7 +50,20 @@ const images = [
   "/images/custom-flutes/mayan-harmony-flutes/mayan-harmony-flute-6.jpg",
 ];
 
-export default function MayanHarmonyFlutes() {
+// Price converted from "Starting at $2,600" to Daniel's final approved FIRM
+// price of $2,600 (same number, no longer presented as variable), with real
+// made-to-order Full/50% Deposit commerce enabled (2026-09-23 Operation
+// Bulletproof pricing + deposit commerce conversion), reusing the EXACT same
+// certified architecture as Mammoth and Triple Chord — no new backend code.
+// See TripleMayanChord.tsx for the full explanation of the lookup-by-name /
+// `getPublicInventory("flute")[0]` safety pattern this also relies on.
+const DOUBLE_HARMONY_ITEM_NAME = "Double Harmony Flutes";
+
+export default async function MayanHarmonyFlutes() {
+  const flutes = await getPublicInventory("flute");
+  const item = flutes.find((i) => i.name === DOUBLE_HARMONY_ITEM_NAME) ?? null;
+  const eligible = item ? isCheckoutEligible(item) : false;
+
   return (
     <SectionWrapper className="bg-brand-surface-2">
       <div className="max-w-5xl mx-auto">
@@ -59,17 +74,15 @@ export default function MayanHarmonyFlutes() {
           <h2 className="font-display text-4xl sm:text-5xl font-light text-brand-text mb-4">
             Double Harmony Flutes
           </h2>
-          <p className="text-brand-muted text-sm">Starting at $2,600</p>
+          <p className="text-brand-muted text-sm">$2,600</p>
           <p className="text-brand-muted text-sm">MADE TO ORDER</p>
         </div>
 
-        {/* Acquisition inquiry (2026-09-23) — "Starting at" is not yet an authorized firm
-            checkout price (no shipping/deposit terms have been published for this design),
-            so this is the existing certified inquiry pathway, not a Stripe checkout. See
-            CustomFluteInquiryCTA.tsx for the full reasoning. */}
-        <div className="flex justify-center mb-16">
-          <CustomFluteInquiryCTA design="Double Harmony Flutes" />
-        </div>
+        {item && eligible && (
+          <div className="max-w-md mx-auto mb-16 border border-brand-border bg-brand-surface p-6 sm:p-8">
+            <MadeToOrderPurchase item={item} noun="Flute" id="double-harmony-order" />
+          </div>
+        )}
 
         {/* Videos */}
         <div className="grid sm:grid-cols-2 gap-6 max-w-3xl mx-auto mb-16">

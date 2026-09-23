@@ -88,7 +88,7 @@ export default function CustomFlutesPage() {
       <ViewStyleLink slug="triple-mayan-chord-flutes" name="Triple Chord Flutes" />
 
       <FourChamberMayanChord />
-      <ViewStyleLink slug="four-chamber-mayan-chord-flutes" name="Four Chamber Mayan Chord Flutes" />
+      <ViewStyleLink slug="four-chamber-mayan-chord-flutes" name="Four Chamber Chord Flutes" />
 
       <RackFlute />
       <ViewStyleLink slug="rack-flutes" name="Rack Flutes" />

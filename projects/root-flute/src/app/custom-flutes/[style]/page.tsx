@@ -19,22 +19,22 @@ import MammothTuskFlutes from "@/components/sections/custom-flutes/MammothTuskFl
 const STYLES = {
   "bell-flutes": {
     name: "Bell Flutes",
-    price: "from $1,500 — price based on labor and materials used",
+    price: "Starting at $1,800 — price based on labor and materials used",
     Component: BellFlutes,
   },
   "point-flutes": {
     name: "Point Flutes",
-    price: "from $1,400 — price based on labor and materials used",
+    price: "Starting at $1,800 — price based on labor and materials used",
     Component: PointFlutes,
   },
   "drone-flutes": {
     name: "Drone Flutes",
-    price: "from $2,000 — price based on labor and materials used",
+    price: "$2,600",
     Component: DroneFlutes,
   },
   "mayan-harmony-flutes": {
     name: "Double Harmony Flutes",
-    price: "starting at $2,600",
+    price: "$2,600",
     Component: MayanHarmonyFlutes,
   },
   "triple-mayan-chord-flutes": {
@@ -43,18 +43,18 @@ const STYLES = {
     Component: TripleMayanChord,
   },
   "four-chamber-mayan-chord-flutes": {
-    name: "Four Chamber Mayan Chord Flutes",
-    price: "starting at $4,200",
+    name: "Four Chamber Chord Flutes",
+    price: "$4,500",
     Component: FourChamberMayanChord,
   },
   "rack-flutes": {
     name: "Rack Flutes",
-    price: "starting at $6,500",
+    price: "$7,500",
     Component: RackFlute,
   },
   "snake-flutes": {
     name: "Snake Flutes",
-    price: "starting at $2,400",
+    price: "Starting at $2,800",
     Component: SnakeFlutes,
   },
   "mammoth-tusk-flutes": {
