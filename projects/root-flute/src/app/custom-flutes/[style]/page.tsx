@@ -70,6 +70,15 @@ export function generateStaticParams() {
   return Object.keys(STYLES).map((style) => ({ style }));
 }
 
+// Forced dynamic (2026-09-23): the Triple Chord style now reads live flute
+// inventory for its made-to-order purchase panel — same reasoning /flutes
+// and /instruments/[slug] already use `force-dynamic` for. `generateStaticParams`
+// above is kept (still gives Next the known slug list for routing/notFound
+// purposes); this just means every request renders fresh instead of serving
+// a build-time snapshot, so a future Studio price edit is reflected
+// immediately, for all nine styles.
+export const dynamic = "force-dynamic";
+
 export async function generateMetadata({
   params,
 }: {

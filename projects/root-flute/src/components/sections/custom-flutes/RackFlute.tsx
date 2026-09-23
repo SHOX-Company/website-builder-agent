@@ -1,5 +1,6 @@
 import Image from "next/image";
 import SectionWrapper from "@/components/ui/SectionWrapper";
+import CustomFluteInquiryCTA from "./CustomFluteInquiryCTA";
 
 // Content migrated verbatim from the old RootFlute site
 // (https://www.rootflute.com/rack-flutes) — price note is Daniel's original
@@ -46,6 +47,16 @@ export default function RackFlute() {
           <p className="text-brand-muted text-sm">Starting at 6500$</p>
         </div>
 
+        {/* Acquisition inquiry (2026-09-23) — "Starting at" is not yet an authorized firm
+            checkout price (no shipping/deposit terms have been published for this design),
+            so this is the existing certified inquiry pathway, not a Stripe checkout. This
+            LONG page (13 photographs) carries this CTA both here (upper) and again after
+            the photo grid below (lower) — see CustomFluteInquiryCTA.tsx for the full
+            reasoning. */}
+        <div className="flex justify-center mb-16">
+          <CustomFluteInquiryCTA design="Rack Flutes" />
+        </div>
+
         {/* Videos */}
         <div className="grid sm:grid-cols-3 gap-6 max-w-4xl mx-auto mb-16">
           {videos.map((video) => (
@@ -62,7 +73,7 @@ export default function RackFlute() {
         </div>
 
         {/* Photographs */}
-        <div className="grid grid-cols-2 sm:grid-cols-3 gap-6">
+        <div className="grid grid-cols-2 sm:grid-cols-3 gap-6 mb-16">
           {images.map((src) => (
             <div key={src} className="relative aspect-square border border-brand-border overflow-hidden">
               <Image
@@ -74,6 +85,11 @@ export default function RackFlute() {
               />
             </div>
           ))}
+        </div>
+
+        {/* Lower acquisition inquiry — see the upper one above for the full reasoning. */}
+        <div className="flex justify-center">
+          <CustomFluteInquiryCTA design="Rack Flutes" />
         </div>
       </div>
     </SectionWrapper>

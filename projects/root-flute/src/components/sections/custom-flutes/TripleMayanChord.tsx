@@ -1,5 +1,8 @@
 import Image from "next/image";
 import SectionWrapper from "@/components/ui/SectionWrapper";
+import { getPublicInventory } from "@/lib/inventoryStore";
+import { isCheckoutEligible } from "@/lib/inventory";
+import MadeToOrderPurchase from "@/components/inventory/MadeToOrderPurchase";
 
 // Content migrated verbatim from the old RootFlute site
 // (https://www.rootflute.com/triple-mayan-chord-flutes) — "MADE TO ORDER"
@@ -53,7 +56,36 @@ const configurations = [
   { label: "Large", price: "$4,200", root: "D–C" },
 ];
 
-export default function TripleMayanChord() {
+// The single, authoritative name this design is looked up by in the flute
+// inventory (see TRIPLE_CHORD_ITEM below) — the same "find by name" pattern
+// already used elsewhere on this site (e.g. Instruments matches a detail
+// page to its inventory record by slugified name). Deliberately NOT a
+// hardcoded id: this component has no route param of its own to carry one,
+// and matching by this exact, unique name is simple and self-documenting.
+const TRIPLE_CHORD_ITEM_NAME = "Triple Chord Flutes";
+
+// Real made-to-order commerce (2026-09-23), reusing the EXISTING certified
+// architecture end to end — no parallel payment system. The inventory record
+// is intentionally `category: "flute"` (the only category besides
+// "instrument" that `isMadeToOrder` allows) yet never appears anywhere on
+// /flutes: that page's only two flute-aware components (CurrentDrop,
+// FinalCTAFlutes) both read exclusively `items[0]`, and Mammoth occupies that
+// slot (kept at its existing, lower `order`). This record's sole purpose is
+// to give the checkout/webhook/order/email pipeline something authoritative
+// to price against; every customer-facing word on this page still comes from
+// this component, not from any generic inventory template. A regression test
+// (test-triple-chord-commerce.mjs) asserts `getPublicInventory("flute")[0]`
+// stays the Mammoth record, guarding against this ever silently changing.
+// Configurations/inclusions were set via the existing Studio inventory PATCH
+// endpoint (already validated, already used for the Triton Shell Harp's own
+// Large/Medium sizes) — no new backend code was needed for pricing or
+// checkout. If the record is ever removed, this section still renders
+// perfectly well without a purchase panel (no crash, no broken page).
+export default async function TripleMayanChord() {
+  const flutes = await getPublicInventory("flute");
+  const item = flutes.find((i) => i.name === TRIPLE_CHORD_ITEM_NAME) ?? null;
+  const eligible = item ? isCheckoutEligible(item) : false;
+
   return (
     <SectionWrapper className="bg-brand-surface-2">
       <div className="max-w-5xl mx-auto">
@@ -77,6 +109,12 @@ export default function TripleMayanChord() {
             tooth, Ammonite, wild shed elk antler.
           </p>
         </div>
+
+        {item && eligible && (
+          <div className="max-w-md mx-auto mb-16 border border-brand-border bg-brand-surface p-6 sm:p-8">
+            <MadeToOrderPurchase item={item} noun="Flute" id="triple-chord-order" />
+          </div>
+        )}
 
         {/* Videos */}
         <div className="grid sm:grid-cols-2 gap-6 max-w-3xl mx-auto mb-16">

@@ -5,7 +5,8 @@ import { usePathname } from "next/navigation";
 
 interface NavChild {
   label: string;
-  href: string;
+  /** Absent for a pure group label with no destination of its own (e.g. "All Other Flute Designs"). */
+  href?: string;
   children?: NavChild[];
 }
 
@@ -15,16 +16,27 @@ interface NavItem {
   children?: NavChild[];
 }
 
-// The nine custom flute designs, each already a standalone, directly
-// shareable page at /custom-flutes/<slug> (see the STYLES map in
-// src/app/custom-flutes/[style]/page.tsx). Order matches that route. Every
+// "All Other Flute Designs" — the nine design choices reachable once a
+// visitor is already looking at Flutes. Mammoth appears here TOO (first,
+// pointing at the same authoritative /flutes experience as "Woolly Mammoth
+// Tusk Flutes" above it) — this is deliberate, not a mistake: both entries
+// route to the same page. The remaining eight are each a standalone,
+// directly shareable page at /custom-flutes/<slug> (see the STYLES map in
+// src/app/custom-flutes/[style]/page.tsx); order matches that route. Every
 // URL/slug is preserved as-is regardless of label wording (existing shared
 // links keep working). "Double Harmony Flutes" and "Triple Chord Flutes"
 // are the canonical customer-facing names as of 2026-09-23 and now match
 // their page headings exactly. "Four Chamber Chord Flutes" remains a
 // display-only shorthand — its page heading still reads "Four Chamber
 // Mayan Chord Flutes" (out of scope for this update).
-const CUSTOM_FLUTE_DESIGNS: NavChild[] = [
+//
+// The weaker legacy page at /custom-flutes/mammoth-tusk-flutes (price
+// upon request, no commerce) is intentionally NOT linked from here or
+// anywhere in navigation — it still exists and is still publicly
+// reachable by direct URL, just not exposed as a second, competing
+// Mammoth purchase path (2026-09-23 navigation restructure).
+const ALL_OTHER_FLUTE_DESIGNS: NavChild[] = [
+  { label: "Mammoth Tusk Flute", href: "/flutes" },
   { label: "Bell Flutes", href: "/custom-flutes/bell-flutes" },
   { label: "Point Flutes", href: "/custom-flutes/point-flutes" },
   { label: "Drone Flutes", href: "/custom-flutes/drone-flutes" },
@@ -33,7 +45,6 @@ const CUSTOM_FLUTE_DESIGNS: NavChild[] = [
   { label: "Four Chamber Chord Flutes", href: "/custom-flutes/four-chamber-mayan-chord-flutes" },
   { label: "Rack Flutes", href: "/custom-flutes/rack-flutes" },
   { label: "Snake Flutes", href: "/custom-flutes/snake-flutes" },
-  { label: "Mammoth Tusk Flute", href: "/custom-flutes/mammoth-tusk-flutes" },
 ];
 
 const NAV_ITEMS: NavItem[] = [
@@ -43,8 +54,15 @@ const NAV_ITEMS: NavItem[] = [
     label: "Flutes",
     href: "/flutes",
     children: [
-      { label: "Explore the Flutes", href: "/flutes" },
-      { label: "Custom Flute Styles", href: "/custom-flutes", children: CUSTOM_FLUTE_DESIGNS },
+      { label: "Woolly Mammoth Tusk Flutes", href: "/flutes" },
+      // No `href`: a pure group label/toggle, same as the top-level "Videos"
+      // item. /custom-flutes (the nine-design index) is deliberately no
+      // longer linked from navigation at all — the 2026-09-23 read-only
+      // audit found it fully redundant with these individual pages (same
+      // components, same content). The route, its code and its content are
+      // untouched and still publicly reachable by direct URL/bookmark/search
+      // result; it is only removed from normal navigation.
+      { label: "All Other Flute Designs", children: ALL_OTHER_FLUTE_DESIGNS },
     ],
   },
   { label: "Music", href: "/music" },
@@ -393,25 +411,18 @@ export default function Navbar() {
                     <div className="min-w-[220px] bg-brand-surface/95 backdrop-blur-md border border-brand-border shadow-2xl py-2">
                       {item.children.map((child) =>
                         child.children ? (
-                          <div key={child.href}>
-                            <a
-                              href={`${promoterPrefix}${child.href}`}
-                              role="menuitem"
-                              onClick={() => setFlutesOpen(false)}
-                              className={`block px-5 py-3 text-sm font-sans text-brand-gold transition-colors duration-150 hover:bg-brand-dark/40 ${
-                                isActive(child.href) ? "bg-brand-dark/40" : ""
-                              }`}
-                            >
-                              {child.label}
-                            </a>
+                          <div key={child.label}>
+                            {/* No `href` on this node (see ALL_OTHER_FLUTE_DESIGNS above) — the
+                                group label itself is the toggle, same pattern as the top-level
+                                "Videos" item. There is no longer a separate link row here. */}
                             <button
                               type="button"
                               role="menuitem"
                               aria-expanded={flutesDesignsOpen}
                               onClick={() => setFlutesDesignsOpen((v) => !v)}
-                              className="w-full flex items-center justify-between gap-2 pl-8 pr-5 py-3 text-sm font-sans text-brand-gold transition-colors duration-150 hover:bg-brand-dark/40"
+                              className="w-full flex items-center justify-between gap-2 px-5 py-3 text-sm font-sans text-brand-gold transition-colors duration-150 hover:bg-brand-dark/40"
                             >
-                              All Designs
+                              {child.label}
                               <svg
                                 viewBox="0 0 10 6"
                                 aria-hidden="true"
@@ -668,54 +679,58 @@ export default function Navbar() {
                     <div className="overflow-hidden">
                       <ul className="flex flex-col pb-3 pl-4">
                         {item.children.map((child) => (
-                          <li key={child.href}>
-                            <a
-                              href={`${promoterPrefix}${child.href}`}
-                              onClick={closeMobileMenu}
-                              className="block py-3 text-sm font-sans text-brand-gold transition-colors duration-150"
-                            >
-                              {child.label}
-                            </a>
+                          <li key={child.label}>
+                            {child.children ? (
+                              // No `href` on this node (see ALL_OTHER_FLUTE_DESIGNS above) —
+                              // the group label itself is the toggle; there is no separate
+                              // link row here.
+                              <button
+                                type="button"
+                                aria-expanded={mobileFlutesDesignsOpen}
+                                onClick={() => setMobileFlutesDesignsOpen((v) => !v)}
+                                className="w-full flex items-center justify-between py-3 text-sm font-sans text-brand-gold transition-colors duration-150"
+                              >
+                                {child.label}
+                                <svg
+                                  viewBox="0 0 10 6"
+                                  aria-hidden="true"
+                                  className={`w-3 h-3 transition-transform duration-200 ${mobileFlutesDesignsOpen ? "rotate-180" : ""}`}
+                                  fill="none"
+                                >
+                                  <path d="M1 1l4 4 4-4" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round" />
+                                </svg>
+                              </button>
+                            ) : (
+                              <a
+                                href={`${promoterPrefix}${child.href}`}
+                                onClick={closeMobileMenu}
+                                className="block py-3 text-sm font-sans text-brand-gold transition-colors duration-150"
+                              >
+                                {child.label}
+                              </a>
+                            )}
                             {child.children && (
-                              <>
-                                <button
-                                  type="button"
-                                  aria-expanded={mobileFlutesDesignsOpen}
-                                  onClick={() => setMobileFlutesDesignsOpen((v) => !v)}
-                                  className="w-full flex items-center justify-between py-3 pl-4 text-sm font-sans text-brand-gold transition-colors duration-150"
-                                >
-                                  All Designs
-                                  <svg
-                                    viewBox="0 0 10 6"
-                                    aria-hidden="true"
-                                    className={`w-3 h-3 transition-transform duration-200 ${mobileFlutesDesignsOpen ? "rotate-180" : ""}`}
-                                    fill="none"
-                                  >
-                                    <path d="M1 1l4 4 4-4" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round" />
-                                  </svg>
-                                </button>
-                                <div
-                                  className={`grid transition-all duration-300 ease-out ${
-                                    mobileFlutesDesignsOpen ? "grid-rows-[1fr] opacity-100" : "grid-rows-[0fr] opacity-0"
-                                  }`}
-                                >
-                                  <div className="overflow-hidden">
-                                    <ul className="flex flex-col pb-2 pl-8">
-                                      {child.children.map((design) => (
-                                        <li key={design.href}>
-                                          <a
-                                            href={`${promoterPrefix}${design.href}`}
-                                            onClick={closeMobileMenu}
-                                            className="block py-2.5 text-sm font-sans text-brand-gold transition-colors duration-150"
-                                          >
-                                            {design.label}
-                                          </a>
-                                        </li>
-                                      ))}
-                                    </ul>
-                                  </div>
+                              <div
+                                className={`grid transition-all duration-300 ease-out ${
+                                  mobileFlutesDesignsOpen ? "grid-rows-[1fr] opacity-100" : "grid-rows-[0fr] opacity-0"
+                                }`}
+                              >
+                                <div className="overflow-hidden">
+                                  <ul className="flex flex-col pb-2 pl-8">
+                                    {child.children.map((design) => (
+                                      <li key={design.href}>
+                                        <a
+                                          href={`${promoterPrefix}${design.href}`}
+                                          onClick={closeMobileMenu}
+                                          className="block py-2.5 text-sm font-sans text-brand-gold transition-colors duration-150"
+                                        >
+                                          {design.label}
+                                        </a>
+                                      </li>
+                                    ))}
+                                  </ul>
                                 </div>
-                              </>
+                              </div>
                             )}
                           </li>
                         ))}

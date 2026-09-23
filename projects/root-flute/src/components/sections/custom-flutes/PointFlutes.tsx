@@ -1,5 +1,6 @@
 import Image from "next/image";
 import SectionWrapper from "@/components/ui/SectionWrapper";
+import CustomFluteInquiryCTA from "./CustomFluteInquiryCTA";
 
 // Content migrated verbatim from the old RootFlute site
 // (https://www.rootflute.com/point-flutes) — price note and sold-piece
@@ -29,6 +30,14 @@ export default function PointFlutes() {
           <p className="text-brand-muted text-sm">
             from $1,400 - price based on labor and materials used
           </p>
+        </div>
+
+        {/* Acquisition inquiry (2026-09-23) — no firm/fixed checkout price exists for this
+            design (price varies with labor and materials, per the copy above), so this is
+            the existing certified inquiry pathway, not a Stripe checkout. See
+            CustomFluteInquiryCTA.tsx for the full reasoning. */}
+        <div className="flex justify-center mb-16">
+          <CustomFluteInquiryCTA design="Point Flutes" />
         </div>
 
         {/* Video */}

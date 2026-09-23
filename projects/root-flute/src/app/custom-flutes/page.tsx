@@ -43,6 +43,12 @@ export const metadata: Metadata = {
   alternates: { canonical: `${SITE_URL}/custom-flutes` },
 };
 
+// Forced dynamic (2026-09-23): TripleMayanChord now reads live flute
+// inventory for its made-to-order purchase panel — same reasoning /flutes
+// already uses `force-dynamic` for. Without this, a future Studio price
+// edit wouldn't reach this page until the next deploy.
+export const dynamic = "force-dynamic";
+
 export default function CustomFlutesPage() {
   return (
     <main>

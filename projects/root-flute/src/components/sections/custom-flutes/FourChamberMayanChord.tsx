@@ -1,5 +1,6 @@
 import Image from "next/image";
 import SectionWrapper from "@/components/ui/SectionWrapper";
+import CustomFluteInquiryCTA from "./CustomFluteInquiryCTA";
 
 // Content migrated verbatim from the old RootFlute site
 // (https://www.rootflute.com/4-chamber-mayan-chord) — price note and
@@ -36,6 +37,14 @@ export default function FourChamberMayanChord() {
           </h2>
           <p className="text-brand-muted text-sm">starting at 4200$</p>
           <p className="text-brand-muted text-sm">MADE TO ORDER</p>
+        </div>
+
+        {/* Acquisition inquiry (2026-09-23) — "starting at" is not yet an authorized firm
+            checkout price (no shipping/deposit terms have been published for this design),
+            so this is the existing certified inquiry pathway, not a Stripe checkout. See
+            CustomFluteInquiryCTA.tsx for the full reasoning. */}
+        <div className="flex justify-center mb-16">
+          <CustomFluteInquiryCTA design="Four Chamber Mayan Chord Flutes" />
         </div>
 
         {/* Videos */}
