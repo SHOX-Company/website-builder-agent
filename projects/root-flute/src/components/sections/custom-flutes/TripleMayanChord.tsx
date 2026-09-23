@@ -19,10 +19,26 @@ import SectionWrapper from "@/components/ui/SectionWrapper";
 // rendered customer-facing text changed, so the existing shared URL keeps
 // working.
 //
-// Video 1 (triple-mayan-chord-video-1.mp4) replaces the prior YouTube embed
-// with the approved supplied clip, self-hosted from /public the same way as
-// every other native <video> in this section — no Blob involved for this
-// static marketing section. Poster frame extracted directly from the video
+// Video 1 is the ORIGINAL video that has been on this page since it was
+// first built (commit 10cb6a0, "Add Triple Mayan Chord to Custom Flutes") —
+// RootFlute's own YouTube upload (youtube.com/watch?v=BMNqOjPdr9g, titled
+// "Triple Mayan Chord Flute", published on the @Rootflute channel). It was
+// briefly replaced outright by the 2026-09-23 name/price update; that was a
+// mistake (forensically confirmed via `git diff 10cb6a0..b15cf58` before
+// this fix — this was the section's only video slot, so the embed was
+// displaced rather than legitimately retired) and it is restored here in
+// its original first position, per the same two-video grid pattern already
+// used by Four Chamber Mayan Chord (native <video> + YouTube <iframe>,
+// side by side).
+//
+// Video 2 (triple-mayan-chord-video-1.mp4) is the newly supplied clip,
+// self-hosted from /public the same way as every other native <video> in
+// this section — no Blob involved for this static marketing section. The
+// public web copy is an H.264 (High profile) / AAC derivative transcoded
+// from the operator-supplied AV1/Opus original for broad Safari/iOS
+// compatibility; the original AV1 source is untouched in Downloads.
+// Duration, aspect ratio, sync, frame rate and content are unchanged —
+// only the codec. Poster frame extracted directly from the original video
 // via ffmpeg (no AI-generated media).
 const images = [
   "/images/custom-flutes/triple-mayan-chord/triple-mayan-chord-1.jpg",
@@ -62,20 +78,31 @@ export default function TripleMayanChord() {
           </p>
         </div>
 
-        {/* Video */}
-        <div className="aspect-video w-full max-w-2xl mx-auto mb-16 border border-brand-border overflow-hidden bg-black">
-          <video
-            controls
-            preload="metadata"
-            poster="/videos/custom-flutes/triple-mayan-chord/triple-mayan-chord-video-1-poster.jpg"
-            aria-label="Triple Chord Flutes, by RootFlute"
-            className="w-full h-full object-contain"
-          >
-            <source
-              src="/videos/custom-flutes/triple-mayan-chord/triple-mayan-chord-video-1.mp4"
-              type="video/mp4"
+        {/* Videos */}
+        <div className="grid sm:grid-cols-2 gap-6 max-w-3xl mx-auto mb-16">
+          <div className="aspect-video w-full border border-brand-border overflow-hidden bg-black">
+            <iframe
+              className="w-full h-full"
+              src="https://www.youtube.com/embed/BMNqOjPdr9g"
+              title="Triple Mayan Chord Flute"
+              allowFullScreen
+              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
             />
-          </video>
+          </div>
+          <div className="aspect-video w-full border border-brand-border overflow-hidden bg-black">
+            <video
+              controls
+              preload="metadata"
+              poster="/videos/custom-flutes/triple-mayan-chord/triple-mayan-chord-video-1-poster.jpg"
+              aria-label="Triple Chord Flutes, by RootFlute"
+              className="w-full h-full object-contain"
+            >
+              <source
+                src="/videos/custom-flutes/triple-mayan-chord/triple-mayan-chord-video-1.mp4"
+                type="video/mp4"
+              />
+            </video>
+          </div>
         </div>
 
         {/* Photographs */}
