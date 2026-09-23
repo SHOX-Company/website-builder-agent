@@ -76,10 +76,10 @@ export default function CustomFlutesPage() {
       <ViewStyleLink slug="drone-flutes" name="Drone Flutes" />
 
       <MayanHarmonyFlutes />
-      <ViewStyleLink slug="mayan-harmony-flutes" name="Mayan Harmony Flutes" />
+      <ViewStyleLink slug="mayan-harmony-flutes" name="Double Harmony Flutes" />
 
       <TripleMayanChord />
-      <ViewStyleLink slug="triple-mayan-chord-flutes" name="Triple Mayan Chord Flutes" />
+      <ViewStyleLink slug="triple-mayan-chord-flutes" name="Triple Chord Flutes" />
 
       <FourChamberMayanChord />
       <ViewStyleLink slug="four-chamber-mayan-chord-flutes" name="Four Chamber Mayan Chord Flutes" />

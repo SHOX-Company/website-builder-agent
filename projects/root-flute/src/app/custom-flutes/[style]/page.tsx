@@ -33,13 +33,13 @@ const STYLES = {
     Component: DroneFlutes,
   },
   "mayan-harmony-flutes": {
-    name: "Mayan Harmony Flutes",
-    price: "starting at $2,200",
+    name: "Double Harmony Flutes",
+    price: "starting at $2,600",
     Component: MayanHarmonyFlutes,
   },
   "triple-mayan-chord-flutes": {
-    name: "Triple Mayan Chord Flutes",
-    price: "starting at $3,300",
+    name: "Triple Chord Flutes",
+    price: "Small $3,600 (F#–E) · Large $4,200 (D–C)",
     Component: TripleMayanChord,
   },
   "four-chamber-mayan-chord-flutes": {

@@ -17,14 +17,18 @@ interface NavItem {
 
 // The nine custom flute designs, each already a standalone, directly
 // shareable page at /custom-flutes/<slug> (see the STYLES map in
-// src/app/custom-flutes/[style]/page.tsx). Order matches that route; the
-// three "Mayan …" designs are shown here WITHOUT the word "Mayan" (menu
-// display labels only — their URLs, page titles and content are unchanged).
+// src/app/custom-flutes/[style]/page.tsx). Order matches that route. Every
+// URL/slug is preserved as-is regardless of label wording (existing shared
+// links keep working). "Double Harmony Flutes" and "Triple Chord Flutes"
+// are the canonical customer-facing names as of 2026-09-23 and now match
+// their page headings exactly. "Four Chamber Chord Flutes" remains a
+// display-only shorthand — its page heading still reads "Four Chamber
+// Mayan Chord Flutes" (out of scope for this update).
 const CUSTOM_FLUTE_DESIGNS: NavChild[] = [
   { label: "Bell Flutes", href: "/custom-flutes/bell-flutes" },
   { label: "Point Flutes", href: "/custom-flutes/point-flutes" },
   { label: "Drone Flutes", href: "/custom-flutes/drone-flutes" },
-  { label: "Harmony Flutes", href: "/custom-flutes/mayan-harmony-flutes" },
+  { label: "Double Harmony Flutes", href: "/custom-flutes/mayan-harmony-flutes" },
   { label: "Triple Chord Flutes", href: "/custom-flutes/triple-mayan-chord-flutes" },
   { label: "Four Chamber Chord Flutes", href: "/custom-flutes/four-chamber-mayan-chord-flutes" },
   { label: "Rack Flutes", href: "/custom-flutes/rack-flutes" },
