@@ -22,18 +22,37 @@ import FluteInquiryModal from "@/components/sections/flutes/FluteInquiryModal";
 // Deliberately restrained language, matching the recent Mammoth cleanup
 // principle ("luxury = clarity + restraint") and avoiding generic ecommerce
 // phrasing (no "Buy Now" / "Add to Cart").
-export default function CustomFluteInquiryCTA({ design }: { design: string }) {
+//
+// `ctaLabel` and `contextLine` (2026-09-23 all-flute acquisition UX pass) are
+// optional so every pre-existing call site (Bell/Point/Drone's-inquiry-era/
+// Rack/Snake's own upper CTAs) renders byte-identical to before. They exist
+// so a page's CLOSING acquisition moment — added after its gallery/media, per
+// the "one restrained closing CTA" rule — can carry its own quiet contextual
+// line and design-specific verb ("Explore Having a Bell Flute Made →")
+// while still opening the exact same inquiry modal/endpoint; this is never a
+// second inquiry implementation, only a second entry point into the one that
+// already exists.
+export default function CustomFluteInquiryCTA({
+  design,
+  ctaLabel = "Have This Flute Made for You →",
+  contextLine,
+}: {
+  design: string;
+  ctaLabel?: string;
+  contextLine?: string;
+}) {
   const [open, setOpen] = useState(false);
 
   return (
     <>
       <div className="flex flex-col items-center gap-2">
+        {contextLine && <p className="text-brand-muted text-sm italic mb-1">{contextLine}</p>}
         <button
           type="button"
           onClick={() => setOpen(true)}
           className="inline-flex items-center justify-center font-semibold transition-colors duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-gold bg-brand-gold text-brand-dark hover:bg-brand-gold-light px-8 py-4 text-base sm:text-lg"
         >
-          Have This Flute Made for You →
+          {ctaLabel}
         </button>
         <p className="text-brand-muted/60 text-xs font-sans">
           Private acquisition inquiry &nbsp;·&nbsp; Handled personally by Daniel

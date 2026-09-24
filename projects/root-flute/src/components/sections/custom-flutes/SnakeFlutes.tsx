@@ -129,9 +129,17 @@ export default function SnakeFlutes() {
           ))}
         </div>
 
-        {/* Lower acquisition inquiry — see the upper one above for the full reasoning. */}
+        {/* Lower acquisition inquiry — see the upper one above for the full reasoning.
+            2026-09-23 all-flute acquisition UX pass: this is this page's closing
+            acquisition moment (it already sits after the full gallery), so it now
+            carries the design-specific closing copy — still the exact same
+            inquiry pathway/modal as the upper CTA, not a second form. */}
         <div className="flex justify-center">
-          <CustomFluteInquiryCTA design="Snake Flutes" />
+          <CustomFluteInquiryCTA
+            design="Snake Flutes"
+            ctaLabel="Explore Having a Snake Flute Made →"
+            contextLine="Made for you, one at a time."
+          />
         </div>
       </div>
     </SectionWrapper>

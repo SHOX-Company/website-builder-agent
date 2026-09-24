@@ -3,6 +3,7 @@ import SectionWrapper from "@/components/ui/SectionWrapper";
 import { getPublicInventory } from "@/lib/inventoryStore";
 import { isCheckoutEligible } from "@/lib/inventory";
 import MadeToOrderPurchase from "@/components/inventory/MadeToOrderPurchase";
+import ClosingOrderCTA from "./ClosingOrderCTA";
 
 // Content migrated verbatim from the old RootFlute site
 // (https://www.rootflute.com/rack-flutes) — the source page had no
@@ -25,14 +26,19 @@ import MadeToOrderPurchase from "@/components/inventory/MadeToOrderPurchase";
 // Price converted from "Starting at $6,500" to Daniel's final approved FIRM
 // price of $7,500, with real made-to-order Full/50% Deposit commerce
 // enabled, reusing the EXACT same certified architecture as Mammoth and
-// Triple Chord — no new backend code. This is a LONG page (13 photographs),
-// so per the CTA strategy it keeps both an upper and a lower purchase
-// touchpoint — the same two-full-panel pattern already certified for
-// Mammoth's own long-page /flutes layout (CurrentDrop + FinalCTAFlutes),
-// not a duplicated form fighting itself: each panel independently resolves
-// and submits against the same authoritative server-side item/price. See
-// TripleMayanChord.tsx for the full explanation of the lookup-by-name /
-// `getPublicInventory("flute")[0]` safety pattern this also relies on.
+// Triple Chord — no new backend code. See TripleMayanChord.tsx for the full
+// explanation of the lookup-by-name / `getPublicInventory("flute")[0]`
+// safety pattern this also relies on.
+//
+// UPPER/LOWER TOUCHPOINTS (updated 2026-09-23 all-flute acquisition UX
+// pass): this is a LONG page (13 photographs), so it keeps two acquisition
+// touchpoints — but only ONE of them is the actual purchase panel now. The
+// upper panel (#rack-order-upper) is the sole <MadeToOrderPurchase> instance;
+// the lower one is a restrained `<ClosingOrderCTA>` that scrolls back to it,
+// per the explicit rule that a closing CTA is navigation back to the
+// existing canonical module, never a second checkout implementation. (An
+// earlier task briefly duplicated the full panel at both positions — that
+// was superseded by this task's stricter no-duplicate-checkout rule.)
 const videos = [
   { id: "aLtf9-UbJyY", title: "Triple Drone Harmony Flute made from Elk Antler" },
   { id: "66Q-p8ssihA", title: 'Custom "triple rack flute" by RootFlute' },
@@ -113,11 +119,10 @@ export default async function RackFlute() {
           ))}
         </div>
 
-        {/* Lower purchase touchpoint — see the file header for the two-panel reasoning. */}
+        {/* Lower touchpoint — see the file header: this is now a closing CTA
+            that scrolls back to the upper panel, not a second purchase panel. */}
         {item && eligible && (
-          <div className="max-w-md mx-auto border border-brand-border bg-brand-surface p-6 sm:p-8">
-            <MadeToOrderPurchase item={item} noun="Flute" id="rack-order-lower" />
-          </div>
+          <ClosingOrderCTA cta="Order Your Rack Flute →" targetId="rack-order-upper" />
         )}
       </div>
     </SectionWrapper>

@@ -3,6 +3,24 @@
 import { useEffect, useState } from "react";
 import { usePathname } from "next/navigation";
 
+// The eight non-Mammoth Custom Flute Style acquisition routes (2026-09-23
+// Operation Bulletproof all-flute acquisition UX pass). Mammoth's own
+// authoritative page (/flutes) already suppresses this bar below via
+// `isFlutes`; the legacy /custom-flutes/mammoth-tusk-flutes page and the
+// /custom-flutes index are deliberately NOT in this list — this task named
+// only /flutes and these eight routes as acquisition pages needing a single,
+// undivided intent.
+const FLUTE_ACQUISITION_ROUTES = new Set([
+  "/custom-flutes/bell-flutes",
+  "/custom-flutes/point-flutes",
+  "/custom-flutes/drone-flutes",
+  "/custom-flutes/mayan-harmony-flutes",
+  "/custom-flutes/triple-mayan-chord-flutes",
+  "/custom-flutes/four-chamber-mayan-chord-flutes",
+  "/custom-flutes/rack-flutes",
+  "/custom-flutes/snake-flutes",
+]);
+
 export default function StickyBar() {
   const [visible, setVisible] = useState(false);
   const pathname = usePathname();
@@ -10,6 +28,7 @@ export default function StickyBar() {
   const isHome = pathname === "/";
   const isJewelry = pathname === "/jewelry";
   const isInstruments = pathname === "/instruments";
+  const isFluteAcquisition = FLUTE_ACQUISITION_ROUTES.has(pathname ?? "");
 
   useEffect(() => {
     const onScroll = () => {
@@ -19,11 +38,14 @@ export default function StickyBar() {
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
 
-  // No sticky bar on homepage, jewelry, instruments or flutes — those pages have
-  // per-item CTAs (the Flutes page renders its own sticky bar from its server-
-  // provided item, so its copy is correct on the very first server render).
-  // RootFlute Studio (/studio) is a separate private app and never shows the public CTA bar.
-  if (isHome || isJewelry || isInstruments || isFlutes || pathname.startsWith("/studio")) return null;
+  // No sticky bar on homepage, jewelry, instruments, flutes, or any of the
+  // eight Custom Flute Style acquisition pages — a visitor evaluating/ordering
+  // a flute should not simultaneously receive a competing Society-membership
+  // sales CTA. Those pages have their own per-item acquisition CTAs (the
+  // Flutes page renders its own sticky bar from its server-provided item, so
+  // its copy is correct on the very first server render). RootFlute Studio
+  // (/studio) is a separate private app and never shows the public CTA bar.
+  if (isHome || isJewelry || isInstruments || isFlutes || isFluteAcquisition || pathname.startsWith("/studio")) return null;
 
   return (
     <div

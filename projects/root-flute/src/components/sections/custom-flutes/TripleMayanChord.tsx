@@ -3,6 +3,7 @@ import SectionWrapper from "@/components/ui/SectionWrapper";
 import { getPublicInventory } from "@/lib/inventoryStore";
 import { isCheckoutEligible } from "@/lib/inventory";
 import MadeToOrderPurchase from "@/components/inventory/MadeToOrderPurchase";
+import ClosingOrderCTA from "./ClosingOrderCTA";
 
 // Content migrated verbatim from the old RootFlute site
 // (https://www.rootflute.com/triple-mayan-chord-flutes) — "MADE TO ORDER"
@@ -144,7 +145,7 @@ export default async function TripleMayanChord() {
         </div>
 
         {/* Photographs */}
-        <div className="grid grid-cols-2 sm:grid-cols-3 gap-6">
+        <div className="grid grid-cols-2 sm:grid-cols-3 gap-6 mb-16">
           {images.map((src) => (
             <div key={src} className="relative aspect-square border border-brand-border overflow-hidden">
               <Image
@@ -157,6 +158,14 @@ export default async function TripleMayanChord() {
             </div>
           ))}
         </div>
+
+        {/* Closing acquisition CTA (2026-09-23 all-flute acquisition UX pass) —
+            one restrained closing moment after the gallery, scrolling back to
+            the SAME Size/Payment panel above (#triple-chord-order) — not a
+            second checkout. */}
+        {item && eligible && (
+          <ClosingOrderCTA cta="Order Your Triple Chord Flute →" targetId="triple-chord-order" />
+        )}
       </div>
     </SectionWrapper>
   );

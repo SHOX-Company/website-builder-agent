@@ -49,7 +49,7 @@ export default function BellFlutes() {
         </div>
 
         {/* Sold pieces */}
-        <div className="grid grid-cols-2 sm:grid-cols-4 gap-6">
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-6 mb-16">
           {soldPieces.map((piece) => (
             <div key={piece.src} className="flex flex-col gap-3">
               <div className="relative aspect-square border border-brand-border overflow-hidden">
@@ -66,6 +66,13 @@ export default function BellFlutes() {
               </p>
             </div>
           ))}
+        </div>
+
+        {/* Closing acquisition CTA (2026-09-23 all-flute acquisition UX pass) —
+            one restrained closing moment after the sold-pieces gallery, routing
+            into the SAME inquiry pathway as the CTA above (not a second form). */}
+        <div className="flex justify-center">
+          <CustomFluteInquiryCTA design="Bell Flutes" ctaLabel="Explore Having a Bell Flute Made →" />
         </div>
       </div>
     </SectionWrapper>

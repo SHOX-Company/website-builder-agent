@@ -3,6 +3,7 @@ import SectionWrapper from "@/components/ui/SectionWrapper";
 import { getPublicInventory } from "@/lib/inventoryStore";
 import { isCheckoutEligible } from "@/lib/inventory";
 import MadeToOrderPurchase from "@/components/inventory/MadeToOrderPurchase";
+import ClosingOrderCTA from "./ClosingOrderCTA";
 
 // Content migrated verbatim from the old RootFlute site
 // (https://www.rootflute.com/drone-flutes) — sold-piece caption is Daniel's
@@ -76,7 +77,7 @@ export default async function DroneFlutes() {
         </div>
 
         {/* Sold pieces */}
-        <div className="grid grid-cols-2 sm:grid-cols-4 gap-6">
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-6 mb-16">
           {soldPieces.map((piece) => (
             <div key={piece.src} className="flex flex-col gap-3">
               <div className="relative aspect-square border border-brand-border overflow-hidden">
@@ -94,6 +95,13 @@ export default async function DroneFlutes() {
             </div>
           ))}
         </div>
+
+        {/* Closing acquisition CTA (2026-09-23 all-flute acquisition UX pass) —
+            one restrained closing moment after the gallery, scrolling back to
+            the SAME purchase panel above (#drone-order) — not a second checkout. */}
+        {item && eligible && (
+          <ClosingOrderCTA cta="Order Your Drone Flute →" targetId="drone-order" />
+        )}
       </div>
     </SectionWrapper>
   );
