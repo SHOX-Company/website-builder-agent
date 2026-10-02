@@ -5,11 +5,11 @@ const PATHWAYS = [
   {
     href: "/society",
     eyebrow: "Community",
-    name: "The RuteFlute Society",
+    name: "The RootFlute Society",
     description:
-      "Immersive sound journeys, conscious gathering, and guided experiences designed to reconnect you with presence, clarity, and emotional release.",
+      "Guided Sound Meditations, conscious gathering, and immersive experiences designed to reconnect you with presence, clarity, and emotional release.",
     cta: "Join the Society",
-    accent: "Founding seats · $35/month · Live twice monthly",
+    accent: "Founding seats · From $35/month · 7-day free trial",
     imageSrc: "/images/homepage-society.png",
     imageAlt: "Daniel playing handcrafted flute in an immersive sound journey",
     variant: "gold" as const,

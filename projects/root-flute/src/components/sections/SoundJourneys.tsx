@@ -65,10 +65,9 @@ export default function SoundJourneys() {
           </p>
 
           <p className="text-white font-sans text-base sm:text-lg font-normal leading-[1.85] max-w-xl mb-10">
-            Every month, Daniel leads a live sound journey for community members.
-            These are not recordings you watch at your convenience. They are moments
-            you enter — together, in real time. The flute as guide. Breath as practice.
-            Presence as the whole point.
+            Every month, Daniel releases new Guided Sound Meditations for
+            members — immersive experiences to help you return to yourself. The
+            flute as guide. Breath as practice. Presence as the whole point.
           </p>
 
           <span aria-hidden="true" className="w-16 border-t border-brand-gold/40 mb-10" />

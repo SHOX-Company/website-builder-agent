@@ -3,7 +3,7 @@ import Button from "@/components/ui/Button";
 import Image from "next/image";
 
 const stats = [
-  { value: "430k+", label: "Followers" },
+  { value: "500K+", label: "Followers" },
   { value: "20+", label: "Years of Guidance" },
   { value: "Countless", label: "Lives Touched" },
 ];
@@ -92,9 +92,10 @@ export default function Authority() {
                 becomes guidance, and community becomes part of the healing.
               </p>
               <p>
-                Every month, Daniel hosts live sound journeys and live Q&amp;A
-                sessions designed to help members reset, reconnect, and go deeper
-                into the practice.
+                Every month, Daniel releases new Guided Sound Meditations for
+                members and hosts live Q&amp;As for Premium and VIP members —
+                designed to help members reset, reconnect, and go deeper into the
+                practice.
               </p>
               <p className="font-display text-lg font-light italic text-brand-text/70">
                 This is not passive content.

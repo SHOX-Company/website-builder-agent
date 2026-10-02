@@ -29,7 +29,7 @@ export default function PrimaryCTA() {
         </Button>
 
         <p className="text-brand-muted text-xs">
-          $35/month. Cancel anytime. Founding rate locked for life.
+          Standard $35/month · Premium $60/month · VIP $135/month. 7-day free trial. Cancel anytime. Founding rate locked for life.
         </p>
 
       </div>

@@ -6,13 +6,13 @@ export default function Manifesto() {
       <div className="max-w-xl mx-auto text-center flex flex-col items-center">
 
         <p className="font-display text-2xl sm:text-3xl md:text-4xl font-light text-brand-text leading-snug">
-          This is not a lesson platform.
+          Come closer to the sound.
         </p>
 
         <span aria-hidden="true" className="block w-px h-8 bg-brand-border my-6" />
 
         <p className="font-display text-2xl sm:text-3xl md:text-4xl font-light text-brand-text leading-snug">
-          This is not a content library.
+          Go deeper into what it reveals.
         </p>
 
         <span aria-hidden="true" className="block w-px h-8 bg-brand-border my-6" />
